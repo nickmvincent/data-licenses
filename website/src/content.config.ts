@@ -23,15 +23,20 @@ const initiatives = defineCollection({
       .default([])
       .optional(),
 
-    // Single status field using simplified scale
     status: z
-      .enum(['WIP', 'usable-but-new', 'usable-with-some-evidence', 'usable-with-strong-evidence'])
+      .enum(['live', 'wip'])
       .describe('Project status'),
-    website: z.string().url().optional(),
-    spec: z.string().url().optional(),
-    sourceRepo: z.string().url().optional(),
-    pressPage: z.string().url().optional().describe('Press page for the project'),
-    linkWithEvidenceOfUse: z.string().url().optional().describe('Evidence of use'),
+    website: z.string().url().describe('Canonical website for the initiative'),
+    evidenceLinks: z
+      .array(
+        z.object({
+          label: z.string().describe('Short label describing the evidence or update'),
+          url: z.string().url().describe('Link to the announcement, docs page, news story, or other evidence'),
+          date: z.coerce.date().describe('Date associated with the evidence link'),
+        })
+      )
+      .default([])
+      .optional(),
     jurisdictions: z.array(z.string()).default([]).optional(),
     signals: z.array(z.string()).default([]).optional(),
     pipelineStages: z
@@ -40,24 +45,14 @@ const initiatives = defineCollection({
       .optional(),
     considerations: z.string().optional().describe('Risks, tradeoffs, or caveats'),
     tags: z.array(z.string()).default([]).optional(),
-    // Dependencies/relationships
     dependsOn: z
       .array(z.string())
       .default([])
       .optional()
       .describe('Slugs/ids of initiatives this depends on'),
-    lastUpdated: z.coerce.date().optional(),
-
-    // Activity metadata
-    recentActivity: z.coerce.date().optional().describe('Most recent public activity date'),
-    recentActivityNote: z.string().optional().describe('Short note/context for recent activity'),
-
-    // Adoption and impact
     usersCount: z.string().optional().describe('Approximate number of users/adopters'),
     dataVolume: z.string().optional().describe('Amount of data flowing (e.g., pages/day, tokens, GB)'),
     moneyVolume: z.string().optional().describe('Payments/revenue flowing (e.g., $/month, $ total)'),
-
-    // Implementation snippets
     implementationSnippets: z
       .array(
         z.object({
@@ -69,7 +64,6 @@ const initiatives = defineCollection({
       )
       .optional(),
 
-    // References to academic papers (citation keys from shared-references)
     references: z
       .array(z.string())
       .default([])

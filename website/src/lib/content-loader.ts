@@ -15,6 +15,60 @@ function coerceDate(value: unknown): Date | undefined {
   return isNaN(d.getTime()) ? undefined : d;
 }
 
+function normalizeStatus(value: unknown): 'live' | 'wip' {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (String(value || '').trim() === 'WIP') return 'wip';
+  if (normalized === 'wip' || normalized === 'w.i.p.' || normalized === 'wip.') return 'wip';
+  return 'live';
+}
+
+function cleanLegacyEvidenceLabel(value: unknown): string {
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!text) return 'Latest update';
+  const withoutUrl = text.replace(/\s*\(https?:\/\/[^)]+\)\s*$/, '').trim();
+  return withoutUrl || 'Latest update';
+}
+
+function extractUrl(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const match = value.match(/https?:\/\/[^\s)]+/);
+  return match ? match[0] : undefined;
+}
+
+function normalizeEvidenceLinks(data: Record<string, unknown>) {
+  const rawLinks = Array.isArray(data.evidenceLinks) ? data.evidenceLinks : [];
+  const normalized = rawLinks
+    .map((link) => {
+      if (!link || typeof link !== 'object') return null;
+      const url = typeof link.url === 'string' ? link.url : '';
+      const label = typeof link.label === 'string' ? link.label : '';
+      const date = coerceDate((link as Record<string, unknown>).date);
+      if (!url || !date) return null;
+      return { label: label || 'Evidence link', url, date };
+    })
+    .filter(Boolean) as Array<{ label: string; url: string; date: Date }>;
+
+  if (normalized.length === 0) {
+    const legacyDate = coerceDate(data.recentActivity) || coerceDate(data.lastUpdated);
+    const legacyUrl =
+      (typeof data.linkWithEvidenceOfUse === 'string' && data.linkWithEvidenceOfUse) ||
+      (typeof data.pressPage === 'string' && data.pressPage) ||
+      extractUrl(data.recentActivityNote) ||
+      (typeof data.website === 'string' && data.website) ||
+      undefined;
+
+    if (legacyDate && legacyUrl) {
+      normalized.push({
+        label: cleanLegacyEvidenceLabel(data.recentActivityNote),
+        url: legacyUrl,
+        date: legacyDate,
+      });
+    }
+  }
+
+  return normalized.sort((a, b) => b.date.getTime() - a.date.getTime());
+}
+
 async function ensureContentRoot(): Promise<string> {
   const target = resolve(DEFAULT_CONTENT_DIR);
   try {
@@ -52,14 +106,31 @@ export async function loadInitiatives() {
       .filter(Boolean);
 
     const slug = slugFromFilename(file);
+    const {
+      evidenceLinks: _rawEvidenceLinks,
+      recentActivity: _recentActivity,
+      recentActivityNote: _recentActivityNote,
+      lastUpdated: _lastUpdated,
+      pressPage: _pressPage,
+      linkWithEvidenceOfUse: _linkWithEvidenceOfUse,
+      sourceRepo: _sourceRepo,
+      spec: _spec,
+      url: _url,
+      ...rest
+    } = data || {};
+    const evidenceLinks = normalizeEvidenceLinks(data || {});
+    const latestEvidenceLink = evidenceLinks[0];
+
     items.push({
       id: data.id || slug,
       slug,
-      ...data,
+      ...rest,
       references: referenceKeys,
       referencesResolved: resolvedReferences,
-      recentActivity: coerceDate(data?.recentActivity),
-      lastUpdated: coerceDate(data?.lastUpdated),
+      status: normalizeStatus(data?.status),
+      evidenceLinks,
+      latestEvidenceLink,
+      latestUpdate: latestEvidenceLink?.date,
     });
   }
 

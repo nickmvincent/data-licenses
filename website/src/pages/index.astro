@@ -2,25 +2,64 @@
 import Layout from '../layouts/Layout.astro';
 import { formatCitation, loadInitiatives } from '../lib/content-loader';
 
-function sortByActivityThenTitle(a, b) {
-  const aHasActivity = Boolean(a.recentActivity);
-  const bHasActivity = Boolean(b.recentActivity);
-  if (aHasActivity !== bHasActivity) return aHasActivity ? -1 : 1;
+const ACTION_LABELS = {
+  'attach-preference-signal': 'Preference signal',
+  'attach-formal-license': 'Formal license',
+  'join-licensing-collective': 'Licensing collective',
+  'add-tollgate': 'Tollgate',
+  'technical-blocking': 'Technical blocking',
+  'new-infrastructures': 'New infrastructure',
+  certification: 'Certification',
+};
 
-  if (aHasActivity && bHasActivity) {
-    const aTimestamp = new Date(a.recentActivity).getTime();
-    const bTimestamp = new Date(b.recentActivity).getTime();
-    if (aTimestamp !== bTimestamp) return bTimestamp - aTimestamp;
-  }
+const PIPELINE_LABELS = {
+  collect: 'Collect',
+  train: 'Train',
+  'fine-tune': 'Fine-tune',
+  retrieve: 'Retrieve',
+  generate: 'Generate',
+};
+
+const STATUS_LABELS = {
+  live: 'Live',
+  wip: 'WIP',
+};
+
+const GOAL_OPTIONS = [
+  {
+    goal: 'signal',
+    label: 'State preferences',
+    description: 'Signals, licenses, and machine-readable permissions.',
+    actions: 'attach-preference-signal,attach-formal-license',
+  },
+  {
+    goal: 'block',
+    label: 'Reduce scraping',
+    description: 'Technical controls that block, meter, or slow crawlers.',
+    actions: 'technical-blocking',
+  },
+  {
+    goal: 'paid',
+    label: 'Get compensated',
+    description: 'Tollgates, collectives, and certification-based leverage.',
+    actions: 'add-tollgate,join-licensing-collective,certification',
+  },
+];
+
+function statusRank(status) {
+  return status === 'live' ? 0 : 1;
+}
+
+function sortByLatestThenTitle(a, b) {
+  const aLatest = a.latestUpdate ? new Date(a.latestUpdate).getTime() : 0;
+  const bLatest = b.latestUpdate ? new Date(b.latestUpdate).getTime() : 0;
+  if (aLatest !== bLatest) return bLatest - aLatest;
+
+  const rankDiff = statusRank(a.status) - statusRank(b.status);
+  if (rankDiff !== 0) return rankDiff;
 
   return a.title.localeCompare(b.title);
 }
-
-const items = (await loadInitiatives()).sort(sortByActivityThenTitle);
-
-// Lookup maps for relations
-const bySlug = Object.fromEntries(items.map((i) => [i.slug, i]));
-const byId = Object.fromEntries(items.map((i) => [i.id, i]));
 
 function formatDate(value) {
   const date = new Date(String(value));
@@ -28,398 +67,534 @@ function formatDate(value) {
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
 }
 
-const STATUS_ORDER = ['WIP', 'usable-but-new', 'usable-with-some-evidence', 'usable-with-strong-evidence'];
-const statuses = STATUS_ORDER.filter((status) => items.some((item) => item.status === status));
-const ACTION_LABELS = {
-  'attach-preference-signal': 'Attach preference signal',
-  'attach-formal-license': 'Attach formal license',
-  'join-licensing-collective': 'Join licensing collective',
-  'add-tollgate': 'Add tollgate',
-  'technical-blocking': 'Technical blocking',
-  'new-infrastructures': 'New infrastructures',
-  'certification': 'Certification',
-};
-const ACTION_DESCRIPTIONS = {
-  'attach-preference-signal': 'Express reuse preferences via machine-readable signals like robots.txt or ai.txt. Crawlers and AI agents can read these to understand permitted uses.',
-  'attach-formal-license': 'Publish structured license terms that machines can parse. Enables automated compliance checking and clear legal boundaries for data reuse.',
-  'join-licensing-collective': 'Pool rights with other creators through a collective or agency. Provides negotiating power and streamlined licensing for AI companies.',
-  'add-tollgate': 'Require payment or authentication for automated access. Monetizes bot traffic while maintaining control over who accesses your content.',
-  'technical-blocking': 'Detect and block unwanted scraping or automated access. Uses rate limiting, CAPTCHAs, or fingerprinting to enforce access policies.',
-  'new-infrastructures': 'Build new protocols or standards for data rights management. Enables end-to-end tracking of permissions across the AI pipeline.',
-  'certification': 'Verify that AI models or processes meet specific data use criteria. Provides third-party validation of ethical training practices.',
-};
-const actions = Array.from(new Set(items.flatMap((i) => i.actionsSupported || [])))
+function formatLinkLabel(url) {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, '');
+    const path = parsed.pathname.replace(/\/$/, '');
+    return path && path !== '/' ? `${host}${path}` : host;
+  } catch {
+    return url;
+  }
+}
+
+function formatActionSummary(actionsSupported) {
+  if (!Array.isArray(actionsSupported) || actionsSupported.length === 0) return 'Uncategorized';
+  return actionsSupported.map((action) => ACTION_LABELS[action] || action).join(' / ');
+}
+
+function formatPipelineSummary(pipelineStages) {
+  if (!Array.isArray(pipelineStages) || pipelineStages.length === 0) return '';
+  return `Pipeline: ${pipelineStages.map((stage) => PIPELINE_LABELS[stage] || stage).join(' -> ')}`;
+}
+
+const items = (await loadInitiatives()).sort(sortByLatestThenTitle);
+const bySlug = Object.fromEntries(items.map((item) => [item.slug, item]));
+const byId = Object.fromEntries(items.map((item) => [item.id, item]));
+
+const actions = Array.from(new Set(items.flatMap((item) => item.actionsSupported || [])))
   .sort((a, b) => (ACTION_LABELS[a] || a).localeCompare(ACTION_LABELS[b] || b));
-
-// Status labels and descriptions (used for legend and badges)
-const STATUS_LABELS = {
-  WIP: 'Work in progress',
-  'usable-but-new': 'Usable (new)',
-  'usable-with-some-evidence': 'Usable (some evidence)',
-  'usable-with-strong-evidence': 'Usable (strong evidence)',
-};
-const STATUS_DESCRIPTIONS = {
-  WIP: 'Under active development; details may change.',
-  'usable-but-new': 'Can be used today but limited or no third-party evidence.',
-  'usable-with-some-evidence': 'Usable with some independent adoption or deployments reported.',
-  'usable-with-strong-evidence': 'Usable with strong, broad evidence of adoption (none yet).',
-};
-
-// Standardized pipeline stage labels
-const PIPELINE_LABELS = {
-  collect: 'Collect/Scrape',
-  train: 'Train',
-  'fine-tune': 'Fine-tune',
-  retrieve: 'Retrieve',
-  generate: 'Generate',
-};
 ---
 
-<Layout>
+<Layout
+  title="Catalog"
+  description="A fast, catalog-first view of live and in-progress initiatives shaping AI data access, licensing, and enforcement."
+>
   <main class="wrap">
-    <header class="page-header">
-      <div class="intro box">
-        <p>
-          A community-curated index of initiatives for controlling AI data flow — licensing, <a href="/glossary#preference-signal">preference signals</a>, and <a href="/glossary#technical-control">technical enforcement</a>.
-        </p>
-        <p class="muted small">
-          Maintained by <a href="https://nickmvincent.com">Nick Vincent</a>.
-          <a href="/contributing">Contributions welcome</a>. New to these concepts? See the <a href="/glossary">Glossary</a>.
+    <header class="catalog-header">
+      <div>
+        <p class="eyebrow">Community-curated catalog</p>
+        <h1 class="catalog-title">DataLicenses.org</h1>
+        <p class="catalog-summary">
+          Live and emerging initiatives that shape AI data access, licensing, and enforcement.
+          Use the <a href="/glossary">glossary</a> for vocabulary or <a href="/contributing">contribute</a> to add a new entry.
         </p>
       </div>
     </header>
 
-    <!-- Creator Guide -->
-    <section class="creator-guide box" id="creator-guide">
-      <div class="guide-header">
-        <h2 class="guide-title">I'm a creator — what can I do?</h2>
-        <p class="guide-subtitle">Select a goal below to filter the catalog.</p>
+    <section class="catalog-toolbar box">
+      <div class="view-switch" aria-label="Catalog view">
+        <button type="button" class="view-button" data-view="spreadsheet" aria-pressed="true">Spreadsheet</button>
+        <button type="button" class="view-button" data-view="cards" aria-pressed="false">Cards</button>
       </div>
 
-      <div class="guide-flow" id="guide-flow">
-        <!-- Goal selection - always visible -->
-        <div class="guide-goals">
-          <button type="button" class="guide-option" data-goal="signal" data-actions="attach-preference-signal,attach-formal-license" aria-pressed="false">
-            <span class="option-emoji">📢</span>
-            <span class="option-text">
-              <span class="option-title">Express my preferences</span>
-              <span class="option-desc">Tell AI companies how I want my work used</span>
-            </span>
-          </button>
-          <button type="button" class="guide-option" data-goal="block" data-actions="technical-blocking" aria-pressed="false">
-            <span class="option-emoji">🛡️</span>
-            <span class="option-text">
-              <span class="option-title">Block AI scraping</span>
-              <span class="option-desc">Prevent bots from collecting my content</span>
-            </span>
-          </button>
-          <button type="button" class="guide-option" data-goal="paid" data-actions="add-tollgate,join-licensing-collective,certification" aria-pressed="false">
-            <span class="option-emoji">💰</span>
-            <span class="option-text">
-              <span class="option-title">Get compensated</span>
-              <span class="option-desc">License my work or get paid for AI use</span>
-            </span>
-          </button>
-        </div>
-        <p class="guide-hint" id="guide-hint">Click a goal to filter, click again to clear</p>
-      </div>
-    </section>
+      <details id="catalog-panel" class="catalog-panel">
+        <summary class="catalog-panel-toggle">
+          <span>Refine results</span>
+          <span id="panel-summary" class="catalog-panel-summary">All initiatives</span>
+        </summary>
 
-    <!-- Icon Legend -->
-    <details class="legend box" open>
-      <summary class="legend-toggle">Icon legend</summary>
-      <div class="legend-content">
-        <div class="legend-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <span>Website</span>
-        </div>
-        <div class="legend-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-          <span>Source code</span>
-        </div>
-        <div class="legend-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <span>Specification</span>
-        </div>
-        <div class="legend-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z"/></svg>
-          <span>Press & news</span>
-        </div>
-        <div class="legend-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <span>Evidence of adoption</span>
-        </div>
-      </div>
-    </details>
+        <div class="catalog-panel-body">
+          <div class="catalog-panel-head">
+            <p class="catalog-panel-intro">Search first, then narrow by status. Goal presets select matching actions, and you can still fine-tune them below.</p>
+            <button type="button" id="reset-filters" class="catalog-reset" hidden>Reset all</button>
+          </div>
 
-    <section class="primer box">
-      <details>
-        <summary class="primer-title">FAQ: Preference signals, licenses, technical controls, and infrastructures <span class="primer-link">(<a href="/glossary">full glossary</a>)</span></summary>
-        <div class="primer-grid">
-          <div class="primer-card">
-            <h3>What are <a href="/glossary#preference-signal">preference signals</a>?</h3>
-            <p>Machine-readable hints for AI agents/crawlers; easy to adopt, rely on compliance.</p>
-            <ul class="primer-list">
-              <li><strong>Attach preference signal</strong>: publish <a href="/glossary#robots-txt">robots.txt</a>/<a href="/glossary#ai-txt">ai.txt</a>, headers, or CC/IETF signals to express permitted AI uses.</li>
-            </ul>
+          <div class="catalog-panel-grid">
+            <div class="catalog-panel-block">
+              <label class="catalog-panel-label" for="q">Search</label>
+              <input id="q" type="search" placeholder="Search title, summary, site, or evidence" autocomplete="off" spellcheck="false" />
+            </div>
+
+            <div class="catalog-panel-block">
+              <label class="catalog-panel-label" for="sort">Sort</label>
+              <select id="sort" class="catalog-select">
+                <option value="latest">Latest update</option>
+                <option value="alpha">A to Z</option>
+                <option value="status">Status</option>
+              </select>
+            </div>
+
+            <div class="catalog-panel-block">
+              <span class="catalog-panel-label">Status</span>
+              <div class="status-switch">
+                <button type="button" class="status-button" data-status-filter="all" aria-pressed="true">All</button>
+                <button type="button" class="status-button" data-status-filter="live" aria-pressed="false">Live</button>
+                <button type="button" class="status-button" data-status-filter="wip" aria-pressed="false">WIP</button>
+              </div>
+            </div>
           </div>
-          <div class="primer-card">
-            <h3>What are licenses and collectives?</h3>
-            <p>Legal terms and institutions that define and negotiate reuse rights.</p>
-            <ul class="primer-list">
-              <li><strong>Attach formal license</strong>: machine-readable terms (e.g., <a href="/glossary#rsl-really-simple-licensing-">RSL</a>) for reuse, attribution, compensation.</li>
-              <li><strong>Join <a href="/glossary#licensing-collective">licensing collective</a></strong>: manage rights and negotiations via a collective or agency.</li>
-              <li><strong>Certification</strong>: independent verification that models/processes follow stated data-use criteria.</li>
-            </ul>
+
+          <div class="catalog-panel-block">
+            <span class="catalog-panel-label">Goal presets</span>
+            <div class="goal-switch">
+              {GOAL_OPTIONS.map((option) => (
+                <button
+                  type="button"
+                  class="goal-button"
+                  data-goal={option.goal}
+                  data-actions={option.actions}
+                  aria-pressed="false"
+                >
+                  <span class="goal-button-title">{option.label}</span>
+                  <span class="goal-button-copy">{option.description}</span>
+                </button>
+              ))}
+            </div>
           </div>
-          <div class="primer-card">
-            <h3>What are <a href="/glossary#technical-control">technical controls</a>?</h3>
-            <p>Perimeter and platform measures that block, meter, or monetize automated access.</p>
-            <ul class="primer-list">
-              <li><strong>Technical blocking</strong>: detect/limit <a href="/glossary#scraping">scraping</a> or unauthorized automated access.</li>
-              <li><strong>Add <a href="/glossary#tollgate">tollgate</a></strong>: gate or charge for automated access (e.g., AI/bots) under defined terms.</li>
-            </ul>
+
+          <div class="catalog-panel-block">
+            <span class="catalog-panel-label">Specific actions</span>
+            <div id="actions" class="catalog-action-list">
+              {actions.map((action) => (
+                <button type="button" class="catalog-action" data-action={action} aria-pressed="false">
+                  {ACTION_LABELS[action] || action}
+                </button>
+              ))}
+            </div>
           </div>
-          <div class="primer-card">
-            <h3>What are new infrastructures?</h3>
-            <p>Emerging standards, protocols, or infra that carry preference and licensing metadata across the AI <a href="/glossary#pipeline-stage">pipeline</a>.</p>
-            <ul class="primer-list">
-              <li><strong>New infrastructures</strong>: new standards/protocols that enable end-to-end data rights.</li>
-            </ul>
-          </div>
+
         </div>
       </details>
     </section>
 
-    <section class="filter-bar box">
-      {/* Primary row: Search + Quick filters */}
-      <div class="filter-row-primary">
-        <div class="search-wrap">
-          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input id="q" type="search" placeholder="Search initiatives…" />
-        </div>
-        <div class="quick-filters">
-          <button type="button" id="usable" class="filter-pill" aria-pressed="false">Usable today</button>
-          <select id="status" class="filter-select">
-            <option value="all">All statuses</option>
-            {statuses.map((s) => <option value={s}>{STATUS_LABELS[s] || s}</option>)}
-          </select>
-          <select id="sort" class="filter-select">
-            <option value="recent">Recent first</option>
-            <option value="alpha">A → Z</option>
-            <option value="usable">Most usable</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Secondary row: Action type filters as pills */}
-      <div class="filter-row-secondary">
-        <span class="filter-label">Filter by action:</span>
-        <div id="actions" class="action-pills">
-          {actions.map((a) => (
-            <button type="button" class="action-pill" data-action={a} title={ACTION_DESCRIPTIONS[a] || ''} aria-pressed="false">
-              {ACTION_LABELS[a] || a}
-            </button>
-          ))}
-        </div>
-        <button type="button" id="copylink" class="share-btn" title="Copy link to this view">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          <span>Share</span>
-        </button>
-      </div>
+    <section class="catalog-results" aria-live="polite">
+      <div class="catalog-results-count"><span id="count">{items.length}</span> initiatives</div>
+      <p id="active-filters" class="catalog-results-summary">Showing all initiatives.</p>
+      <div id="active-filter-chips" class="active-filter-chips" hidden></div>
     </section>
 
-    <section class="results-meta">
-      <span id="count">{items.length}</span> items
-    </section>
+    <div id="spreadsheet-view" class="catalog-table-wrap">
+      <table class="catalog-table">
+        <thead>
+          <tr>
+            <th>Initiative</th>
+            <th>Website</th>
+            <th>Latest update</th>
+            <th>Approach</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          {items.map((item) => {
+            const latest = item.latestEvidenceLink;
+            const actionSummary = formatActionSummary(item.actionsSupported);
+            const pipelineSummary = formatPipelineSummary(item.pipelineStages);
+            const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
+            const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
+            const hasMetrics = Boolean(item.usersCount || item.dataVolume || item.moneyVolume);
+            const hasRowDetails = (item.evidenceLinks || []).length > 1 ||
+              (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
+              hasMetrics;
 
-    <section id="cards" class="grid">
-      {items.map((i) => {
-        const hasDetails = (Array.isArray(i.dependsOn) && i.dependsOn.length > 0) ||
-          i.usersCount || i.dataVolume || i.moneyVolume ||
-          (Array.isArray(i.referencesResolved) && i.referencesResolved.length > 0) ||
-          (Array.isArray(i.implementationSnippets) && i.implementationSnippets.length > 0) ||
-          i.recentActivityNote;
-        return (
-        <article
-          class="card"
-          id={i.slug}
-          data-title={i.title.toLowerCase()}
-          data-summary={(i.summary || '').toLowerCase()}
-          data-tags={(i.tags || []).join(' ').toLowerCase()}
-          data-actions={(i.actionsSupported || []).join(' ').toLowerCase()}
-          data-status={i.status}
-          data-pipeline={(i.pipelineStages || []).join(' ').toLowerCase()}
-          data-uses={(i.dependsOn || []).join(' ').toLowerCase()}
-          data-usable={String((i.status || '') !== 'WIP')}
-          data-activity={i.recentActivity ? String(new Date(i.recentActivity).getTime()) : ''}
-        >
-          {/* Primary: Title + Status */}
-          <div class="card-header">
-            <h2 class="card-title">{i.title}</h2>
-            <span class={`badge ${i.status}`} title={STATUS_DESCRIPTIONS[i.status] || ''}>{STATUS_LABELS[i.status] || i.status}</span>
-          </div>
-
-          {/* Summary */}
-          <p class="card-summary">{i.summary}</p>
-
-          {/* Icon links row */}
-          <div class="icon-links">
-            {i.website && <a href={i.website} target="_blank" rel="noopener" title="Website" class="icon-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></a>}
-            {i.sourceRepo && <a href={i.sourceRepo} target="_blank" rel="noopener" title="Source code" class="icon-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>}
-            {i.spec && <a href={i.spec} target="_blank" rel="noopener" title="Specification" class="icon-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></a>}
-            {i.pressPage && <a href={i.pressPage} target="_blank" rel="noopener" title="Press & news" class="icon-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z"/></svg></a>}
-            {i.linkWithEvidenceOfUse && <a href={i.linkWithEvidenceOfUse} target="_blank" rel="noopener" title="Evidence of adoption" class="icon-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></a>}
-            {i.recentActivity && <span class="activity-date" title={`Last activity: ${formatDate(i.recentActivity)}`}>{formatDate(i.recentActivity)}</span>}
-          </div>
-
-          {/* Primary action chip - show type prefix for clarity */}
-          <div class="meta">
-            {(i.actionsSupported || []).slice(0, 2).map((a) => <span class="chip type-chip" title={ACTION_DESCRIPTIONS[a] || ''}><span class="chip-label">Type:</span> {ACTION_LABELS[a] || a}</span>)}
-            {(i.pipelineStages || []).length > 0 && <span class="chip muted-chip"><span class="chip-label">Stage:</span> {(i.pipelineStages || []).map(p => PIPELINE_LABELS[p] || p).join(' -> ')}</span>}
-          </div>
-
-          {/* Expandable details section */}
-          {hasDetails && (
-            <details class="card-details">
-              <summary class="details-toggle">More details</summary>
-              <div class="details-content">
-                {/* Dependencies */}
-                {(Array.isArray(i.dependsOn) && i.dependsOn.length > 0) && (
-                  <div class="detail-section">
-                    <span class="detail-label">Uses:</span>
-                    {i.dependsOn.map((d) => {
-                      const dep = bySlug[d] || byId[d];
-                      const label = (dep && dep.title) || d;
-                      const href = dep ? `#${dep.slug}` : '';
-                      return href ? (
-                        <a class="chip" href={href} title={`Jump to ${label}`}>{label}</a>
-                      ) : (
-                        <span class="chip">{label}</span>
-                      );
-                    })}
+            return (
+              <tr
+                class="catalog-row"
+                data-item={item.slug}
+                data-title={item.title.toLowerCase()}
+                data-summary={(item.summary || '').toLowerCase()}
+                data-tags={(item.tags || []).join(' ').toLowerCase()}
+                data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
+                data-status={item.status}
+                data-website={formatLinkLabel(item.website).toLowerCase()}
+                data-approach={searchableApproach}
+                data-evidence={evidenceSearchText}
+                data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
+              >
+                <td class="catalog-row-main" data-label="Initiative">
+                  <div class="catalog-row-titleline">
+                    <a class="catalog-row-title" href={item.website} target="_blank" rel="noopener">{item.title}</a>
+                    <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
                   </div>
-                )}
-
-                {/* Metrics */}
-                {(i.usersCount || i.dataVolume || i.moneyVolume) && (
-                  <div class="detail-section">
-                    {i.usersCount && <span class="chip" title="Reported users/adopters">👥 {i.usersCount}</span>}
-                    {i.dataVolume && <span class="chip" title="Reported data throughput">📊 {i.dataVolume}</span>}
-                    {i.moneyVolume && <span class="chip" title="Reported payments or revenue">💰 {i.moneyVolume}</span>}
-                  </div>
-                )}
-
-                {/* Activity note */}
-                {i.recentActivityNote && (
-                  <div class="detail-section">
-                    <p class="activity-note">{i.recentActivityNote}</p>
-                  </div>
-                )}
-
-                {/* References */}
-                {(Array.isArray(i.referencesResolved) && i.referencesResolved.length > 0) && (
-                  <div class="detail-section">
-                    <span class="detail-label">Related papers:</span>
-                    <ul class="references-list">
-                      {i.referencesResolved.map((ref) => (
-                        <li>
-                          {ref.url ? (
-                            <a href={ref.url} target="_blank" rel="noopener">{formatCitation(ref)}</a>
-                          ) : (
-                            <span>{formatCitation(ref)}</span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Implementation snippets */}
-                {Array.isArray(i.implementationSnippets) && i.implementationSnippets.length > 0 && (
-                  <div class="detail-section">
-                    <span class="detail-label">Implementation:</span>
-                    <div class="snippets-wrap">
-                      {i.implementationSnippets.map((s) => (
-                        <div class="snippet">
-                          <div class="snippet-head">
-                            <span class="chip">{s.title}</span>
-                            {s.sourceUrl && <a href={s.sourceUrl} target="_blank" rel="noopener" title="Source">Source</a>}
-                            <button type="button" class="copy" data-code={encodeURIComponent(s.code || '')}>Copy</button>
+                  <p class="catalog-row-summary">{item.summary}</p>
+                  {hasRowDetails && (
+                    <details class="catalog-row-details">
+                      <summary class="catalog-row-details-toggle">More context</summary>
+                      <div class="catalog-row-details-content">
+                        {(item.evidenceLinks || []).length > 0 && (
+                          <div class="catalog-row-detail">
+                            <span class="catalog-row-detail-label">Evidence trail</span>
+                            <ul class="catalog-row-links">
+                              {(item.evidenceLinks || []).map((link) => (
+                                <li>
+                                  <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
+                                  <span class="catalog-evidence-date">{formatDate(link.date)}</span>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                          <pre class="code"><code>{s.code}</code></pre>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                        )}
+
+                        {(Array.isArray(item.dependsOn) && item.dependsOn.length > 0) && (
+                          <div class="catalog-row-detail">
+                            <span class="catalog-row-detail-label">Uses</span>
+                            <div class="catalog-row-detail-chips">
+                              {item.dependsOn.map((dependency) => {
+                                const related = bySlug[dependency] || byId[dependency];
+                                const label = (related && related.title) || dependency;
+                                return <span class="chip">{label}</span>;
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {hasMetrics && (
+                          <div class="catalog-row-detail">
+                            <span class="catalog-row-detail-label">Signals</span>
+                            <div class="catalog-row-detail-chips">
+                              {item.usersCount && (
+                                <span class="chip metric-chip">
+                                  <span class="chip-label">Users</span>
+                                  {item.usersCount}
+                                </span>
+                              )}
+                              {item.dataVolume && (
+                                <span class="chip metric-chip">
+                                  <span class="chip-label">Data</span>
+                                  {item.dataVolume}
+                                </span>
+                              )}
+                              {item.moneyVolume && (
+                                <span class="chip metric-chip">
+                                  <span class="chip-label">Payments</span>
+                                  {item.moneyVolume}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  )}
+                </td>
+                <td class="catalog-row-site" data-label="Website">
+                  <a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a>
+                </td>
+                <td class="catalog-row-update" data-label="Latest update">
+                  {latest ? (
+                    <>
+                      <span class="catalog-row-date">{formatDate(latest.date)}</span>
+                      <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
+                    </>
+                  ) : (
+                    <span class="muted">No evidence links yet</span>
+                  )}
+                </td>
+                <td class="catalog-row-type" data-label="Approach">
+                  <span>{actionSummary}</span>
+                  {pipelineSummary && <span class="catalog-row-subtle">{pipelineSummary}</span>}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
+    <section id="cards-view" class="catalog-card-grid" hidden>
+      {items.map((item) => {
+        const latest = item.latestEvidenceLink;
+        const actionSummary = formatActionSummary(item.actionsSupported);
+        const pipelineSummary = formatPipelineSummary(item.pipelineStages);
+        const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
+        const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
+        const hasDetails = (item.evidenceLinks || []).length > 0 ||
+          (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
+          item.usersCount || item.dataVolume || item.moneyVolume ||
+          (Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) ||
+          (Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0);
+
+        return (
+          <article
+            class="catalog-card"
+            data-item={item.slug}
+            data-title={item.title.toLowerCase()}
+            data-summary={(item.summary || '').toLowerCase()}
+            data-tags={(item.tags || []).join(' ').toLowerCase()}
+            data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
+            data-status={item.status}
+            data-website={formatLinkLabel(item.website).toLowerCase()}
+            data-approach={searchableApproach}
+            data-evidence={evidenceSearchText}
+            data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
+          >
+            <div class="catalog-card-header">
+              <h2 class="catalog-card-title">
+                <a class="catalog-card-title-link" href={item.website} target="_blank" rel="noopener">{item.title}</a>
+              </h2>
+              <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
+            </div>
+
+            <p class="catalog-card-summary">{item.summary}</p>
+
+            <dl class="catalog-card-meta">
+              <div>
+                <dt>Website</dt>
+                <dd><a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a></dd>
               </div>
-            </details>
-          )}
-        </article>
-      )})}
+              <div>
+                <dt>Latest update</dt>
+                <dd>
+                  {latest ? (
+                    <>
+                      <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
+                      <span class="catalog-card-date">{formatDate(latest.date)}</span>
+                    </>
+                  ) : (
+                    <span class="muted">No evidence links yet</span>
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt>Approach</dt>
+                <dd>{actionSummary}</dd>
+              </div>
+            </dl>
+
+            {pipelineSummary && <p class="catalog-card-subtle">{pipelineSummary}</p>}
+
+            {hasDetails && (
+              <details class="card-details">
+                <summary class="details-toggle">Details</summary>
+                <div class="details-content">
+                  {(item.evidenceLinks || []).length > 0 && (
+                    <div class="detail-section detail-stack">
+                      <span class="detail-label">Evidence trail</span>
+                      <ul class="catalog-evidence-list">
+                        {(item.evidenceLinks || []).map((link) => (
+                          <li>
+                            <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
+                            <span class="catalog-evidence-date">{formatDate(link.date)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {(Array.isArray(item.dependsOn) && item.dependsOn.length > 0) && (
+                    <div class="detail-section">
+                      <span class="detail-label">Uses</span>
+                      {item.dependsOn.map((dependency) => {
+                        const related = bySlug[dependency] || byId[dependency];
+                        const label = (related && related.title) || dependency;
+                        return <span class="chip">{label}</span>;
+                      })}
+                    </div>
+                  )}
+
+                  {(item.usersCount || item.dataVolume || item.moneyVolume) && (
+                    <div class="detail-section">
+                      {item.usersCount && (
+                        <span class="chip metric-chip">
+                          <span class="chip-label">Users</span>
+                          {item.usersCount}
+                        </span>
+                      )}
+                      {item.dataVolume && (
+                        <span class="chip metric-chip">
+                          <span class="chip-label">Data</span>
+                          {item.dataVolume}
+                        </span>
+                      )}
+                      {item.moneyVolume && (
+                        <span class="chip metric-chip">
+                          <span class="chip-label">Payments</span>
+                          {item.moneyVolume}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {(Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) && (
+                    <div class="detail-section detail-stack">
+                      <span class="detail-label">Related papers</span>
+                      <ul class="references-list">
+                        {item.referencesResolved.map((reference) => (
+                          <li>
+                            {reference.url ? (
+                              <a href={reference.url} target="_blank" rel="noopener">{formatCitation(reference)}</a>
+                            ) : (
+                              <span>{formatCitation(reference)}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0 && (
+                    <div class="detail-section detail-stack">
+                      <span class="detail-label">Implementation</span>
+                      <div class="snippets-wrap">
+                        {item.implementationSnippets.map((snippet) => (
+                          <div class="snippet">
+                            <div class="snippet-head">
+                              <span class="chip">{snippet.title}</span>
+                              {snippet.sourceUrl && (
+                                <a href={snippet.sourceUrl} target="_blank" rel="noopener" title="Source">Source</a>
+                              )}
+                              <button type="button" class="copy" data-code={encodeURIComponent(snippet.code || '')}>Copy</button>
+                            </div>
+                            <pre class="code"><code>{snippet.code}</code></pre>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </details>
+            )}
+          </article>
+        );
+      })}
     </section>
 
-    <p id="empty" class="muted" hidden>No results match your filters. <button id="clear" type="button">Clear filters</button></p>
+    <p id="empty" class="catalog-empty muted" hidden>
+      No initiatives match this view. <button id="clear" type="button">Clear filters</button>
+    </p>
   </main>
 
   <script>
     (() => {
       const queryAll = (selector, root = document) => Array.from(root.querySelectorAll(selector));
       const queryOne = (selector, root = document) => root.querySelector(selector);
-      const setPressed = (el, pressed) => el.setAttribute('aria-pressed', String(pressed));
+      const setPressed = (element, pressed) => element.setAttribute('aria-pressed', String(pressed));
 
       const searchInput = queryOne('#q');
-      const statusSelect = queryOne('#status');
-      const actionsContainer = queryOne('#actions');
-      const usableToggle = queryOne('#usable');
       const sortSelect = queryOne('#sort');
+      const controlsPanel = queryOne('#catalog-panel');
+      const panelSummary = queryOne('#panel-summary');
+      const actionsContainer = queryOne('#actions');
       const countText = queryOne('#count');
+      const activeFiltersText = queryOne('#active-filters');
+      const chipsContainer = queryOne('#active-filter-chips');
+      const spreadsheetView = queryOne('#spreadsheet-view');
+      const cardsView = queryOne('#cards-view');
+      const tableBody = queryOne('#table-body');
       const emptyState = queryOne('#empty');
-      const cardsContainer = queryOne('#cards');
-      const copyLinkButton = queryOne('#copylink');
       const clearButton = queryOne('#clear');
-      const guideHint = queryOne('#guide-hint');
-      const guideButtons = queryAll('.guide-option');
+      const resetButton = queryOne('#reset-filters');
+      const viewButtons = queryAll('.view-button');
+      const goalButtons = queryAll('.goal-button');
+      const statusButtons = queryAll('.status-button');
+      const statusLabels = { live: 'Live', wip: 'WIP' };
 
       const requiredElements = [
         searchInput,
-        statusSelect,
-        actionsContainer,
-        usableToggle,
         sortSelect,
+        actionsContainer,
         countText,
+        activeFiltersText,
+        chipsContainer,
+        spreadsheetView,
+        cardsView,
+        tableBody,
         emptyState,
-        cardsContainer,
-        copyLinkButton,
+        panelSummary,
       ];
-      if (requiredElements.some((el) => !el)) return;
+
+      if (requiredElements.some((element) => !element)) return;
 
       let activeGoal = null;
+      let currentView = 'spreadsheet';
 
-      const actionPills = () => queryAll('.action-pill', actionsContainer);
-      const cards = () => queryAll('.card', cardsContainer);
+      const actionButtons = () => queryAll('.catalog-action', actionsContainer);
+      const rowNodes = () => queryAll('.catalog-row', tableBody);
+      const cardNodes = () => queryAll('.catalog-card', cardsView);
+      const cardsById = () => new Map(cardNodes().map((card) => [card.dataset.item || '', card]));
+      const getGoalButton = (goal) => goalButtons.find((button) => button.dataset.goal === goal) || null;
+      const getGoalLabel = (goal) =>
+        getGoalButton(goal)
+          ?.querySelector('.goal-button-title')
+          ?.textContent
+          ?.trim() || goal;
+      const getActionLabel = (action) =>
+        actionButtons().find((button) => button.dataset.action === action)?.textContent?.trim() || action;
+      const getSortLabel = (sortMode) =>
+        Array.from(sortSelect.options).find((option) => option.value === sortMode)?.text || sortMode;
 
       function getSelectedActions() {
-        return actionPills()
-          .filter((pill) => pill.getAttribute('aria-pressed') === 'true')
-          .map((pill) => (pill.dataset.action || '').toLowerCase())
+        return actionButtons()
+          .filter((button) => button.getAttribute('aria-pressed') === 'true')
+          .map((button) => (button.dataset.action || '').toLowerCase())
           .filter(Boolean);
       }
 
-      function clearActionPills() {
-        actionPills().forEach((pill) => setPressed(pill, false));
+      function getStatusFilter() {
+        const active = statusButtons.find((button) => button.getAttribute('aria-pressed') === 'true');
+        return active?.dataset.statusFilter || 'all';
+      }
+
+      function setStatusFilter(value) {
+        statusButtons.forEach((button) => {
+          setPressed(button, button.dataset.statusFilter === value);
+        });
+      }
+
+      function clearActionButtons() {
+        actionButtons().forEach((button) => setPressed(button, false));
+      }
+
+      function setGoalActions(goal) {
+        const goalButton = getGoalButton(goal);
+        if (!goalButton) return false;
+
+        const matchedActions = new Set(
+          (goalButton.dataset.actions || '')
+            .split(',')
+            .map((action) => action.trim())
+            .filter(Boolean)
+        );
+
+        actionButtons().forEach((actionButton) => {
+          setPressed(actionButton, matchedActions.has(actionButton.dataset.action || ''));
+        });
+
+        return true;
+      }
+
+      function setView(view) {
+        currentView = view === 'cards' ? 'cards' : 'spreadsheet';
+        viewButtons.forEach((button) => {
+          setPressed(button, button.dataset.view === currentView);
+        });
+        spreadsheetView.hidden = currentView !== 'spreadsheet';
+        cardsView.hidden = currentView !== 'cards';
       }
 
       function updateGoalButtons() {
-        guideButtons.forEach((button) => {
+        goalButtons.forEach((button) => {
           setPressed(button, button.dataset.goal === activeGoal);
         });
-
-        if (!guideHint) return;
-        guideHint.textContent = activeGoal
-          ? 'Filtering by goal. Click again to show all.'
-          : 'Click a goal to filter, click again to clear';
       }
 
       function toggleGoalFilter(button) {
@@ -428,107 +603,215 @@ const PIPELINE_LABELS = {
 
         if (activeGoal === goal) {
           activeGoal = null;
-          clearActionPills();
+          clearActionButtons();
           return;
         }
 
         activeGoal = goal;
-        const matchedActions = new Set(
-          (button.dataset.actions || '')
-            .split(',')
-            .map((action) => action.trim())
-            .filter(Boolean)
-        );
-        actionPills().forEach((pill) => {
-          setPressed(pill, matchedActions.has(pill.dataset.action || ''));
-        });
+        setGoalActions(goal);
       }
 
-      function compareCards(a, b, sortMode) {
-        const aTitle = a.dataset.title || '';
-        const bTitle = b.dataset.title || '';
+      function compareItems(a, b, sortMode) {
+        const aTitle = a.row.dataset.title || '';
+        const bTitle = b.row.dataset.title || '';
 
         if (sortMode === 'alpha') return aTitle.localeCompare(bTitle);
-        if (sortMode === 'usable') {
-          const aUsable = a.dataset.usable === 'true' ? 1 : 0;
-          const bUsable = b.dataset.usable === 'true' ? 1 : 0;
-          if (aUsable !== bUsable) return bUsable - aUsable;
+        if (sortMode === 'status') {
+          const aRank = (a.row.dataset.status || '') === 'live' ? 0 : 1;
+          const bRank = (b.row.dataset.status || '') === 'live' ? 0 : 1;
+          if (aRank !== bRank) return aRank - bRank;
           return aTitle.localeCompare(bTitle);
         }
 
-        const aActivity = Number(a.dataset.activity || 0);
-        const bActivity = Number(b.dataset.activity || 0);
-        if (aActivity !== bActivity) return bActivity - aActivity;
+        const aLatest = Number(a.row.dataset.latest || 0);
+        const bLatest = Number(b.row.dataset.latest || 0);
+        if (aLatest !== bLatest) return bLatest - aLatest;
+
+        const aRank = (a.row.dataset.status || '') === 'live' ? 0 : 1;
+        const bRank = (b.row.dataset.status || '') === 'live' ? 0 : 1;
+        if (aRank !== bRank) return aRank - bRank;
+
         return aTitle.localeCompare(bTitle);
       }
 
-      function syncUrl(rawQuery, statusValue, selectedActions, onlyUsable, sortMode) {
+      function buildActiveChips(rawQuery, statusValue, selectedActions, sortMode) {
+        const chips = [];
+
+        if (rawQuery) chips.push({ kind: 'search', label: `Search: ${rawQuery}` });
+        if (statusValue !== 'all') chips.push({ kind: 'status', value: statusValue, label: `Status: ${statusLabels[statusValue] || statusValue}` });
+        if (activeGoal) {
+          chips.push({ kind: 'goal', value: activeGoal, label: `Goal preset: ${getGoalLabel(activeGoal)}` });
+        } else {
+          selectedActions.forEach((action) => {
+            chips.push({ kind: 'action', value: action, label: `Action: ${getActionLabel(action)}` });
+          });
+        }
+        if (sortMode !== 'latest') chips.push({ kind: 'sort', value: sortMode, label: `Sort: ${getSortLabel(sortMode)}` });
+
+        return chips;
+      }
+
+      function renderActiveChips(chips) {
+        if (!chipsContainer) return;
+
+        chipsContainer.replaceChildren();
+
+        chips.forEach((chip) => {
+          const button = document.createElement('button');
+          const label = document.createElement('span');
+          const close = document.createElement('span');
+
+          button.type = 'button';
+          button.className = 'active-filter-chip';
+          button.dataset.removeKind = chip.kind;
+          if (chip.value) button.dataset.removeValue = chip.value;
+          button.setAttribute('aria-label', `Remove ${chip.label}`);
+
+          label.textContent = chip.label;
+          close.className = 'active-filter-chip-close';
+          close.textContent = '×';
+          close.setAttribute('aria-hidden', 'true');
+
+          button.append(label, close);
+          chipsContainer.append(button);
+        });
+
+        chipsContainer.hidden = chips.length === 0;
+      }
+
+      function updateSummaries(chips) {
+        activeFiltersText.textContent = chips.length > 0
+          ? 'Active selections'
+          : 'Showing all initiatives.';
+
+        panelSummary.textContent = chips.length > 0
+          ? `${chips.length} active ${chips.length === 1 ? 'selection' : 'selections'}`
+          : 'All initiatives';
+
+        if (resetButton) {
+          resetButton.hidden = chips.length === 0;
+        }
+
+        renderActiveChips(chips);
+      }
+
+      function syncUrl(rawQuery, statusValue, selectedActions, sortMode) {
         const params = new URLSearchParams();
         if (rawQuery) params.set('q', rawQuery);
-        if (statusValue && statusValue !== 'all') params.set('status', statusValue);
-        selectedActions.forEach((action) => params.append('actions', action));
-        if (onlyUsable) params.set('usable', 'true');
-        if (sortMode && sortMode !== 'recent') params.set('sort', sortMode);
+        if (statusValue !== 'all') params.set('status', statusValue);
+        if (activeGoal) {
+          params.set('goal', activeGoal);
+        } else {
+          selectedActions.forEach((action) => params.append('actions', action));
+        }
+        if (sortMode !== 'latest') params.set('sort', sortMode);
+        if (currentView !== 'spreadsheet') params.set('view', currentView);
 
-        const qs = params.toString();
-        const nextUrl = qs ? `?${qs}` : location.pathname;
+        const nextUrl = params.toString() ? `?${params.toString()}` : location.pathname;
         history.replaceState(null, '', nextUrl);
       }
 
       function applyFilters() {
         const rawQuery = (searchInput.value || '').trim();
         const query = rawQuery.toLowerCase();
-        const statusValue = statusSelect.value;
         const selectedActions = getSelectedActions();
-        const onlyUsable = usableToggle.getAttribute('aria-pressed') === 'true';
-        const sortMode = sortSelect.value || 'recent';
+        const statusValue = getStatusFilter();
+        const sortMode = sortSelect.value || 'latest';
 
-        let visibleCount = 0;
-        const visibleCards = [];
+        const cardsLookup = cardsById();
+        const items = rowNodes().map((row) => ({
+          key: row.dataset.item || '',
+          row,
+          card: cardsLookup.get(row.dataset.item || ''),
+        }));
 
-        cards().forEach((card) => {
+        const visibleItems = [];
+
+        items.forEach((item) => {
           let matches = true;
 
           if (query) {
-            const searchable = `${card.dataset.title || ''} ${card.dataset.summary || ''} ${card.dataset.tags || ''}`;
+            const searchable = `${item.row.dataset.title || ''} ${item.row.dataset.summary || ''} ${item.row.dataset.tags || ''} ${item.row.dataset.website || ''} ${item.row.dataset.approach || ''} ${item.row.dataset.evidence || ''}`;
             matches = searchable.includes(query);
           }
 
-          if (matches && statusValue !== 'all') matches = card.dataset.status === statusValue;
-          if (matches && selectedActions.length > 0) {
-            const cardActions = (card.dataset.actions || '').split(' ').filter(Boolean);
-            matches = selectedActions.some((action) => cardActions.includes(action));
+          if (matches && statusValue !== 'all') {
+            matches = item.row.dataset.status === statusValue;
           }
-          if (matches && onlyUsable) matches = card.dataset.usable === 'true';
 
-          card.hidden = !matches;
-          if (!matches) return;
+          if (matches && selectedActions.length > 0) {
+            const itemActions = (item.row.dataset.actions || '').split(' ').filter(Boolean);
+            matches = selectedActions.some((action) => itemActions.includes(action));
+          }
 
-          visibleCount += 1;
-          visibleCards.push(card);
+          item.row.hidden = !matches;
+          if (item.card) item.card.hidden = !matches || currentView !== 'cards';
+          if (matches) visibleItems.push(item);
         });
 
-        countText.textContent = String(visibleCount);
-        emptyState.hidden = visibleCount !== 0;
+        visibleItems.sort((a, b) => compareItems(a, b, sortMode));
+        visibleItems.forEach((item) => {
+          tableBody.appendChild(item.row);
+          if (item.card) cardsView.appendChild(item.card);
+        });
 
-        visibleCards.sort((a, b) => compareCards(a, b, sortMode));
-        visibleCards.forEach((card) => cardsContainer.appendChild(card));
+        countText.textContent = String(visibleItems.length);
+        emptyState.hidden = visibleItems.length !== 0;
 
-        syncUrl(rawQuery, statusValue, selectedActions, onlyUsable, sortMode);
+        const chips = buildActiveChips(rawQuery, statusValue, selectedActions, sortMode);
+        updateSummaries(chips);
+        syncUrl(rawQuery, statusValue, selectedActions, sortMode);
       }
 
       function clearFilters() {
         searchInput.value = '';
-        statusSelect.value = 'all';
-        clearActionPills();
-        setPressed(usableToggle, false);
-        sortSelect.value = 'recent';
+        sortSelect.value = 'latest';
+        setStatusFilter('all');
+        clearActionButtons();
         activeGoal = null;
         updateGoalButtons();
         applyFilters();
       }
 
-      guideButtons.forEach((button) => {
+      function initializeFromUrl() {
+        const params = new URLSearchParams(location.search);
+        const queryValue = params.get('q');
+        const statusValue = params.get('status');
+        const goalValue = params.get('goal');
+        const sortValue = params.get('sort');
+        const viewValue = params.get('view');
+        const preselectedActions = new Set(params.getAll('actions'));
+
+        if (queryValue) searchInput.value = queryValue;
+        if (statusValue && ['all', 'live', 'wip'].includes(statusValue)) setStatusFilter(statusValue);
+        if (sortValue && Array.from(sortSelect.options).some((option) => option.value === sortValue)) {
+          sortSelect.value = sortValue;
+        }
+        if (goalValue && setGoalActions(goalValue)) {
+          activeGoal = goalValue;
+        } else if (preselectedActions.size > 0) {
+          actionButtons().forEach((button) => {
+            setPressed(button, preselectedActions.has(button.dataset.action || ''));
+          });
+        }
+        if (viewValue === 'cards') setView('cards');
+
+        const hasStatusFilter = statusValue && statusValue !== 'all';
+        const hasSortOverride = sortValue && sortValue !== 'latest';
+
+        if (controlsPanel && (queryValue || hasStatusFilter || hasSortOverride || goalValue || preselectedActions.size > 0)) {
+          controlsPanel.open = true;
+        }
+      }
+
+      viewButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          setView(button.dataset.view || 'spreadsheet');
+          applyFilters();
+        });
+      });
+
+      goalButtons.forEach((button) => {
         button.addEventListener('click', () => {
           toggleGoalFilter(button);
           updateGoalButtons();
@@ -536,49 +819,62 @@ const PIPELINE_LABELS = {
         });
       });
 
-      searchInput.addEventListener('input', applyFilters);
-      statusSelect.addEventListener('change', applyFilters);
-      sortSelect.addEventListener('change', applyFilters);
+      statusButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          setStatusFilter(button.dataset.statusFilter || 'all');
+          applyFilters();
+        });
+      });
 
       actionsContainer.addEventListener('click', (event) => {
         const target = event.target;
         if (!(target instanceof Element)) return;
 
-        const pill = target.closest('.action-pill');
-        if (!(pill instanceof HTMLElement)) return;
+        const actionButton = target.closest('.catalog-action');
+        if (!(actionButton instanceof HTMLElement)) return;
 
-        const pressed = pill.getAttribute('aria-pressed') === 'true';
-        setPressed(pill, !pressed);
+        const nextPressed = actionButton.getAttribute('aria-pressed') !== 'true';
+        setPressed(actionButton, nextPressed);
         activeGoal = null;
         updateGoalButtons();
         applyFilters();
       });
 
-      usableToggle.addEventListener('click', () => {
-        const nextPressed = usableToggle.getAttribute('aria-pressed') !== 'true';
-        setPressed(usableToggle, nextPressed);
-        applyFilters();
-      });
+      if (chipsContainer) {
+        chipsContainer.addEventListener('click', (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
 
-      copyLinkButton.addEventListener('click', async () => {
-        const textSpan = queryOne('span', copyLinkButton);
-        if (!textSpan) return;
+          const chipButton = target.closest('.active-filter-chip');
+          if (!(chipButton instanceof HTMLButtonElement)) return;
 
-        try {
-          await navigator.clipboard.writeText(location.href);
-          textSpan.textContent = 'Copied!';
-        } catch {
-          textSpan.textContent = 'Copy failed';
-        }
+          const kind = chipButton.dataset.removeKind;
+          const value = chipButton.dataset.removeValue || '';
 
-        setTimeout(() => {
-          textSpan.textContent = 'Share';
-        }, 1800);
-      });
+          if (kind === 'search') searchInput.value = '';
+          if (kind === 'status') setStatusFilter('all');
+          if (kind === 'goal') {
+            activeGoal = null;
+            clearActionButtons();
+            updateGoalButtons();
+          }
+          if (kind === 'action') {
+            const actionButton = actionButtons().find((button) => button.dataset.action === value);
+            if (actionButton) setPressed(actionButton, false);
+            activeGoal = null;
+            updateGoalButtons();
+          }
+          if (kind === 'sort') sortSelect.value = 'latest';
 
-      if (clearButton) {
-        clearButton.addEventListener('click', clearFilters);
+          applyFilters();
+        });
       }
+
+      searchInput.addEventListener('input', applyFilters);
+      sortSelect.addEventListener('change', applyFilters);
+
+      if (clearButton) clearButton.addEventListener('click', clearFilters);
+      if (resetButton) resetButton.addEventListener('click', clearFilters);
 
       document.addEventListener('click', async (event) => {
         const target = event.target;
@@ -600,40 +896,8 @@ const PIPELINE_LABELS = {
         }, 1200);
       });
 
-      function initializeFromUrl() {
-        const params = new URLSearchParams(location.search);
-
-        const queryValue = params.get('q');
-        if (queryValue) searchInput.value = queryValue;
-
-        const statusValue = params.get('status');
-        if (statusValue) {
-          const hasStatus = Array.from(statusSelect.options).some((option) => option.value === statusValue);
-          if (hasStatus) statusSelect.value = statusValue;
-        }
-
-        const preselectedActions = new Set([
-          ...params.getAll('action'),
-          ...params.getAll('actions'),
-        ]);
-        if (preselectedActions.size > 0) {
-          actionPills().forEach((pill) => {
-            setPressed(pill, preselectedActions.has(pill.dataset.action || ''));
-          });
-        }
-
-        if (params.get('usable') === 'true') {
-          setPressed(usableToggle, true);
-        }
-
-        const sortValue = params.get('sort');
-        if (sortValue) {
-          const hasSortOption = Array.from(sortSelect.options).some((option) => option.value === sortValue);
-          if (hasSortOption) sortSelect.value = sortValue;
-        }
-      }
-
       initializeFromUrl();
+      setView(currentView);
       updateGoalButtons();
       applyFilters();
     })();

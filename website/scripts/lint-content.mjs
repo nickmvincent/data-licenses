@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { load as loadYaml } from 'js-yaml';
 
-const dir = join(process.cwd(), '..', '..', 'content', 'data-licenses', 'initiatives');
-const sharedRefsDir = join(process.cwd(), '..', '..', 'content', 'shared-references');
+const dir = join(process.cwd(), '..', 'content', 'initiatives');
+const sharedRefsDir = join(process.cwd(), '..', 'content', 'shared-references');
 
 function extractFrontmatter(content) {
   const m = content.match(/^---\n([\s\S]*?)\n---/);
@@ -26,19 +26,25 @@ function isUrl(s) {
   return /^https?:\/\//i.test(s || '');
 }
 
+function stripQuotes(value) {
+  return String(value || '').replace(/^['"]|['"]$/g, '');
+}
+
 let errors = 0;
 let warnings = 0;
 
 // Load available reference keys once
 const availableRefs = new Set();
 try {
-  for (const file of readdirSync(sharedRefsDir).filter((f) => f.endsWith('.md'))) {
-    const raw = readFileSync(join(sharedRefsDir, file), 'utf8');
-    const fm = extractFrontmatter(raw);
-    if (!fm) continue;
-    const parsed = loadYaml(fm) || {};
-    if (parsed.citation_key) {
-      availableRefs.add(String(parsed.citation_key));
+  if (existsSync(sharedRefsDir)) {
+    for (const file of readdirSync(sharedRefsDir).filter((f) => f.endsWith('.md'))) {
+      const raw = readFileSync(join(sharedRefsDir, file), 'utf8');
+      const fm = extractFrontmatter(raw);
+      if (!fm) continue;
+      const parsed = loadYaml(fm) || {};
+      if (parsed.citation_key) {
+        availableRefs.add(String(parsed.citation_key));
+      }
     }
   }
 } catch (err) {
@@ -57,18 +63,31 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.md'))) {
   if (!hasKey(fm, 'summary')) issues.push('missing summary');
   if (!hasKey(fm, 'status')) issues.push('missing status');
 
-  const allowed = new Set(['WIP','usable-but-new','usable-with-some-evidence','usable-with-strong-evidence']);
+  const allowed = new Set(['live', 'wip']);
   if (hasKey(fm, 'status')) {
     const v = (getValue(fm, 'status') || '').replace(/#.*/, '').trim();
     if (v && !allowed.has(v)) warns.push(`status not in allowed set: ${v}`);
   }
 
-  ['website', 'spec', 'sourceRepo', 'pressPage', 'linkWithEvidenceOfUse'].forEach((k) => {
+  ['website'].forEach((k) => {
     if (hasKey(fm, k)) {
-      const v = getValue(fm, k)?.replace(/#.*/, '').trim();
+      const v = stripQuotes(getValue(fm, k)?.replace(/#.*/, '').trim());
       if (v && !isUrl(v)) warns.push(`field ${k} does not look like a URL`);
     }
   });
+
+  if (Array.isArray(parsedFm.evidenceLinks)) {
+    parsedFm.evidenceLinks.forEach((link, index) => {
+      if (!link || typeof link !== 'object') {
+        warns.push(`evidenceLinks[${index}] is not an object`);
+        return;
+      }
+      if (!isUrl(stripQuotes(link.url))) warns.push(`evidenceLinks[${index}].url does not look like a URL`);
+      if (!link.date || Number.isNaN(new Date(String(link.date)).getTime())) {
+        warns.push(`evidenceLinks[${index}].date is not a valid date`);
+      }
+    });
+  }
 
   if (Array.isArray(parsedFm.references)) {
     parsedFm.references.forEach((ref) => {
@@ -83,7 +102,7 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.md'))) {
   }
 
   if (issues.length || warns.length) {
-    const rel = `content/initiatives/${file}`;
+      const rel = `content/initiatives/${file}`;
     if (issues.length) {
       console.error(`ERROR ${rel}: ${issues.join('; ')}`);
       errors += issues.length;

@@ -5,12 +5,14 @@ summary: >-
   for AI agents and crawlers ("building blocks that allow for the expression of
   preferences about how content is collected and processed for Artificial
   Intelligence (AI) model development, deployment, and use.")
-status: WIP
 website: 'https://datatracker.ietf.org/wg/aipref/about/'
 actionsSupported:
   - attach-preference-signal
-recentActivity: '2025-08-01T00:00:00.000Z'
-recentActivityNote: Milestone for protocol specifications
+status: wip
+evidenceLinks:
+  - label: Milestone for protocol specifications
+    url: 'https://datatracker.ietf.org/wg/aipref/about/'
+    date: '2025-08-01'
 visibility: public
 type: data_license_initiative
 ---

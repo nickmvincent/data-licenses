@@ -3,260 +3,418 @@ import '../styles/global.css';
 import NetworkFooter from '../../../helpers/astro/NetworkFooter.astro';
 import networkData from '../data/network.json';
 
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'DataLicenses.org',
+  description = 'A curated catalog of public initiatives shaping AI data access, licensing, technical enforcement, and creator leverage.',
+} = Astro.props;
+
 const currentPath = Astro.url.pathname;
-const networkLinks = networkData.allProjects.map(p => ({ href: p.website, label: p.title }));
+const pageTitle = title === 'DataLicenses.org' ? title : `${title} | DataLicenses.org`;
+const networkLinks = networkData.allProjects.map((project) => ({ href: project.website, label: project.title }));
+
 const navLinks = [
   { href: '/', label: 'Catalog' },
   { href: '/memo', label: 'Memo' },
   { href: '/glossary', label: 'Glossary' },
-  { href: '/contributing', label: 'About' },
+  { href: '/contributing', label: 'Contribute' },
 ];
 
 const alsoLikeLinks = [
-  { href: 'https://sr.ithaka.org/our-work/generative-ai-licensing-agreement-tracker', label: 'Data Deals Tracker', desc: 'Tracks licensing agreements between AI companies and content providers. Curated by Ithaka S+R.' },
-  { href: 'https://www.mckoolsmith.com/newsroom-ailitigation', label: 'AI Litigation Tracker', desc: 'Comprehensive list of lawsuits involving AI and data rights. Maintained by McKool Smith.' },
-  { href: 'https://exploringai.org/', label: 'ExploringAI.org', desc: 'Research notes and napkin math about AI data flows. Explores the scale and economics of training data.' },
-  { href: 'https://datalevers.org', label: 'DataLevers.org', desc: 'Tools for collective action around data rights. Covers protests, strikes, and bargaining strategies.' },
+  {
+    href: 'https://sr.ithaka.org/our-work/generative-ai-licensing-agreement-tracker',
+    label: 'Data Deals Tracker',
+    desc: 'Tracks licensing agreements between AI companies and content providers.',
+  },
+  {
+    href: 'https://www.mckoolsmith.com/newsroom-ailitigation',
+    label: 'AI Litigation Tracker',
+    desc: 'Maintains a broad list of lawsuits involving AI and data rights.',
+  },
+  {
+    href: 'https://exploringai.org/',
+    label: 'ExploringAI.org',
+    desc: 'Research notes and napkin math about AI data flows.',
+  },
+  {
+    href: 'https://datalevers.org',
+    label: 'DataLevers.org',
+    desc: 'Tools and strategy for collective action around data rights.',
+  },
 ];
 ---
+
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>DataLicenses.org</title>
-	</head>
-	<body>
-		<nav class="navbar">
-			<div class="navbar-inner">
-				<a href="/" class="navbar-brand">DATALICENSES.ORG</a>
-				<div class="navbar-links">
-					{navLinks.map(link => (
-						<a
-							href={link.href}
-							class:list={['nav-link', { active: currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)) }]}
-						>
-							{link.label}
-						</a>
-					))}
-					<a href="/data/initiatives.json" class="nav-link" title="JSON API">API</a>
-					<button type="button" id="theme-toggle" class="theme-toggle" title="Toggle light/dark theme" aria-label="Toggle theme">
-						<svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-						<svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-					</button>
-				</div>
-			</div>
-		</nav>
-		<slot />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f4efe6" />
+    <title>{pageTitle}</title>
+    <script is:inline>
+      (() => {
+        const storageKey = 'theme';
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const saved = localStorage.getItem(storageKey);
+        const theme = saved === 'light' || saved === 'dark'
+          ? saved
+          : mediaQuery.matches
+            ? 'dark'
+            : 'light';
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+      })();
+    </script>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-inner">
+        <a href="/" class="navbar-brand">
+          <span class="brand-wordmark">DataLicenses.org</span>
+          <span class="brand-tag">AI data rights field guide</span>
+        </a>
 
-		<footer class="also-like-footer">
-			<div class="also-like-inner">
-				<span class="also-like-label">You may also like:</span>
-				<div class="also-like-links">
-					{alsoLikeLinks.map(link => (
-						<a href={link.href} target="_blank" rel="noopener" class="also-like-link">
-							{link.label}
-							<span class="also-like-desc">{link.desc}</span>
-						</a>
-					))}
-				</div>
-			</div>
-		</footer>
+        <div class="navbar-links">
+          {navLinks.map((link) => (
+            <a
+              href={link.href}
+              class:list={[
+                'nav-link',
+                { active: currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)) },
+              ]}
+            >
+              {link.label}
+            </a>
+          ))}
 
-		<NetworkFooter links={networkLinks} />
-	<script is:inline>
-		(function () {
-			const root = document.documentElement;
-			const toggle = document.getElementById('theme-toggle');
-			const storageKey = 'theme';
-			const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+          <a href="/data/initiatives.json" class="nav-link nav-link-secondary" title="JSON API">API</a>
 
-			function readStoredTheme() {
-				const saved = localStorage.getItem(storageKey);
-				return saved === 'light' || saved === 'dark' ? saved : null;
-			}
+          <button type="button" id="theme-toggle" class="theme-toggle" title="Toggle light or dark theme" aria-label="Toggle theme">
+            <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+        </div>
+      </div>
+    </nav>
 
-			function currentSystemTheme() {
-				return mediaQuery.matches ? 'light' : 'dark';
-			}
+    <slot />
 
-			function applyTheme(theme) {
-				root.classList.toggle('light', theme === 'light');
-			}
+    <footer class="also-like-footer">
+      <div class="also-like-inner">
+        <div class="also-like-heading">
+          <p class="also-like-kicker">Adjacent work</p>
+          <p class="also-like-label">Trackers and research projects worth keeping open in the next tab.</p>
+        </div>
+        <div class="also-like-links">
+          {alsoLikeLinks.map((link) => (
+            <a href={link.href} target="_blank" rel="noopener" class="also-like-link">
+              <span class="also-like-name">{link.label}</span>
+              <span class="also-like-desc">{link.desc}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </footer>
 
-			const initialTheme = readStoredTheme() || currentSystemTheme();
-			applyTheme(initialTheme);
+    <NetworkFooter links={networkLinks} label="Part of a broader research network:" />
 
-			if (toggle) {
-				toggle.addEventListener('click', () => {
-					const nextTheme = root.classList.contains('light') ? 'dark' : 'light';
-					applyTheme(nextTheme);
-					localStorage.setItem(storageKey, nextTheme);
-				});
-			}
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const toggle = document.getElementById('theme-toggle');
+        const storageKey = 'theme';
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-			const onSystemThemeChange = (event) => {
-				if (readStoredTheme()) return;
-				applyTheme(event.matches ? 'light' : 'dark');
-			};
+        function readStoredTheme() {
+          const saved = localStorage.getItem(storageKey);
+          return saved === 'light' || saved === 'dark' ? saved : null;
+        }
 
-			if (typeof mediaQuery.addEventListener === 'function') {
-				mediaQuery.addEventListener('change', onSystemThemeChange);
-			} else if (typeof mediaQuery.addListener === 'function') {
-				mediaQuery.addListener(onSystemThemeChange);
-			}
-		})();
-	</script>
-	</body>
+        function currentSystemTheme() {
+          return mediaQuery.matches ? 'dark' : 'light';
+        }
+
+        function applyTheme(theme) {
+          root.classList.toggle('dark', theme === 'dark');
+        }
+
+        applyTheme(readStoredTheme() || currentSystemTheme());
+
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            const nextTheme = root.classList.contains('dark') ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            localStorage.setItem(storageKey, nextTheme);
+          });
+        }
+
+        const onSystemThemeChange = (event) => {
+          if (readStoredTheme()) return;
+          applyTheme(event.matches ? 'dark' : 'light');
+        };
+
+        if (typeof mediaQuery.addEventListener === 'function') {
+          mediaQuery.addEventListener('change', onSystemThemeChange);
+        } else if (typeof mediaQuery.addListener === 'function') {
+          mediaQuery.addListener(onSystemThemeChange);
+        }
+      })();
+    </script>
+  </body>
 </html>
+
 <style is:global>
-	/* Navbar */
-	.navbar {
-		position: sticky;
-		top: 0;
-		z-index: 100;
-		background: color-mix(in srgb, var(--bg) 85%, transparent);
-		backdrop-filter: blur(12px);
-		border-bottom: 1px solid var(--border);
-	}
-	.navbar-inner {
-		max-width: 1100px;
-		margin: 0 auto;
-		padding: 0 20px;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		height: 52px;
-	}
-	.navbar-brand {
-		font-size: 12px;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-		color: var(--muted);
-		text-decoration: none;
-	}
-	.navbar-brand:hover {
-		color: var(--text);
-	}
-	.navbar-links {
-		display: flex;
-		gap: 4px;
-		flex-wrap: wrap;
-	}
-	.nav-link {
-		font-size: 12px;
-		color: var(--text);
-		text-decoration: none;
-		padding: 6px 10px;
-		border-radius: 6px;
-		border: 1px solid transparent;
-		transition: all 0.15s;
-	}
-	.nav-link:hover {
-		border-color: var(--accent);
-	}
-	.nav-link.active {
-		background: var(--accent-soft);
-		border-color: var(--accent);
-		color: var(--accent);
-	}
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(16px);
+  }
 
-	/* Theme toggle */
-	.theme-toggle {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 32px;
-		height: 32px;
-		background: transparent;
-		border: 1px solid var(--border);
-		border-radius: 6px;
-		cursor: pointer;
-		color: var(--muted);
-		transition: all 0.15s;
-	}
-	.theme-toggle:hover {
-		border-color: var(--accent);
-		color: var(--text);
-	}
-	/* Show sun in dark mode, moon in light mode */
-	.icon-moon { display: none; }
-	.icon-sun { display: block; }
-	:root.light .icon-moon { display: block; }
-	:root.light .icon-sun { display: none; }
+  .navbar-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+    min-height: 68px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
 
-	/* Also Like Footer */
-	.also-like-footer {
-		margin-top: 3rem;
-		padding: 1.25rem 1.5rem;
-		border-top: 1px solid var(--border);
-		background: color-mix(in srgb, var(--card) 60%, transparent);
-	}
-	.also-like-inner {
-		max-width: 1100px;
-		margin: 0 auto;
-	}
-	.also-like-label {
-		font-size: 12px;
-		color: var(--muted);
-		font-weight: 500;
-		display: block;
-		margin-bottom: 10px;
-	}
-	.also-like-links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-	}
-	.also-like-link {
-		display: inline-flex;
-		flex-direction: column;
-		padding: 8px 12px;
-		background: var(--card);
-		border: 1px solid var(--border);
-		border-radius: 8px;
-		text-decoration: none;
-		font-size: 13px;
-		color: var(--accent);
-		transition: border-color 0.15s;
-	}
-	.also-like-link:hover {
-		border-color: var(--accent);
-	}
-	.also-like-desc {
-		font-size: 11px;
-		color: var(--muted);
-		margin-top: 2px;
-	}
+  .navbar-brand {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+    color: inherit;
+    text-decoration: none;
+  }
 
-	/* Footer - dark theme */
-	.network-footer {
-		margin-top: 0;
-		padding: 1.5rem;
-		border-top: 1px solid var(--border);
-		background: color-mix(in srgb, var(--card) 50%, transparent);
-		text-align: center;
-		font-size: 0.8rem;
-	}
-	.network-footer-content {
-		max-width: 800px;
-		margin: 0 auto;
-	}
-	.network-label {
-		color: var(--muted);
-		margin-right: 0.5rem;
-	}
-	.network-links {
-		display: inline;
-	}
-	.network-links a {
-		color: var(--accent);
-		text-decoration: none;
-		margin: 0 0.5rem;
-	}
-	.network-links a:hover {
-		text-decoration: underline;
-	}
+  .brand-wordmark {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  .brand-tag {
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 0.9rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.93rem;
+    font-weight: 600;
+    transition:
+      border-color 0.18s ease,
+      background 0.18s ease,
+      color 0.18s ease;
+  }
+
+  .nav-link:hover {
+    border-color: var(--border-strong);
+    background: color-mix(in srgb, var(--card) 75%, transparent);
+    text-decoration: none;
+  }
+
+  .nav-link.active {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .nav-link-secondary {
+    color: var(--muted);
+  }
+
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 92%, transparent);
+    color: var(--muted);
+    cursor: pointer;
+    transition:
+      border-color 0.18s ease,
+      color 0.18s ease,
+      background 0.18s ease;
+  }
+
+  .theme-toggle:hover {
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    color: var(--text);
+  }
+
+  .icon-sun {
+    display: none;
+  }
+
+  .icon-moon {
+    display: block;
+  }
+
+  :root.dark .icon-sun {
+    display: block;
+  }
+
+  :root.dark .icon-moon {
+    display: none;
+  }
+
+  .also-like-footer {
+    margin-top: 3rem;
+    padding: 2rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 66%, transparent);
+  }
+
+  .also-like-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .also-like-heading {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .also-like-kicker {
+    margin: 0;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warm);
+  }
+
+  .also-like-label {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .also-like-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .also-like-link {
+    display: grid;
+    gap: 0.3rem;
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 94%, transparent);
+    text-decoration: none;
+    transition:
+      transform 0.18s ease,
+      border-color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  .also-like-link:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    box-shadow: var(--shadow-soft);
+    text-decoration: none;
+  }
+
+  .also-like-name {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .also-like-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .network-footer {
+    margin-top: 0;
+    padding: 1.6rem 1.5rem 2.2rem;
+    border-top: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 58%, transparent);
+    text-align: center;
+    font-size: 0.88rem;
+  }
+
+  .network-footer-content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .network-label {
+    color: var(--muted);
+    margin-right: 0.35rem;
+  }
+
+  .network-links {
+    display: inline;
+  }
+
+  .network-links a {
+    margin: 0 0.45rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .network-links a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 900px) {
+    .also-like-inner {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .navbar-inner {
+      padding: 12px 16px;
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .navbar-links {
+      width: 100%;
+    }
+
+    .nav-link {
+      min-height: 38px;
+    }
+  }
 </style>

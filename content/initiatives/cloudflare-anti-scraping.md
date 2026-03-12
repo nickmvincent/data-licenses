@@ -3,9 +3,8 @@ title: Cloudflare AI Crawl Control
 summary: >-
   A set of tools to block or charge for scraping; includes AI Audit dashboard,
   managed robots.txt, and pay-per-crawl marketplace.
-status: usable-with-some-evidence
+status: live
 website: 'https://blog.cloudflare.com/control-content-use-for-ai-training/'
-spec: 'https://developers.cloudflare.com/bots/concepts/bot/'
 tags:
   - scraping
   - bot-management
@@ -15,9 +14,10 @@ actionsSupported:
   - technical-blocking
   - add-tollgate
   - attach-preference-signal
-linkWithEvidenceOfUse: 'https://blog.cloudflare.com/control-content-use-for-ai-training/'
-recentActivity: '2025-07-01T00:00:00.000Z'
-recentActivityNote: AI Audit and marketplace features launched
+evidenceLinks:
+  - label: AI Audit and marketplace features launched
+    url: 'https://blog.cloudflare.com/control-content-use-for-ai-training/'
+    date: '2025-07-01'
 visibility: public
 type: data_license_initiative
 ---

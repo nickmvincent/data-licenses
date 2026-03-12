@@ -95,12 +95,12 @@ const terms = [
   },
   {
     term: 'Status: WIP',
-    definition: 'Work in Progress. The initiative is under active development and details may change. Not yet ready for production use.',
-    related: ['Status: Usable'],
+    definition: 'Work in Progress. The initiative is still forming, changing quickly, or not ready for dependable use yet.',
+    related: ['Status: Live'],
   },
   {
-    term: 'Status: Usable',
-    definition: 'The initiative can be used today. May have varying levels of evidence of adoption, from "new" (limited evidence) to "strong evidence" (broad, documented adoption).',
+    term: 'Status: Live',
+    definition: 'The initiative is publicly live or deployable today, even if adoption is still limited or emerging.',
     related: ['Status: WIP'],
   },
 ];
@@ -118,7 +118,7 @@ const grouped = terms.reduce((acc, t) => {
 const letters = Object.keys(grouped).sort();
 ---
 
-<Layout>
+<Layout title="Glossary">
   <main class="wrap glossary-page">
     <header class="page-header glossary-header">
       <h1>Glossary</h1>

@@ -3,7 +3,7 @@ title: ProRata / Gist
 summary: >-
   A 50/50 revenue-share platform connecting publishers with AI companies,
   with 700+ publishers signed up including major news outlets.
-status: usable-with-some-evidence
+status: live
 website: 'https://www.prorata.ai/'
 actionsSupported:
   - join-licensing-collective
@@ -13,8 +13,10 @@ tags:
   - licensing-marketplace
   - publishers
 usersCount: '700+ publishers'
-recentActivity: '2025-01-01T00:00:00.000Z'
-recentActivityNote: Gist search engine launched
+evidenceLinks:
+  - label: Gist search engine launched
+    url: 'https://www.prorata.ai/'
+    date: '2025-01-01'
 visibility: public
 type: data_license_initiative
 ---

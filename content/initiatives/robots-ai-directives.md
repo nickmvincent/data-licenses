@@ -4,11 +4,14 @@ summary: >-
   robots.txt can be used to express AI crawler access preferences. See example
   from OpenAI. Additionally, the X-Robots-Tag response header allows servers to
   send crawler directives via HTTP response headers.
-status: usable-with-some-evidence
+status: live
 website: 'https://platform.openai.com/docs/bots'
 actionsSupported:
   - attach-preference-signal
-recentActivity: '2025-09-17T00:00:00.000Z'
+evidenceLinks:
+  - label: OpenAI bots documentation
+    url: 'https://platform.openai.com/docs/bots'
+    date: '2025-09-17'
 visibility: public
 type: data_license_initiative
 ---

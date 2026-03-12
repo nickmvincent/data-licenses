@@ -3,7 +3,7 @@ title: easy-dataset-share
 summary: >-
   A simple anti-scraping tool intended to protect datasets from basic
   crawlers/scrapers.
-status: usable-but-new
+status: live
 website: 'https://github.com/Responsible-Dataset-Sharing/easy-dataset-share'
 actionsSupported:
   - technical-blocking
@@ -15,6 +15,7 @@ tags:
   - mitigation
 dependsOn:
   - cloudflare-anti-scraping
+evidenceLinks: []
 visibility: public
 type: data_license_initiative
 ---

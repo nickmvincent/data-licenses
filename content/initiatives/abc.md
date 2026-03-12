@@ -1,13 +1,14 @@
 ---
 title: Attribution-based control
 summary: Approach from OpenMined
-status: WIP
+status: wip
 website: 'https://openmined.org/attribution-based-control/'
-url: 'https://openmined.org/attribution-based-control/'
 actionsSupported:
   - new-infrastructures
-recentActivity: "2025-09-01T00:00:00.000Z"
-recentActivityNote: Launch target
+evidenceLinks:
+  - label: Launch target
+    url: 'https://openmined.org/attribution-based-control/'
+    date: '2025-09-01'
 visibility: public
 type: data_license_initiative
 ---

@@ -1,12 +1,14 @@
 ---
 title: FairlyTrained
 summary: Certify that models are fairly trained
-status: usable-with-some-evidence
+status: live
 website: 'https://www.fairlytrained.org/'
 actionsSupported:
   - certification
-recentActivity: '2025-09-01T00:00:00.000Z'
-recentActivityNote: Launch target
+evidenceLinks:
+  - label: Launch target
+    url: 'https://www.fairlytrained.org/'
+    date: '2025-09-01'
 visibility: public
 type: data_license_initiative
 ---
