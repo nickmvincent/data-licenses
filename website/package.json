@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "check": "astro check",
     "preview": "astro preview",
     "astro": "astro",
     "cf:deploy": "npx wrangler pages deploy dist --project-name datalicenses",
@@ -13,5 +14,9 @@
   "dependencies": {
     "astro": "^5.13.7",
     "js-yaml": "^4.1.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.7",
+    "typescript": "^5.9.3"
   }
 }

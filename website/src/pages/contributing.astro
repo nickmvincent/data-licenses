@@ -13,7 +13,7 @@ import networkData from '../data/network.json';
     <section class="box section">
       <h2>What we're capturing</h2>
       <ul>
-        <li>Initiatives that shape AI data flows via preference signals, licenses/terms, collectives, technical controls, certification, or new infrastructures.</li>
+        <li>Initiatives that shape AI data flows via preference signals, licenses/terms, collectives, data market platforms, technical controls, certification, or new infrastructures.</li>
         <li>Concrete implementation details, canonical websites, and dated evidence links for updates or adoption.</li>
         <li>Practical metadata: live or wip status, pipeline stages, jurisdictions, and adoption signals (users/data/money).</li>
       </ul>
@@ -32,10 +32,19 @@ import networkData from '../data/network.json';
       <h2>How to contribute</h2>
       <ul>
         <li>Suggest a new initiative or update an existing one (links appreciated: canonical website plus dated evidence links).</li>
-        <li>Provide short, neutral summaries; include any adoption metrics if public.</li>
+        <li>Provide short, neutral summaries; include adoption metrics only when they are public and source-backed.</li>
       </ul>
       <p>Send a note to <a href="https://nickmvincent.com" target="_blank" rel="noopener">Nick</a>.</p>
       <p class="muted small">Developers: you can also open a PR by adding or updating a markdown file under <code>content/initiatives/</code>. Each entry should have one canonical <code>website</code>, a <code>status</code> of <code>live</code> or <code>wip</code>, and optional dated <code>evidenceLinks</code>.</p>
+    </section>
+
+    <section class="box section">
+      <h2>Research method</h2>
+      <ul>
+        <li>Read the <a href="/methodology">methodology</a> before proposing updates. It explains how we decide what counts as a real update and how metrics are grounded.</li>
+        <li>AI-assisted first passes are welcome, but every suggested <code>evidenceLinks</code>, <code>usersCount</code>, <code>dataVolume</code>, or <code>moneyVolume</code> value should come with a clickable source and date. If you add a metric, also add matching <code>metricEvidence</code>.</li>
+        <li>You can start from the public <a href="/prompts/find-updates.txt">research prompt</a>, the current <a href="/data/initiatives.json">catalog JSON</a>, and the curation backlog at <a href="/data/curation.json">/data/curation.json</a>.</li>
+      </ul>
     </section>
 
     <section class="box section">

@@ -1,0 +1,166 @@
+{
+  "abc": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Early-stage architecture and governance approach with no stable public adopter count yet."
+  },
+  "adobe-content-authenticity": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Adobe publishes broad ecosystem updates, but AI preference uptake is not usually broken out as a separate public metric."
+  },
+  "ai-pref": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Standards work in progress; public adoption is not yet well defined."
+  },
+  "ai-ready-licenses": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "License family is still proposal-stage rather than a deployed program with public user counts."
+  },
+  "ai-txt": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Informal proposed signal with diffuse deployment and no canonical public adoption tracker."
+  },
+  "bria-artist-program": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official materials now support a partner-count metric for the licensed training catalog."
+  },
+  "cc-signals": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Consultation-stage preference-signal effort with no stable public deployment metric yet."
+  },
+  "cloudflare-anti-scraping": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official rollout posts now support both customer-adoption and traffic-volume metrics."
+  },
+  "commonsdb": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Public declaration volume is already recorded."
+  },
+  "copyrightsh": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Public materials describe the offer and onboarding but do not yet expose a stable creator or customer count."
+  },
+  "created-by-humans": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Author count is already captured from official materials."
+  },
+  "credtent": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official marketplace materials now support a conservative creator-count metric."
+  },
+  "dappier": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Public materials make the product legible, but I could not find a stable official publisher or customer count."
+  },
+  "dataset-providers-alliance": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Member count is now recorded as a conservative announced total across official alliance announcements."
+  },
+  "defined-ai-marketplace": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official 2025 review materials now support a conservative marketplace-revenue metric."
+  },
+  "deviantart-noai": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Platform-wide feature adoption is hard to separate from overall platform scale."
+  },
+  "do-not-train-registry": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Registry workflow is in flux and public counts are not clearly available right now."
+  },
+  "easy-dataset-share": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Small OSS project without a strong public reporting surface for usage."
+  },
+  "european-books-data-commons": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Design proposal rather than a deployed service."
+  },
+  "fairlytrained": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Certification count is now recorded as a conservative rollup across official announcement posts; the undated certified-models page appears larger."
+  },
+  "flexolmo": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Research-oriented commons effort with no stable public adoption unit yet."
+  },
+  "gated-datasets": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Could be large in practice, but platform-wide counts would be inferred unless Hugging Face publishes them."
+  },
+  "global-copyright-exchange": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official launch materials support a conservative catalog-size metric; newer official corpus claims exist but are currently undated."
+  },
+  "human-native": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Human Native has dated product and acquisition updates, but I could not find a stable public marketplace-size metric."
+  },
+  "noml": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Proposal-stage directive with no canonical deployment tracker."
+  },
+  "prorata": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Publisher count is already recorded."
+  },
+  "protege": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Organization count is already recorded."
+  },
+  "publishers-rights": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "The coalition is now sourced, but I could not find a clean public member count worth recording yet."
+  },
+  "robots-ai-directives": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Umbrella pattern spanning many actors; deployment is diffuse and hard to count cleanly."
+  },
+  "rsl": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official standards-release materials now support organization and page-scale metrics."
+  },
+  "social-license-data-reuse": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Governance framework and toolkit rather than a product with obvious public usage counts."
+  },
+  "spawning-data-diligence": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Developer tooling with no strong public reporting surface beyond indirect signals."
+  },
+  "syftbox": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Open-source infrastructure project without a clearly disclosed adoption metric."
+  },
+  "tdm-ai": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Emerging protocol, not yet a broadly deployed service."
+  },
+  "tdmrep": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Community standard adoption is diffuse and difficult to measure without a dedicated survey or crawl."
+  },
+  "tk-labels": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Local Contexts publishes broader program signals, but AI-relevant uptake is not cleanly separated."
+  },
+  "tollbit": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official launch materials now support a conservative premium-publisher count."
+  },
+  "user-intents": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Proposal and demo stage, not yet a network-wide deployed control."
+  },
+  "vaisual-marketplace": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official materials now support a conservative image-corpus metric."
+  },
+  "web-bot-auth": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "IETF working group; adoption is not yet the right unit."
+  },
+  "wikimedia-enterprise": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Partner and corpus-volume signals are already recorded."
+  }
+}

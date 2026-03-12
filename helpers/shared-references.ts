@@ -1,5 +1,5 @@
 /**
- * Shared utility for loading references from content/shared-references/
+ * Shared utility for loading references from content/shared-references/bibtex-entries/
  *
  * Can be used by Astro projects to load bibliographic data.
  *

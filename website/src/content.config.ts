@@ -1,6 +1,25 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+const evidenceLinkSchema = z.object({
+  label: z.string().describe('Short label describing the evidence or update'),
+  url: z.string().url().describe('Link to the announcement, docs page, news story, or other evidence'),
+  date: z.coerce.date().describe('Date associated with the evidence link'),
+});
+
+const metricEvidenceSchema = z.object({
+  basis: z
+    .enum(['explicit', 'derived'])
+    .default('explicit')
+    .optional()
+    .describe('Whether the displayed metric comes directly from one source or a simple rollup across sources'),
+  notes: z.string().optional().describe('Short note on how the metric was sourced or derived'),
+  sources: z
+    .array(evidenceLinkSchema)
+    .min(1)
+    .describe('One or more public sources supporting the metric'),
+});
+
 const initiatives = defineCollection({
   loader: glob({ pattern: '**/*.md', base: '../content/initiatives' }),
   schema: z.object({
@@ -14,6 +33,7 @@ const initiatives = defineCollection({
           'attach-preference-signal',
           'attach-formal-license',
           'join-licensing-collective',
+          'data-market-platform',
           'add-tollgate',
           'technical-blocking',
           'new-infrastructures',
@@ -28,13 +48,7 @@ const initiatives = defineCollection({
       .describe('Project status'),
     website: z.string().url().describe('Canonical website for the initiative'),
     evidenceLinks: z
-      .array(
-        z.object({
-          label: z.string().describe('Short label describing the evidence or update'),
-          url: z.string().url().describe('Link to the announcement, docs page, news story, or other evidence'),
-          date: z.coerce.date().describe('Date associated with the evidence link'),
-        })
-      )
+      .array(evidenceLinkSchema)
       .default([])
       .optional(),
     jurisdictions: z.array(z.string()).default([]).optional(),
@@ -53,6 +67,14 @@ const initiatives = defineCollection({
     usersCount: z.string().optional().describe('Approximate number of users/adopters'),
     dataVolume: z.string().optional().describe('Amount of data flowing (e.g., pages/day, tokens, GB)'),
     moneyVolume: z.string().optional().describe('Payments/revenue flowing (e.g., $/month, $ total)'),
+    metricEvidence: z
+      .object({
+        usersCount: metricEvidenceSchema.optional(),
+        dataVolume: metricEvidenceSchema.optional(),
+        moneyVolume: metricEvidenceSchema.optional(),
+      })
+      .optional()
+      .describe('Public source attribution for any adoption metrics shown on the initiative'),
     implementationSnippets: z
       .array(
         z.object({

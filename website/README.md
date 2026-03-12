@@ -1,139 +1,113 @@
 # datalicenses.org
 
-A community‑curated index of initiatives related to AI data flow, focused on:
-- Preference signals
-- Licenses/collectives
-- Technical enforcement and certification
+This Astro site renders the public catalog for DataLicenses.org from the shared content in the repo root.
 
-This README documents the schema, filters/sorting, endpoints, and local development.
-
-## Project Structure
+## Project structure
 
 Key paths:
-- `src/content.config.ts` — Content collections and schema
-- `content/initiatives/*.md` — Main dataset (frontmatter + optional body)
-- `src/pages/index.astro` — UI (filters, cards, primer, etc.)
-- `src/pages/memo.astro` and `content/memos/memo.md` — Longer memo
+- `src/content.config.ts` — Astro-side schema for initiative frontmatter
+- `../content/initiatives/*.md` — Main dataset
+- `../content/shared-references/bibtex-entries/*.md` — Optional bibliography records used by `references`
+- `src/data/initiative-curation.json` — Editorial tracking for evidence/adoption research backlog
+- `src/lib/content-loader.ts` — Runtime content loader and derived fields
+- `src/pages/index.astro` — Catalog UI
+- `src/pages/methodology.astro` — Public sourcing rules and merge-ready schema examples
 - `src/pages/contributing.astro` — Contributing guide
-- `src/pages/data/initiatives.json.ts` — JSON endpoint
+- `src/pages/data/initiatives.json.ts` — Full catalog JSON endpoint
+- `src/pages/data/curation.json.ts` — Curation/backlog JSON endpoint
 - `scripts/lint-content.mjs` — Content linter
 
-## Schema: collections
+## Initiative schema
 
-The site uses an Astro Content Collection (`astro:content`): `initiatives`.
+Required frontmatter:
+- `title`: string
+- `summary`: string
+- `status`: `live` | `wip`
+- `website`: URL
 
-### initiatives frontmatter
+Common optional fields:
+- `actionsSupported`: array of `attach-preference-signal`, `attach-formal-license`, `join-licensing-collective`, `data-market-platform`, `add-tollgate`, `technical-blocking`, `new-infrastructures`, `certification`
+- `evidenceLinks`: array of `{ label, url, date }`
+- `jurisdictions`, `signals`, `pipelineStages`, `tags`, `dependsOn`
+- `usersCount`, `dataVolume`, `moneyVolume`
+- `metricEvidence`: per-metric attribution matching any populated adoption metric
+- `considerations`
+- `implementationSnippets`
+- `references`: citation keys from `../content/shared-references/bibtex-entries`
 
-Required
-- `title`: string — Display name
-- `summary`: string — Short description for cards
+Example:
 
-Recommended/optional
-- `actionsSupported`: string[] — One or more of:
-  - `attach-preference-signal`
-  - `attach-formal-license`
-  - `join-licensing-collective`
-  - `add-tollgate`
-  - `technical-blocking`
-  - `new-infrastructures`
-  - `certification`
-- `status`: enum — Project status (simplified scale):
-  - `WIP` — Work in progress
-  - `usable-but-new` — Usable, limited or no third‑party evidence
-  - `usable-with-some-evidence` — Usable with some independent adoption
-  - `usable-with-strong-evidence` — Usable with strong, broad evidence
-- `website`: url
-- `spec`: url
-- `sourceRepo`: url
-- `pressPage`: url
-- `linkWithEvidenceOfUse`: url — Evidence of adoption/use
-- `jurisdictions`: string[]
-- `signals`: string[]
-- `pipelineStages`: enum[] — Any of `collect`, `train`, `fine-tune`, `retrieve`, `generate`
-- `considerations`: string — Risks, tradeoffs, caveats
-- `tags`: string[]
-- `lastUpdated`: date
-- Activity metadata:
-  - `recentActivity`: date — Most recent public activity
-  - `recentActivityNote`: string — Short note/context
-- Adoption/impact (displayed as chips):
-  - `usersCount`: string — e.g., `10+ orgs`, `1k+ users`
-  - `dataVolume`: string — e.g., `>10M pages/day`, `TB/mo`
-  - `moneyVolume`: string — e.g., `$100k+/mo`, `$2M total`
-- Implementation snippets (rendered in a collapsible section):
-  - `implementationSnippets`: Array<{ `title`: string; `language`?: string; `code`: string; `sourceUrl`: url }>
-
-Example
 ```md
 ---
-title: Really Simple Licensing (RSL)
-summary: Machine‑readable licensing schema to signal reuse permissions.
-actionsSupported: ["attach-formal-license"]
-status: usable-with-some-evidence
-website: https://rslstandard.org/
-spec: https://rslstandard.org/spec
-pressPage: https://rslstandard.org/press
-pipelineStages: ["collect", "train", "retrieve"]
-usersCount: "10+ orgs"
-linkWithEvidenceOfUse: https://rslstandard.org/press
-recentActivity: 2025-09-14
-recentActivityNote: See press page
-implementationSnippets:
-  - title: Add X‑Robots‑Tag
-    language: http
-    code: |
-      X-Robots-Tag: noai, notrain
-    sourceUrl: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Robots-Tag
+title: Example Initiative
+summary: One-line neutral summary.
+status: live
+website: https://example.org/
+evidenceLinks:
+  - label: Partner program announced
+    url: https://example.org/blog/partners
+    date: 2026-01-15
+usersCount: "10+ announced partners"
+metricEvidence:
+  usersCount:
+    basis: explicit
+    sources:
+      - label: Partner program announced
+        url: https://example.org/blog/partners
+        date: 2026-01-15
+considerations: Partner count comes from the launch post and may understate current uptake.
 ---
-
-Optional long body text…
 ```
 
-## Filters, sorting, and URL params
+## Evidence workflow
 
-UI behavior (implemented in `src/pages/index.astro`):
-- Search: free text over `title`, `summary`, and `tags`.
-- Actions: multi‑select (pill toggles) from `actionsSupported`.
-- Status: filter using the simplified scale (WIP → Strong evidence).
-- Show what I can use today: toggle shows items with non‑WIP status.
-- Sort: `recent` (default), `alpha`, `usable`.
+- The catalog's "Latest update" is the newest dated `evidenceLinks` entry.
+- Prefer primary sources: official sites, docs, repos, changelogs, announcements, filings, and product pages.
+- Use top-level `usersCount`, `dataVolume`, and `moneyVolume` only when a public source states or clearly supports the metric.
+- When a metric is present, add matching `metricEvidence`.
+- `metricEvidence.basis: derived` is only for simple, reviewable rollups across public sources.
+- Keep caveats in `considerations` instead of hiding uncertainty.
 
-Deep‑linking via URL parameters:
-- `q`: string — search query
-- `status`: string — status value (e.g., `usable-with-some-evidence`)
-- `actions`: repeated — one or more action values
-- `usable`: `true` — toggle on
-- `sort`: `recent` | `alpha` | `usable`
+`src/data/initiative-curation.json` tracks editorial backlog state:
+- `adoptionResearchStatus`: `populated` | `needs-research` | `hard-to-quantify`
+- `adoptionResearchNotes`: short rationale
 
-“Copy link to this view” updates and copies the current filter URL.
+## Catalog behavior
 
-## JSON endpoint
+The main catalog in `src/pages/index.astro` supports:
+- Free-text search over title, summary, tags, website, approach text, and evidence labels
+- Goal presets and action filters
+- Status filters
+- Sorting by latest update, alphabetically, or status
+- URL-backed filter state via `q`, `status`, `goal`, repeated `actions`, `sort`, and `view`
 
-`/data/initiatives.json` (defined in `src/pages/data/initiatives.json.ts`)
-- Response: `{ count: number, items: Initiative[] }`
-- Items include all frontmatter fields plus `id` and `slug`.
-- Ordered alphabetically by `title`.
+## JSON endpoints
 
-## Linting content
+`/data/initiatives.json`
+- Response: `{ count, items }`
+- Includes initiative frontmatter plus derived fields such as `slug`, `latestUpdate`, `evidenceStatus`, and resolved references
 
-Run: `npm run lint:content`
-- Checks required fields (`title`, `summary`, `status`).
-- Light URL shape checks on common link fields.
-- Notes presence of `implementationSnippets` (no deep validation).
+`/data/curation.json`
+- Response: `{ count, summary, items }`
+- Includes derived sourcing/adoption status fields for editorial triage
 
-## Contributing
+## Validation
 
-- See `src/pages/contributing.astro` for scope and how to add entries.
-- Quick path: add a new Markdown file under `content/initiatives/` with the frontmatter above and open a PR.
-- Or ping @nickmvincent
+Run:
+- `npm run lint:content`
+- `npm run build`
+- `npm run check`
+
+The content linter validates required fields, evidence/metric structure, placeholder text, shared-reference integrity, and a few weak-evidence patterns.
 
 ## Development
 
 Commands:
-- `npm install` — install deps
-- `npm run dev` — dev server at `localhost:4321`
-- `npm run build` — build to `./dist/`
-- `npm run preview` — preview the build locally
+- `npm install`
+- `npm run dev`
+- `npm run build`
+- `npm run preview`
+- `npm run check`
 
 ## Deploying to Cloudflare Pages
 
@@ -141,14 +115,5 @@ This repo includes a `wrangler.toml` configured for Pages.
 
 1. Authenticate once: `npx wrangler login`
 2. Build the static assets: `npm run build`
-3. Deploy to your Pages project: `npm run cf:deploy` (defaults to project name `datalicenses-org`; override with `--project-name <your-project>` if needed)
+3. Deploy to your Pages project: `npm run cf:deploy`
 4. Optional: test locally with `npx wrangler pages dev dist`
-
-The Pages output directory is `dist`; adjust `wrangler.toml` if you change the build path.
-
-## UI notes
-
-- Primer cards explain “Preference signals”, “Licenses and collectives”, and “Technical controls”, mapping to all action tags.
-- Card badges show status; a “usable today” chip appears for non‑WIP items.
-- Implementation snippets section supports copy‑to‑clipboard and links to sources.
-- “You may also like” provides related resources.

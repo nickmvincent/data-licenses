@@ -1,30 +1,84 @@
-Goal: Find and summarize updates to AI data licensing, preference signals, enforcement tools, and adoption.
+Goal: Produce a merge-friendly first-pass update packet for initiative records and adoption metrics.
 
-Context sources (seed):
-- Initiatives JSON: https://datalicenses.org/data/initiatives.json
-- Look for: status changes, new deployments, policy shifts, spec updates, evidence of use.
+Seed inputs:
+- Catalog JSON: https://datalicenses.org/data/initiatives.json
+- Curation JSON: https://datalicenses.org/data/curation.json
+- Current methodology: https://datalicenses.org/methodology
 
-Instructions:
-1) Crawl official sources per item (website, repo, spec, press page). Include dates and links.
-2) Prefer primary sources; cross-check with reputable coverage.
-3) Capture: what changed, when, who announced, scope (users/data/money), and implications.
-4) Note compliance/enforcement realities (is it opt-in/opt-out, blocking vs legal terms, known non-compliance).
-5) Output one JSON object per item with fields:
-   {
-     "title": string,
-     "date": ISO-8601,
-     "change": string,
-     "source": url,
-     "secondary": [url],
-     "adoption": { "usersCount": string?, "dataVolume": string?, "moneyVolume": string? }
-   }
-6) Then produce a human-readable summary of the top 5 notable updates.
+Research scope:
+- Status changes
+- New launches, releases, or spec changes
+- Partnerships, deployments, enforcement changes, or new implementations
+- Public adoption signals such as org counts, user counts, dataset counts, traffic volume, or revenue/payment volume
 
-Tips:
-- Use site: filters for org domains (e.g., site:rslstandard.org, site:creativecommons.org, site:ietf.org/aipref).
-- Include terms like: update, release, v, roadmap, adoption, partnership, enforcement, robots.txt, ai.txt, tollgate, certification.
-- When evidence is weak, mark as "claim (unverified)".
+Priority guidance:
+- If `adoptionResearchStatus` is `needs-research`, actively look for public metrics worth adding.
+- If `adoptionResearchStatus` is `hard-to-quantify`, still look for major updates, but avoid forcing weak usage estimates.
+- If `evidenceStatus` is `needs-sourcing`, prioritize finding at least one dated public source before anything else.
 
-Deliverables:
-1) JSON lines of updates (one per line).
-2) Short summary list (bullets) of top updates with links.
+Workflow:
+1) Start from the initiative's canonical website in the catalog, then check official docs, blogs, repos, specs, changelogs, press pages, and announcement posts.
+2) Prefer primary sources. Use secondary coverage only to confirm or contextualize a primary-source claim.
+3) Identify the newest dated public evidence that reflects a meaningful change. This is the best candidate for the catalog's latest `evidenceLinks` item.
+4) Look for explicit public metrics that can support `usersCount`, `dataVolume`, or `moneyVolume`.
+5) Do not infer numbers from vague language, web traffic tools, follower counts, or press volume.
+6) If a metric needs a simple rollup across multiple official sources, mark it as derived and explain the arithmetic briefly.
+7) If evidence is weak, conflicting, stale, or only indirectly related, include it as a candidate but mark it clearly for review.
+
+Rules for dates and evidence:
+- Use absolute dates in ISO-8601 format when possible.
+- Keep source labels short and factual.
+- Prefer the exact wording used by the source for adoption metrics, or a conservative summary such as `700+ publishers`.
+- If the source does not actually state a number, omit the metric.
+- If the source is under maintenance or unavailable, note that instead of guessing.
+
+Output:
+Return one JSON object per initiative using the catalog's field names. Use this shape:
+{
+  "slug": "example-initiative",
+  "title": "string",
+  "website": "https://example.org",
+  "status": "live | wip",
+  "summary": "Optional one-line summary if it needs updating",
+  "evidenceLinks": [
+    {
+      "label": "Short factual label",
+      "url": "https://example.org/post",
+      "date": "2026-01-15"
+    }
+  ],
+  "usersCount": "700+ publishers",
+  "dataVolume": null,
+  "moneyVolume": null,
+  "metricEvidence": {
+    "usersCount": {
+      "basis": "explicit | derived",
+      "notes": "Optional short sourcing note",
+      "sources": [
+        {
+          "label": "Publisher program announced",
+          "url": "https://example.org/adoption-post",
+          "date": "2026-01-15"
+        }
+      ]
+    },
+  },
+  "considerations": "Optional note about non-compliance, weak sourcing, ambiguity, or missing data",
+  "references": []
+}
+
+Rules:
+- Use `evidenceLinks` for all dated public evidence. Put the newest meaningful update first.
+- Use top-level `usersCount`, `dataVolume`, and `moneyVolume` when a public metric is worth recording.
+- When you add a metric, also add matching `metricEvidence`.
+- Omit fields you are not proposing to change. Do not invent `confidence`, `sourceType`, `latestEvidence`, or nested `adoption` objects.
+- Only include `references` when the cited key already exists in the shared references corpus.
+
+Then provide a short human-readable summary:
+- Top 5 notable updates, each with one link
+- Any adoption claims that should not be merged without extra review
+
+Search tips:
+- Use site: filters for official domains first.
+- Include terms like: update, release, launch, roadmap, changelog, docs, partners, adoption, deployment, enforcement, robots.txt, ai.txt, tollgate, certification.
+- For repos, look at releases, tags, docs commits, or discussion posts instead of guessing from commit velocity.

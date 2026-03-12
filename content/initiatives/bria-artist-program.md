@@ -1,0 +1,32 @@
+---
+title: Bria Artist Program / Licensed Training Catalog
+summary: Contributor compensation and licensed visual training-data program tied to Bria's commercially safe generative AI stack.
+status: live
+website: 'https://bria.ai/artist-program'
+actionsSupported:
+  - data-market-platform
+pipelineStages:
+  - train
+tags:
+  - visual-media
+  - contributors
+  - compensation
+  - licensed-data
+usersCount: '30+ data partners'
+metricEvidence:
+  usersCount:
+    basis: explicit
+    sources:
+      - label: Licensed training catalog published
+        url: 'https://bria.ai/licensed-training-catalog'
+        date: '2025-04-30'
+evidenceLinks:
+  - label: Licensed training catalog published
+    url: 'https://bria.ai/licensed-training-catalog'
+    date: '2025-04-30'
+considerations: Bria is a vertically integrated model vendor rather than a neutral marketplace or reusable web standard.
+visibility: public
+type: data_license_initiative
+---
+
+Bria combines a contributor program, licensed training catalog, and enterprise model stack to offer generative AI built on commercial rights. It is worth tracking because it turns dataset licensing and artist compensation into a concrete go-to-market layer rather than treating them as back-office compliance only.
