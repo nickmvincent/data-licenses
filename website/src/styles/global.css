@@ -1484,6 +1484,45 @@ input[type='search'] {
   color: var(--muted);
 }
 
+.catalog-group-stack {
+  display: grid;
+  gap: 20px;
+}
+
+.catalog-group {
+  display: grid;
+  gap: 12px;
+}
+
+.catalog-group-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 2px 2px 0;
+}
+
+.catalog-group-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.catalog-group-title {
+  margin: 0;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+}
+
+.catalog-group-copy {
+  margin: 0.35rem 0 0;
+  max-width: 42rem;
+  color: var(--muted);
+}
+
 .catalog-table-wrap {
   overflow: auto;
   border: 1px solid var(--border);

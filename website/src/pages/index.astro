@@ -47,6 +47,19 @@ const GOAL_OPTIONS = [
   },
 ];
 
+type MarketGroup = 'primary' | 'market';
+
+const GROUP_DETAILS: Record<MarketGroup, { title: string; description: string }> = {
+  primary: {
+    title: 'Everything else',
+    description: 'Signals, standards, controls, collectives, and mixed models.',
+  },
+  market: {
+    title: 'Pure markets/platforms',
+    description: 'Entries whose only catalog approach is `data-market-platform`.',
+  },
+};
+
 function statusRank(status: string) {
   return status === 'live' ? 0 : 1;
 }
@@ -89,9 +102,27 @@ function formatPipelineSummary(pipelineStages: string[]) {
   return `Pipeline: ${pipelineStages.map((stage) => PIPELINE_LABELS[stage] || stage).join(' -> ')}`;
 }
 
+function marketGroupForItem(item: LoadedInitiative): MarketGroup {
+  return item.actionsSupported.length === 1 && item.actionsSupported[0] === 'data-market-platform'
+    ? 'market'
+    : 'primary';
+}
+
 const items: LoadedInitiative[] = (await loadInitiatives()).sort(sortByLatestThenTitle);
 const bySlug = Object.fromEntries(items.map((item) => [item.slug, item]));
 const byId = Object.fromEntries(items.map((item) => [item.id, item]));
+const groupedItems: Array<{ key: MarketGroup; items: LoadedInitiative[]; title: string; description: string }> = [
+  {
+    key: 'primary',
+    items: items.filter((item) => marketGroupForItem(item) === 'primary'),
+    ...GROUP_DETAILS.primary,
+  },
+  {
+    key: 'market',
+    items: items.filter((item) => marketGroupForItem(item) === 'market'),
+    ...GROUP_DETAILS.market,
+  },
+];
 
 const actions: string[] = Array.from(new Set(items.flatMap((item) => item.actionsSupported || [])))
   .sort((a, b) => (ACTION_LABELS[a] || a).localeCompare(ACTION_LABELS[b] || b));
@@ -195,56 +226,235 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       <div id="active-filter-chips" class="active-filter-chips" hidden></div>
     </section>
 
-    <div id="spreadsheet-view" class="catalog-table-wrap">
-      <table class="catalog-table">
-        <thead>
-          <tr>
-            <th>Initiative</th>
-            <th>Website</th>
-            <th>Latest update</th>
-            <th>Approach</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-          {items.map((item) => {
-            const latest = item.latestEvidenceLink;
-            const actionSummary = formatActionSummary(item.actionsSupported);
-            const pipelineSummary = formatPipelineSummary(item.pipelineStages);
-            const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
-            const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
-            const hasMetrics = Boolean(item.usersCount || item.dataVolume || item.moneyVolume);
-            const hasRowDetails = (item.evidenceLinks || []).length > 1 ||
-              (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
-              hasMetrics;
+    <div id="spreadsheet-view" class="catalog-group-stack">
+      {groupedItems.map((group) => (
+        <section
+          id={`spreadsheet-group-${group.key}`}
+          class="catalog-group"
+          data-market-group={group.key}
+        >
+          <div class="catalog-group-head">
+            <div>
+              <p class="catalog-group-kicker">Spreadsheet view</p>
+              <h2 class="catalog-group-title">{group.title}</h2>
+              <p class="catalog-group-copy">{group.description}</p>
+            </div>
+          </div>
+          <div class="catalog-table-wrap">
+            <table class="catalog-table">
+              <thead>
+                <tr>
+                  <th>Initiative</th>
+                  <th>Website</th>
+                  <th>Latest update</th>
+                  <th>Approach</th>
+                </tr>
+              </thead>
+              <tbody id={`table-body-${group.key}`}>
+                {group.items.map((item) => {
+                  const latest = item.latestEvidenceLink;
+                  const actionSummary = formatActionSummary(item.actionsSupported);
+                  const pipelineSummary = formatPipelineSummary(item.pipelineStages);
+                  const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
+                  const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
+                  const hasMetrics = Boolean(item.usersCount || item.dataVolume || item.moneyVolume);
+                  const hasRowDetails = (item.evidenceLinks || []).length > 1 ||
+                    (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
+                    hasMetrics;
 
-            return (
-              <tr
-                class="catalog-row"
-                data-item={item.slug}
-                data-title={item.title.toLowerCase()}
-                data-summary={(item.summary || '').toLowerCase()}
-                data-tags={(item.tags || []).join(' ').toLowerCase()}
-                data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
-                data-status={item.status}
-                data-website={formatLinkLabel(item.website).toLowerCase()}
-                data-approach={searchableApproach}
-                data-evidence={evidenceSearchText}
-                data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
-              >
-                <td class="catalog-row-main" data-label="Initiative">
-                  <div class="catalog-row-titleline">
-                    <a class="catalog-row-title" href={item.website} target="_blank" rel="noopener">{item.title}</a>
+                  return (
+                    <tr
+                      class="catalog-row"
+                      data-item={item.slug}
+                      data-market-group={group.key}
+                      data-title={item.title.toLowerCase()}
+                      data-summary={(item.summary || '').toLowerCase()}
+                      data-tags={(item.tags || []).join(' ').toLowerCase()}
+                      data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
+                      data-status={item.status}
+                      data-website={formatLinkLabel(item.website).toLowerCase()}
+                      data-approach={searchableApproach}
+                      data-evidence={evidenceSearchText}
+                      data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
+                    >
+                      <td class="catalog-row-main" data-label="Initiative">
+                        <div class="catalog-row-titleline">
+                          <a class="catalog-row-title" href={item.website} target="_blank" rel="noopener">{item.title}</a>
+                          <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
+                        </div>
+                        <p class="catalog-row-summary">{item.summary}</p>
+                        {hasRowDetails && (
+                          <details class="catalog-row-details">
+                            <summary class="catalog-row-details-toggle">More context</summary>
+                            <div class="catalog-row-details-content">
+                              {(item.evidenceLinks || []).length > 0 && (
+                                <div class="catalog-row-detail">
+                                  <span class="catalog-row-detail-label">Evidence trail</span>
+                                  <ul class="catalog-row-links">
+                                    {(item.evidenceLinks || []).map((link) => (
+                                      <li>
+                                        <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
+                                        <span class="catalog-evidence-date">{formatDate(link.date)}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+
+                              {(Array.isArray(item.dependsOn) && item.dependsOn.length > 0) && (
+                                <div class="catalog-row-detail">
+                                  <span class="catalog-row-detail-label">Uses</span>
+                                  <div class="catalog-row-detail-chips">
+                                    {item.dependsOn.map((dependency) => {
+                                      const related = bySlug[dependency] || byId[dependency];
+                                      const label = (related && related.title) || dependency;
+                                      return <span class="chip">{label}</span>;
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
+                              {hasMetrics && (
+                                <div class="catalog-row-detail">
+                                  <span class="catalog-row-detail-label">Signals</span>
+                                  <div class="catalog-row-detail-chips">
+                                    {item.usersCount && (
+                                      <span class="chip metric-chip">
+                                        <span class="chip-label">Users</span>
+                                        {item.usersCount}
+                                      </span>
+                                    )}
+                                    {item.dataVolume && (
+                                      <span class="chip metric-chip">
+                                        <span class="chip-label">Data</span>
+                                        {item.dataVolume}
+                                      </span>
+                                    )}
+                                    {item.moneyVolume && (
+                                      <span class="chip metric-chip">
+                                        <span class="chip-label">Payments</span>
+                                        {item.moneyVolume}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </details>
+                        )}
+                      </td>
+                      <td class="catalog-row-site" data-label="Website">
+                        <a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a>
+                      </td>
+                      <td class="catalog-row-update" data-label="Latest update">
+                        {latest ? (
+                          <>
+                            <span class="catalog-row-date">{formatDate(latest.date)}</span>
+                            <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
+                          </>
+                        ) : (
+                          <span class="muted">No evidence links yet</span>
+                        )}
+                      </td>
+                      <td class="catalog-row-type" data-label="Approach">
+                        <span>{actionSummary}</span>
+                        {pipelineSummary && <span class="catalog-row-subtle">{pipelineSummary}</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <section id="cards-view" class="catalog-group-stack" hidden>
+      {groupedItems.map((group) => (
+        <section
+          id={`cards-group-${group.key}`}
+          class="catalog-group"
+          data-market-group={group.key}
+        >
+          <div class="catalog-group-head">
+            <div>
+              <p class="catalog-group-kicker">Card view</p>
+              <h2 class="catalog-group-title">{group.title}</h2>
+              <p class="catalog-group-copy">{group.description}</p>
+            </div>
+          </div>
+          <div id={`cards-grid-${group.key}`} class="catalog-card-grid">
+            {group.items.map((item) => {
+              const latest = item.latestEvidenceLink;
+              const actionSummary = formatActionSummary(item.actionsSupported);
+              const pipelineSummary = formatPipelineSummary(item.pipelineStages);
+              const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
+              const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
+              const hasDetails = (item.evidenceLinks || []).length > 0 ||
+                (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
+                item.usersCount || item.dataVolume || item.moneyVolume ||
+                (Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) ||
+                (Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0);
+
+              return (
+                <article
+                  class="catalog-card"
+                  data-item={item.slug}
+                  data-market-group={group.key}
+                  data-title={item.title.toLowerCase()}
+                  data-summary={(item.summary || '').toLowerCase()}
+                  data-tags={(item.tags || []).join(' ').toLowerCase()}
+                  data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
+                  data-status={item.status}
+                  data-website={formatLinkLabel(item.website).toLowerCase()}
+                  data-approach={searchableApproach}
+                  data-evidence={evidenceSearchText}
+                  data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
+                >
+                  <div class="catalog-card-header">
+                    <h2 class="catalog-card-title">
+                      <a class="catalog-card-title-link" href={item.website} target="_blank" rel="noopener">{item.title}</a>
+                    </h2>
                     <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
                   </div>
-                  <p class="catalog-row-summary">{item.summary}</p>
-                  {hasRowDetails && (
-                    <details class="catalog-row-details">
-                      <summary class="catalog-row-details-toggle">More context</summary>
-                      <div class="catalog-row-details-content">
+
+                  <p class="catalog-card-summary">{item.summary}</p>
+
+                  <dl class="catalog-card-meta">
+                    <div>
+                      <dt>Website</dt>
+                      <dd><a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a></dd>
+                    </div>
+                    <div>
+                      <dt>Latest update</dt>
+                      <dd>
+                        {latest ? (
+                          <>
+                            <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
+                            <span class="catalog-card-date">{formatDate(latest.date)}</span>
+                          </>
+                        ) : (
+                          <span class="muted">No evidence links yet</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Approach</dt>
+                      <dd>{actionSummary}</dd>
+                    </div>
+                  </dl>
+
+                  {pipelineSummary && <p class="catalog-card-subtle">{pipelineSummary}</p>}
+
+                  {hasDetails && (
+                    <details class="card-details">
+                      <summary class="details-toggle">Details</summary>
+                      <div class="details-content">
                         {(item.evidenceLinks || []).length > 0 && (
-                          <div class="catalog-row-detail">
-                            <span class="catalog-row-detail-label">Evidence trail</span>
-                            <ul class="catalog-row-links">
+                          <div class="detail-section detail-stack">
+                            <span class="detail-label">Evidence trail</span>
+                            <ul class="catalog-evidence-list">
                               {(item.evidenceLinks || []).map((link) => (
                                 <li>
                                   <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
@@ -256,227 +466,84 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                         )}
 
                         {(Array.isArray(item.dependsOn) && item.dependsOn.length > 0) && (
-                          <div class="catalog-row-detail">
-                            <span class="catalog-row-detail-label">Uses</span>
-                            <div class="catalog-row-detail-chips">
-                              {item.dependsOn.map((dependency) => {
-                                const related = bySlug[dependency] || byId[dependency];
-                                const label = (related && related.title) || dependency;
-                                return <span class="chip">{label}</span>;
-                              })}
-                            </div>
+                          <div class="detail-section">
+                            <span class="detail-label">Uses</span>
+                            {item.dependsOn.map((dependency) => {
+                              const related = bySlug[dependency] || byId[dependency];
+                              const label = (related && related.title) || dependency;
+                              return <span class="chip">{label}</span>;
+                            })}
                           </div>
                         )}
 
-                        {hasMetrics && (
-                          <div class="catalog-row-detail">
-                            <span class="catalog-row-detail-label">Signals</span>
-                            <div class="catalog-row-detail-chips">
-                              {item.usersCount && (
-                                <span class="chip metric-chip">
-                                  <span class="chip-label">Users</span>
-                                  {item.usersCount}
-                                </span>
-                              )}
-                              {item.dataVolume && (
-                                <span class="chip metric-chip">
-                                  <span class="chip-label">Data</span>
-                                  {item.dataVolume}
-                                </span>
-                              )}
-                              {item.moneyVolume && (
-                                <span class="chip metric-chip">
-                                  <span class="chip-label">Payments</span>
-                                  {item.moneyVolume}
-                                </span>
-                              )}
+                        {(item.usersCount || item.dataVolume || item.moneyVolume) && (
+                          <div class="detail-section">
+                            {item.usersCount && (
+                              <span class="chip metric-chip">
+                                <span class="chip-label">Users</span>
+                                {item.usersCount}
+                              </span>
+                            )}
+                            {item.dataVolume && (
+                              <span class="chip metric-chip">
+                                <span class="chip-label">Data</span>
+                                {item.dataVolume}
+                              </span>
+                            )}
+                            {item.moneyVolume && (
+                              <span class="chip metric-chip">
+                                <span class="chip-label">Payments</span>
+                                {item.moneyVolume}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {(Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) && (
+                          <div class="detail-section detail-stack">
+                            <span class="detail-label">Related references</span>
+                            <ul class="references-list">
+                              {item.referencesResolved.map((reference) => (
+                                <li>
+                                  {reference.url ? (
+                                    <a href={reference.url} target="_blank" rel="noopener">{formatCitation(reference)}</a>
+                                  ) : (
+                                    <span>{formatCitation(reference)}</span>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0 && (
+                          <div class="detail-section detail-stack">
+                            <span class="detail-label">Implementation</span>
+                            <div class="snippets-wrap">
+                              {item.implementationSnippets.map((snippet) => (
+                                <div class="snippet">
+                                  <div class="snippet-head">
+                                    <span class="chip">{snippet.title}</span>
+                                    {snippet.sourceUrl && (
+                                      <a href={snippet.sourceUrl} target="_blank" rel="noopener" title="Source">Source</a>
+                                    )}
+                                    <button type="button" class="copy" data-code={encodeURIComponent(snippet.code || '')}>Copy</button>
+                                  </div>
+                                  <pre class="code"><code>{snippet.code}</code></pre>
+                                </div>
+                              ))}
                             </div>
                           </div>
                         )}
                       </div>
                     </details>
                   )}
-                </td>
-                <td class="catalog-row-site" data-label="Website">
-                  <a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a>
-                </td>
-                <td class="catalog-row-update" data-label="Latest update">
-                  {latest ? (
-                    <>
-                      <span class="catalog-row-date">{formatDate(latest.date)}</span>
-                      <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
-                    </>
-                  ) : (
-                    <span class="muted">No evidence links yet</span>
-                  )}
-                </td>
-                <td class="catalog-row-type" data-label="Approach">
-                  <span>{actionSummary}</span>
-                  {pipelineSummary && <span class="catalog-row-subtle">{pipelineSummary}</span>}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-
-    <section id="cards-view" class="catalog-card-grid" hidden>
-      {items.map((item) => {
-        const latest = item.latestEvidenceLink;
-        const actionSummary = formatActionSummary(item.actionsSupported);
-        const pipelineSummary = formatPipelineSummary(item.pipelineStages);
-        const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
-        const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
-        const hasDetails = (item.evidenceLinks || []).length > 0 ||
-          (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
-          item.usersCount || item.dataVolume || item.moneyVolume ||
-          (Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) ||
-          (Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0);
-
-        return (
-          <article
-            class="catalog-card"
-            data-item={item.slug}
-            data-title={item.title.toLowerCase()}
-            data-summary={(item.summary || '').toLowerCase()}
-            data-tags={(item.tags || []).join(' ').toLowerCase()}
-            data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
-            data-status={item.status}
-            data-website={formatLinkLabel(item.website).toLowerCase()}
-            data-approach={searchableApproach}
-            data-evidence={evidenceSearchText}
-            data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
-          >
-            <div class="catalog-card-header">
-              <h2 class="catalog-card-title">
-                <a class="catalog-card-title-link" href={item.website} target="_blank" rel="noopener">{item.title}</a>
-              </h2>
-              <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
-            </div>
-
-            <p class="catalog-card-summary">{item.summary}</p>
-
-            <dl class="catalog-card-meta">
-              <div>
-                <dt>Website</dt>
-                <dd><a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a></dd>
-              </div>
-              <div>
-                <dt>Latest update</dt>
-                <dd>
-                  {latest ? (
-                    <>
-                      <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
-                      <span class="catalog-card-date">{formatDate(latest.date)}</span>
-                    </>
-                  ) : (
-                    <span class="muted">No evidence links yet</span>
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt>Approach</dt>
-                <dd>{actionSummary}</dd>
-              </div>
-            </dl>
-
-            {pipelineSummary && <p class="catalog-card-subtle">{pipelineSummary}</p>}
-
-            {hasDetails && (
-              <details class="card-details">
-                <summary class="details-toggle">Details</summary>
-                <div class="details-content">
-                  {(item.evidenceLinks || []).length > 0 && (
-                    <div class="detail-section detail-stack">
-                      <span class="detail-label">Evidence trail</span>
-                      <ul class="catalog-evidence-list">
-                        {(item.evidenceLinks || []).map((link) => (
-                          <li>
-                            <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
-                            <span class="catalog-evidence-date">{formatDate(link.date)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {(Array.isArray(item.dependsOn) && item.dependsOn.length > 0) && (
-                    <div class="detail-section">
-                      <span class="detail-label">Uses</span>
-                      {item.dependsOn.map((dependency) => {
-                        const related = bySlug[dependency] || byId[dependency];
-                        const label = (related && related.title) || dependency;
-                        return <span class="chip">{label}</span>;
-                      })}
-                    </div>
-                  )}
-
-                  {(item.usersCount || item.dataVolume || item.moneyVolume) && (
-                    <div class="detail-section">
-                      {item.usersCount && (
-                        <span class="chip metric-chip">
-                          <span class="chip-label">Users</span>
-                          {item.usersCount}
-                        </span>
-                      )}
-                      {item.dataVolume && (
-                        <span class="chip metric-chip">
-                          <span class="chip-label">Data</span>
-                          {item.dataVolume}
-                        </span>
-                      )}
-                      {item.moneyVolume && (
-                        <span class="chip metric-chip">
-                          <span class="chip-label">Payments</span>
-                          {item.moneyVolume}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {(Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) && (
-                    <div class="detail-section detail-stack">
-                      <span class="detail-label">Related references</span>
-                      <ul class="references-list">
-                        {item.referencesResolved.map((reference) => (
-                          <li>
-                            {reference.url ? (
-                              <a href={reference.url} target="_blank" rel="noopener">{formatCitation(reference)}</a>
-                            ) : (
-                              <span>{formatCitation(reference)}</span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0 && (
-                    <div class="detail-section detail-stack">
-                      <span class="detail-label">Implementation</span>
-                      <div class="snippets-wrap">
-                        {item.implementationSnippets.map((snippet) => (
-                          <div class="snippet">
-                            <div class="snippet-head">
-                              <span class="chip">{snippet.title}</span>
-                              {snippet.sourceUrl && (
-                                <a href={snippet.sourceUrl} target="_blank" rel="noopener" title="Source">Source</a>
-                              )}
-                              <button type="button" class="copy" data-code={encodeURIComponent(snippet.code || '')}>Copy</button>
-                            </div>
-                            <pre class="code"><code>{snippet.code}</code></pre>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </details>
-            )}
-          </article>
-        );
-      })}
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ))}
     </section>
 
     <p id="empty" class="catalog-empty muted" hidden>
@@ -501,7 +568,22 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       const chipsContainer = queryOne('#active-filter-chips');
       const spreadsheetView = queryOne('#spreadsheet-view');
       const cardsView = queryOne('#cards-view');
-      const tableBody = queryOne('#table-body');
+      const tableBodies = {
+        primary: queryOne('#table-body-primary'),
+        market: queryOne('#table-body-market'),
+      };
+      const spreadsheetGroups = {
+        primary: queryOne('#spreadsheet-group-primary'),
+        market: queryOne('#spreadsheet-group-market'),
+      };
+      const cardGrids = {
+        primary: queryOne('#cards-grid-primary'),
+        market: queryOne('#cards-grid-market'),
+      };
+      const cardGroups = {
+        primary: queryOne('#cards-group-primary'),
+        market: queryOne('#cards-group-market'),
+      };
       const emptyState = queryOne('#empty');
       const clearButton = queryOne('#clear');
       const resetButton = queryOne('#reset-filters');
@@ -519,7 +601,14 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         chipsContainer,
         spreadsheetView,
         cardsView,
-        tableBody,
+        tableBodies.primary,
+        tableBodies.market,
+        spreadsheetGroups.primary,
+        spreadsheetGroups.market,
+        cardGrids.primary,
+        cardGrids.market,
+        cardGroups.primary,
+        cardGroups.market,
         emptyState,
         panelSummary,
       ];
@@ -530,7 +619,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       let currentView = 'spreadsheet';
 
       const actionButtons = () => queryAll('.catalog-action', actionsContainer);
-      const rowNodes = () => queryAll('.catalog-row', tableBody);
+      const rowNodes = () => queryAll('.catalog-row', spreadsheetView);
       const cardNodes = () => queryAll('.catalog-card', cardsView);
       const cardsById = () => new Map(cardNodes().map((card) => [card.dataset.item || '', card]));
       const getGoalButton = (goal) => goalButtons.find((button) => button.dataset.goal === goal) || null;
@@ -752,10 +841,18 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         });
 
         visibleItems.sort((a, b) => compareItems(a, b, sortMode));
+        const visibleByGroup = { primary: 0, market: 0 };
         visibleItems.forEach((item) => {
-          tableBody.appendChild(item.row);
-          if (item.card) cardsView.appendChild(item.card);
+          const marketGroup = item.row.dataset.marketGroup === 'market' ? 'market' : 'primary';
+          visibleByGroup[marketGroup] += 1;
+          tableBodies[marketGroup].appendChild(item.row);
+          if (item.card) cardGrids[marketGroup].appendChild(item.card);
         });
+
+        spreadsheetGroups.primary.hidden = visibleByGroup.primary === 0;
+        spreadsheetGroups.market.hidden = visibleByGroup.market === 0;
+        cardGroups.primary.hidden = visibleByGroup.primary === 0;
+        cardGroups.market.hidden = visibleByGroup.market === 0;
 
         countText.textContent = String(visibleItems.length);
         emptyState.hidden = visibleItems.length !== 0;
