@@ -16,21 +16,41 @@ const sourceTiers = [
   },
 ];
 
-const workflowSteps = [
-  'Start with the initiative record already in the catalog: canonical website, current evidence links, and any existing metrics.',
-  'Check official sources first. For each initiative, look at its website, docs, repo, press page, and any public specification or product documentation.',
-  'Capture the newest dated public update that reflects a meaningful change. This becomes the best candidate for the newest `evidenceLinks` item.',
-  'Look for explicit public adoption claims. Good examples are partner counts, publisher counts, dataset counts, queries, pages, or disclosed payment volume.',
-  'Keep the wording conservative. If a source says "over 700 publishers," use `700+ publishers` rather than a more aggressive interpretation.',
-  'Hand off the candidate evidence to a human reviewer before merge. AI agents are for first-pass collection, not silent publication.',
+const goals = [
+  'Keep the catalog grounded in concrete initiatives that shape AI data access, licensing, enforcement, compensation, or negotiation.',
+  'Make every meaningful claim inspectable through dated public evidence that a reader can click and sanity-check.',
+  'Track updates and adoption signals without overstating what the evidence proves.',
+  'Keep the contribution path friendly to humans, while allowing tools and agents to help with first-pass research.',
 ];
 
-const checklist = [
+const generalFlow = [
+  'Confirm the initiative is in scope and identify its canonical website or public home.',
+  'Read the existing entry first so you know what evidence, metrics, and caveats are already recorded.',
+  'Check official sources first: website, docs, repo, spec, changelog, press page, or announcement post.',
+  'Add the newest meaningful dated update to `evidenceLinks`; if no dated source exists, leave recency sparse rather than inventing it.',
+  'Add adoption metrics only when a public source explicitly states them, and pair each one with matching `metricEvidence`.',
+  'Write down ambiguity, weak evidence, or missing pieces in `considerations`, the PR, or the review note.',
+  'Have a human reviewer make the merge decision and the final call on wording.',
+];
+
+const humanContributionTips = [
+  'Start small. One well-sourced initiative update is more useful than a shallow sweep of many.',
+  'Use short, neutral summaries that describe what the initiative does, not what its backers hope it will do.',
   'Every proposed update should have at least one clickable source and a date.',
   'Every `usersCount`, `dataVolume`, or `moneyVolume` value should be grounded in public evidence and paired with `metricEvidence`.',
-  'If the evidence is weak, stale, or contradictory, say so in `considerations`, the PR, or the review note instead of smoothing it over.',
-  'Use absolute dates, short factual labels, and neutral summaries.',
+  'If evidence is weak, stale, or contradictory, say so plainly instead of smoothing it over.',
+  'When you cannot verify a number, omit it instead of rounding, inferring, or translating hype into certainty.',
+  'Use absolute dates, short factual labels, and explicit caveats.',
   'Do not infer adoption from website traffic, social followers, GitHub stars, or general media attention.',
+];
+
+const agentWorkflowSteps = [
+  'Start from the public catalog JSON, curation JSON, and the current initiative record.',
+  'Prefer primary sources and dated official pages. Use secondary coverage only to confirm or contextualize.',
+  'Propose the newest meaningful `evidenceLinks` item first, then only the fields that actually changed.',
+  'Add `usersCount`, `dataVolume`, or `moneyVolume` only when a public source explicitly supports them, and include matching `metricEvidence`.',
+  'Use `considerations` to flag weak, stale, conflicting, or partial evidence instead of smoothing it over.',
+  'Return a flat initiative object using the catalog\'s current field names so a human can review it quickly.',
 ];
 
 const fieldRows = [
@@ -134,59 +154,74 @@ considerations: Partner count comes from the launch post and may understate curr
 
 <Layout
   title="Methodology"
-  description="How DataLicenses.org verifies initiative updates, adoption claims, and AI-assisted contribution research."
+  description="How DataLicenses.org scopes initiatives, reviews human contributions, and optionally uses AI-assisted first-pass research."
 >
   <main class="wrap narrow methodology-page">
     <header class="page-header">
       <p class="eyebrow">How we verify things</p>
       <h1>Methodology</h1>
       <p class="muted methodology-intro">
-        DataLicenses.org uses AI agents for first-pass research, but the catalog itself is evidence-led.
-        We only want updates and adoption signals that a contributor or reader can click through,
-        date, and sanity-check.
+        DataLicenses.org is human-curated and evidence-led. The first pass on this catalog was assembled
+        manually, and this page should not imply otherwise. AI tools can help collect candidate evidence,
+        but contributors and editors decide what belongs in the catalog, how claims are phrased, and which
+        caveats stay attached.
       </p>
     </header>
 
     <section class="methodology-grid">
       <article class="box section methodology-card">
-        <h2>Latest update</h2>
+        <h2>Human-curated</h2>
         <p>
-          The site's "Latest update" value is derived from the newest dated <code>evidenceLinks</code>
-          entry attached to an initiative. If we do not have a dated public source, we should leave the
-          field sparse rather than invent recency.
+          Contributors and editors make the inclusion decisions, choose the wording, and decide how much
+          uncertainty to carry into the final record.
         </p>
       </article>
 
       <article class="box section methodology-card">
-        <h2>Adoption metrics</h2>
+        <h2>Public evidence</h2>
         <p>
-          Counts like <code>usersCount</code>, <code>dataVolume</code>, and <code>moneyVolume</code>
-          should be short summaries of explicit public claims. We use conservative phrasing and avoid
-          extrapolating beyond what the source actually says. Each metric should also carry a
-          matching <code>metricEvidence</code> entry so contributors can see exactly what supports it.
+          The site's "Latest update" comes from the newest dated <code>evidenceLinks</code> entry attached
+          to an initiative. If we cannot click and date a claim, we should treat it as unconfirmed.
         </p>
       </article>
 
       <article class="box section methodology-card">
-        <h2>Agent-first, human-reviewed</h2>
+        <h2>Conservative metrics</h2>
         <p>
-          AI agents are welcome for collecting candidate evidence and summarizing it. A human should still
-          decide what gets merged into the catalog and how caveats are represented.
+          Counts like <code>usersCount</code>, <code>dataVolume</code>, and <code>moneyVolume</code> should
+          stay close to explicit public claims and carry matching <code>metricEvidence</code>.
         </p>
       </article>
     </section>
 
     <section class="box section">
-      <h2>Research Workflow</h2>
+      <h2>General Goals</h2>
+      <ul class="method-list">
+        {goals.map((goal) => (
+          <li>{goal}</li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="box section">
+      <h2>General Contribution Flow</h2>
       <ol class="method-list">
-        {workflowSteps.map((step) => (
+        {generalFlow.map((step) => (
           <li>{step}</li>
         ))}
       </ol>
+    </section>
+
+    <section class="box section">
+      <h2>Tips for Human Contributions</h2>
+      <ul class="method-list">
+        {humanContributionTips.map((tip) => (
+          <li>{tip}</li>
+        ))}
+      </ul>
       <p class="muted small">
-        Starter assets: <a href="/data/initiatives.json">catalog JSON</a>,
-        <a href="/data/curation.json"> curation JSON</a>, and the
-        <a href="/prompts/find-updates.txt"> update-research prompt</a>.
+        Contributions are easier to review when the PR or note also says which sources were checked and what
+        was ruled out as too weak to include.
       </p>
     </section>
 
@@ -237,15 +272,6 @@ considerations: Partner count comes from the launch post and may understate curr
     </section>
 
     <section class="box section">
-      <h2>Review Checklist</h2>
-      <ul class="method-list">
-        {checklist.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
-    </section>
-
-    <section class="box section">
       <h2>Curation Backlog</h2>
       <p>
         We now track two editorial statuses in structured form. <code>evidenceStatus</code> tells us whether an
@@ -253,39 +279,35 @@ considerations: Partner count comes from the launch post and may understate curr
         adoption metrics are already populated, still worth researching, or probably hard to quantify for now.
       </p>
       <p>
-        Contributors and agents can inspect the current backlog at <a href="/data/curation.json">/data/curation.json</a>.
+        Contributors can inspect the current backlog at <a href="/data/curation.json">/data/curation.json</a>.
       </p>
     </section>
 
     <section class="box section">
-      <h2>AI Agent Output Contract</h2>
+      <h2>Optional AI Agent Workflow</h2>
       <p>
-        We want AI-generated research to be structured enough for review and close to merge-ready.
-        The easiest path is a flat initiative object using the same field names the catalog already stores.
+        AI assistance is optional and mostly useful for terse, merge-friendly first-pass packets. The goal
+        is to hand a human reviewer something structured and easy to challenge, not something that
+        auto-publishes.
       </p>
+      <ol class="method-list">
+        {agentWorkflowSteps.map((step) => (
+          <li>{step}</li>
+        ))}
+      </ol>
+      <p class="muted small">
+        Starter assets: <a href="/data/initiatives.json">catalog JSON</a>,
+        <a href="/data/curation.json"> curation JSON</a>, and the
+        <a href="/prompts/find-updates.txt"> update-research prompt</a>.
+      </p>
+      <h3>Structured output</h3>
       <pre class="method-code"><code>{exampleJson}</code></pre>
-    </section>
-
-    <section class="box section">
-      <h2>Catalog Snippet</h2>
       <p>
         After review, the mergeable catalog object should stay compact. The key thing is that the public
         evidence remains attached to the initiative entry.
       </p>
+      <h3>Mergeable catalog snippet</h3>
       <pre class="method-code"><code>{exampleFrontmatter}</code></pre>
-    </section>
-
-    <section class="box section">
-      <h2>Contributor Checklist</h2>
-      <ul class="method-list">
-        {checklist.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
-      <p class="muted small">
-        Contributions are easier to review when the PR or note also says which sources were checked and what was
-        ruled out as too weak to include.
-      </p>
     </section>
   </main>
 </Layout>
@@ -311,6 +333,10 @@ considerations: Partner count comes from the launch post and may understate curr
   .tier-card h3,
   .methodology-card h2 {
     margin-bottom: 0.55rem;
+  }
+
+  .section h3 {
+    margin: 1.35rem 0 0.6rem;
   }
 
   .method-list {
