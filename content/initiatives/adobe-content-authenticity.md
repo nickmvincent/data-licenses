@@ -8,6 +8,9 @@ actionsSupported:
 pipelineStages:
   - train
   - generate
+dataTypes:
+  - images
+  - video
 tags:
   - content-credentials
   - metadata

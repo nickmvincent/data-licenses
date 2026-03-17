@@ -9,6 +9,8 @@ actionsSupported:
   - new-infrastructures
 pipelineStages:
   - train
+dataTypes:
+  - multimodal
 tags:
   - registry
   - creators

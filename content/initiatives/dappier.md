@@ -9,12 +9,17 @@ actionsSupported:
 pipelineStages:
   - retrieve
   - generate
+dataTypes:
+  - text
 tags:
   - publishers
   - rag
   - monetization
   - marketplace
 evidenceLinks:
+  - label: Licensing program launch announced
+    url: 'https://www.dappier.com/newsroom/dappier-launches-licensing-program-to-help-brands-and-publishers-monetize-content-in-ai-search/'
+    date: '2025-08-18'
   - label: DPA welcomed Dappier as a member
     url: 'https://www.thedpa.ai/post/dataset-providers-alliance-welcomes-created-by-humans-and-dappier'
     date: '2024-12-10'

@@ -7,6 +7,8 @@ actionsSupported:
   - data-market-platform
 pipelineStages:
   - train
+dataTypes:
+  - images
 tags:
   - visual-media
   - contributors
@@ -21,6 +23,9 @@ metricEvidence:
         url: 'https://bria.ai/licensed-training-catalog'
         date: '2025-04-30'
 evidenceLinks:
+  - label: Platform release highlights rights-clear models
+    url: 'https://blog.bria.ai/enterprise-grade-control-meets-creativity-new-platform-release'
+    date: '2025-09-18'
   - label: Licensed training catalog published
     url: 'https://bria.ai/licensed-training-catalog'
     date: '2025-04-30'

@@ -10,6 +10,9 @@ actionsSupported:
   - attach-preference-signal
 status: wip
 evidenceLinks:
+  - label: Vocabulary draft updated
+    url: 'https://datatracker.ietf.org/doc/draft-ietf-aipref-vocab/'
+    date: '2025-12-01'
   - label: Milestone for protocol specifications
     url: 'https://datatracker.ietf.org/wg/aipref/about/'
     date: '2025-08-01'

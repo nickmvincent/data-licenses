@@ -87,6 +87,10 @@
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Could be large in practice, but platform-wide counts would be inferred unless Hugging Face publishes them."
   },
+  "gloo-ai-licensing": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official launch materials support a conservative pooled-guarantee metric; broader participant totals are not clearly broken out."
+  },
   "global-copyright-exchange": {
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Official launch materials support a conservative catalog-size metric; newer official corpus claims exist but are currently undated."
@@ -94,6 +98,14 @@
   "human-native": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Human Native has dated product and acquisition updates, but I could not find a stable public marketplace-size metric."
+  },
+  "iptc-plus-data-mining-metadata": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Standards-layer metadata fields are live, but public deployment is diffuse and hard to count cleanly."
+  },
+  "microsoft-publisher-content-marketplace": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Launch announcement names seven initial publisher partners; broader marketplace adoption remains too early to quantify."
   },
   "noml": {
     "adoptionResearchStatus": "hard-to-quantify",
@@ -122,6 +134,10 @@
   "social-license-data-reuse": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Governance framework and toolkit rather than a product with obvious public usage counts."
+  },
+  "sourceaudio-ai-dataset-licensing": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Official materials support a conservative track-count metric for the opt-in AI licensing catalog."
   },
   "spawning-data-diligence": {
     "adoptionResearchStatus": "hard-to-quantify",

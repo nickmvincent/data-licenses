@@ -13,6 +13,10 @@ tags:
   - compliance-tooling
   - opt-out
   - python
+evidenceLinks:
+  - label: PyPI release 0.1.7 published
+    url: 'https://pypi.org/project/datadiligence/'
+    date: '2024-10-09'
 considerations: >-
   Coverage depends on which opt-out methods the tool knows about and, for some
   workflows, on access to external services maintained by Spawning.

@@ -15,7 +15,13 @@ tags:
   - mitigation
 dependsOn:
   - cloudflare-anti-scraping
-evidenceLinks: []
+evidenceLinks:
+  - label: easy-dataset-share paper published
+    url: 'https://arxiv.org/abs/2601.06621'
+    date: '2026-01-09'
+  - label: Project launch post published
+    url: 'https://www.lesswrong.com/posts/DA3vbSEfABLdoCt59/we-built-a-tool-to-protect-your-dataset-from-simple-scrapers'
+    date: '2025-09-13'
 visibility: public
 type: data_license_initiative
 ---

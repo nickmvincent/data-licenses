@@ -37,11 +37,13 @@ export type LoadedInitiative = {
   slug: string;
   title: string;
   summary: string;
+  body: string;
   website: string;
   actionsSupported: string[];
   jurisdictions: string[];
   signals: string[];
   pipelineStages: string[];
+  dataTypes: string[];
   considerations?: string;
   tags: string[];
   dependsOn: string[];
@@ -99,7 +101,7 @@ export async function loadInitiatives(): Promise<LoadedInitiative[]> {
   const items: LoadedInitiative[] = [];
   for (const file of files) {
     const raw = await fs.readFile(join(dir, file), 'utf8');
-    const { data } = parseFrontmatter(raw);
+    const { data, body } = parseFrontmatter(raw);
     const context = `Initiative ${file}`;
     const frontmatter = normalizeInitiativeFrontmatter(
       (data || {}) as Record<string, unknown>,
@@ -159,11 +161,13 @@ export async function loadInitiatives(): Promise<LoadedInitiative[]> {
       slug,
       title: frontmatter.title,
       summary: frontmatter.summary,
+      body,
       website: frontmatter.website,
       actionsSupported: frontmatter.actionsSupported,
       jurisdictions: frontmatter.jurisdictions,
       signals: frontmatter.signals,
       pipelineStages: frontmatter.pipelineStages,
+      dataTypes: frontmatter.dataTypes,
       considerations: frontmatter.considerations,
       tags: frontmatter.tags,
       dependsOn: frontmatter.dependsOn,

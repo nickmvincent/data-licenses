@@ -8,6 +8,8 @@ website: 'https://rslstandard.org/'
 actionsSupported:
   - attach-formal-license
   - attach-preference-signal
+dataTypes:
+  - web-content
 usersCount: '1,500+ organizations'
 dataVolume: 'billions of web pages'
 metricEvidence:

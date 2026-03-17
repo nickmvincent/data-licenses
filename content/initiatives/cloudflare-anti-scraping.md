@@ -14,6 +14,8 @@ actionsSupported:
   - technical-blocking
   - add-tollgate
   - attach-preference-signal
+dataTypes:
+  - web-content
 usersCount: '1M+ customers enabled AI bot blocking'
 dataVolume: '1B+ 402 responses/day'
 metricEvidence:

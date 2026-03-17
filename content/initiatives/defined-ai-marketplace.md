@@ -8,6 +8,8 @@ actionsSupported:
 pipelineStages:
   - train
   - fine-tune
+dataTypes:
+  - multimodal
 tags:
   - datasets
   - annotation

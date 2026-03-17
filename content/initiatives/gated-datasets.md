@@ -14,6 +14,10 @@ tags:
   - hugging-face
   - dataset-hosting
   - access-control
+evidenceLinks:
+  - label: Gated datasets launch explained
+    url: 'https://huggingface.co/blog/unlocking-the-source-of-gated-datasets'
+    date: '2022-09-30'
 implementationSnippets:
   - title: Basic gated dataset card
     language: yaml

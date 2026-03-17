@@ -8,11 +8,16 @@ actionsSupported:
 pipelineStages:
   - collect
   - retrieve
+dataTypes:
+  - web-content
 tags:
   - ietf
   - bot-authentication
   - ai-agents
 evidenceLinks:
+  - label: Use cases draft published
+    url: 'https://datatracker.ietf.org/doc/draft-nottingham-webbotauth-use-cases/'
+    date: '2026-01-18'
   - label: Charter approved
     url: 'https://datatracker.ietf.org/group/webbotauth/history/'
     date: '2025-10-23'

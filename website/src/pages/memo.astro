@@ -1,26 +1,245 @@
 ---
-import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import Layout from '../layouts/Layout.astro';
 import { loadMemo } from '../lib/content-loader';
+import { getMarkdownProcessor } from '../lib/markdown';
 
 const memo = await loadMemo();
-const markdown = await createMarkdownProcessor();
+const markdown = await getMarkdownProcessor();
 const rendered = await markdown.render(memo.body);
-const memoHtml = rendered.code;
+
+const memoTitle = typeof memo.frontmatter?.title === 'string' ? memo.frontmatter.title : 'Memo';
+const stripTags = (value: string) => value.replace(/<[^>]+>/g, '');
+const decodeEntities = (value: string) =>
+  value
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+const seenHeadingIds = new Map<string, number>();
+const headings: Array<{ id: string; level: number; text: string }> = [];
+
+const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level, inner) => {
+  const text = decodeEntities(stripTags(inner)).trim();
+  const base = slugify(text) || `section-${headings.length + 1}`;
+  const seenCount = seenHeadingIds.get(base) || 0;
+  seenHeadingIds.set(base, seenCount + 1);
+  const id = seenCount === 0 ? base : `${base}-${seenCount + 1}`;
+
+  headings.push({
+    id,
+    level: Number(level),
+    text,
+  });
+
+  return `<h${level} id="${id}">${inner}</h${level}>`;
+});
 ---
 
 <Layout title="Memo">
-  <main class="wrap narrow">
-    <header class="page-header">
-      <h1>Memo</h1>
-      <p class="muted">Read our memo on AI preference signals, licenses, and enforcement.</p>
+  <main class="wrap narrow memo-page">
+    <header class="page-header memo-header">
+      <div>
+        <p class="eyebrow">Briefing</p>
+        <h1>Memo</h1>
+        <p class="muted">{memoTitle}</p>
+      </div>
       <p>
-        <a class="btn" href="/">← Back to home</a>
+        <a class="btn" href="/">Back to catalog</a>
       </p>
     </header>
 
-    <article class="memo" set:html={memoHtml}>
-    </article>
+    <div class="memo-progress" aria-hidden="true">
+      <span id="memo-progress-bar"></span>
+    </div>
+
+    <div class="memo-shell">
+      {headings.length > 0 && (
+        <aside class="memo-toc box section">
+          <p class="eyebrow">On this page</p>
+          <nav class="memo-toc-nav" aria-label="Memo contents">
+            {headings.map((heading) => (
+              <a
+                href={`#${heading.id}`}
+                class={`memo-toc-link level-${heading.level}`}
+                data-heading-id={heading.id}
+              >
+                {heading.text}
+              </a>
+            ))}
+          </nav>
+        </aside>
+      )}
+
+      <article id="memo-article" class="memo box section" set:html={memoHtml}></article>
+    </div>
   </main>
-  
+
+  <script>
+    // @ts-nocheck
+    (() => {
+      const article = document.getElementById('memo-article');
+      const progressBar = document.getElementById('memo-progress-bar');
+      const tocLinks = Array.from(document.querySelectorAll('.memo-toc-link'));
+
+      if (!(article instanceof HTMLElement) || !(progressBar instanceof HTMLElement)) return;
+
+      const headingElements = tocLinks
+        .map((link) => {
+          if (!(link instanceof HTMLAnchorElement)) return null;
+          const id = link.dataset.headingId;
+          if (!id) return null;
+          const target = document.getElementById(id);
+          return target instanceof HTMLElement ? target : null;
+        })
+        .filter(Boolean);
+
+      function updateProgress() {
+        const articleTop = article.offsetTop;
+        const maxScroll = Math.max(article.offsetHeight - window.innerHeight, 1);
+        const progress = Math.max(
+          0,
+          Math.min(1, (window.scrollY - articleTop + 120) / maxScroll)
+        );
+        progressBar.style.transform = `scaleX(${progress})`;
+      }
+
+      function updateActiveHeading() {
+        if (headingElements.length === 0) return;
+
+        let currentId = headingElements[0].id;
+        headingElements.forEach((heading) => {
+          if (window.scrollY + 140 >= heading.offsetTop) {
+            currentId = heading.id;
+          }
+        });
+
+        tocLinks.forEach((link) => {
+          if (!(link instanceof HTMLElement)) return;
+          link.classList.toggle('active', link.dataset.headingId === currentId);
+        });
+      }
+
+      function updateMemoUi() {
+        updateProgress();
+        updateActiveHeading();
+      }
+
+      document.addEventListener('scroll', updateMemoUi, { passive: true });
+      window.addEventListener('resize', updateMemoUi);
+      updateMemoUi();
+    })();
+  </script>
 </Layout>
+
+<style>
+  .memo-page {
+    display: grid;
+    gap: 16px;
+  }
+
+  .memo-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: end;
+    flex-wrap: wrap;
+  }
+
+  .memo-header .muted {
+    margin: 0.55rem 0 0;
+    max-width: 44rem;
+  }
+
+  .memo-progress {
+    height: 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface-muted) 88%, var(--card));
+    overflow: hidden;
+  }
+
+  .memo-progress span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: left center;
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 48%, var(--warm)));
+  }
+
+  .memo-shell {
+    display: grid;
+    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .memo-toc {
+    position: sticky;
+    top: 90px;
+  }
+
+  .memo-toc-nav {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .memo-toc-link {
+    padding: 0.55rem 0.7rem;
+    border-radius: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    transition:
+      background 0.18s ease,
+      color 0.18s ease;
+  }
+
+  .memo-toc-link:hover {
+    background: color-mix(in srgb, var(--accent-soft) 48%, var(--card));
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .memo-toc-link.level-3 {
+    padding-left: 1.15rem;
+    font-size: 0.92rem;
+  }
+
+  .memo-toc-link.active {
+    background: color-mix(in srgb, var(--accent-soft) 62%, var(--card));
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .memo {
+    padding: 24px 28px;
+  }
+
+  .memo :global(h2),
+  .memo :global(h3) {
+    scroll-margin-top: 100px;
+  }
+
+  @media (max-width: 960px) {
+    .memo-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .memo-toc {
+      position: static;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .memo {
+      padding: 22px;
+    }
+  }
+</style>

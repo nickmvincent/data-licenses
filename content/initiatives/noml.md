@@ -8,6 +8,8 @@ actionsSupported:
 pipelineStages:
   - collect
   - train
+dataTypes:
+  - web-content
 signals:
   - noml
 tags:
@@ -15,6 +17,10 @@ tags:
   - x-robots-tag
   - search
   - machine-learning
+evidenceLinks:
+  - label: Project featured in scholarly article on search and AI opt-out
+    url: 'https://noml.info/project-featured-in-scholarly-article-on-search-engine-and-ai-opt-out/'
+    date: '2024-05-29'
 implementationSnippets:
   - title: HTML meta tag
     language: html

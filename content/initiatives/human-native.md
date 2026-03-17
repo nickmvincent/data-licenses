@@ -8,6 +8,8 @@ actionsSupported:
   - new-infrastructures
 pipelineStages:
   - train
+dataTypes:
+  - multimodal
 tags:
   - multimedia
   - marketplace

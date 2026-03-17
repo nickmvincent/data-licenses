@@ -18,6 +18,10 @@ const {
 const currentPath = Astro.url.pathname;
 const pageTitle = title === 'DataLicenses.org' ? title : `${title} | DataLicenses.org`;
 const networkLinks = networkData.allProjects.map((project) => ({ href: project.website, label: project.title }));
+const isNavActive = (href: string) =>
+  href === '/'
+    ? currentPath === '/' || currentPath.startsWith('/initiatives/')
+    : currentPath.startsWith(href);
 
 const navLinks = [
   { href: '/', label: 'Catalog' },
@@ -76,6 +80,7 @@ const alsoLikeLinks = [
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <nav class="navbar">
       <div class="navbar-inner">
         <a href="/" class="navbar-brand">
@@ -89,14 +94,15 @@ const alsoLikeLinks = [
               href={link.href}
               class:list={[
                 'nav-link',
-                { active: currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)) },
+                { active: isNavActive(link.href) },
               ]}
+              aria-current={isNavActive(link.href) ? 'page' : undefined}
             >
               {link.label}
             </a>
           ))}
 
-          <a href="/data/initiatives.json" class="nav-link nav-link-secondary" title="JSON API">API</a>
+          <a href="/data/initiatives.json" class="nav-link nav-link-secondary" title="JSON API" aria-label="Open the catalog API">API</a>
 
           <button type="button" id="theme-toggle" class="theme-toggle" title="Toggle light or dark theme" aria-label="Toggle theme">
             <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -106,7 +112,9 @@ const alsoLikeLinks = [
       </div>
     </nav>
 
-    <slot />
+    <div id="main-content" tabindex="-1">
+      <slot />
+    </div>
 
     <footer class="also-like-footer">
       <div class="also-like-inner">
@@ -156,6 +164,54 @@ const alsoLikeLinks = [
           });
         }
 
+        const legacyExecCommand = /** @type {{ [key: string]: any }} */ (document)['execCommand']?.bind(document);
+        const legacyAddListener = /** @type {{ [key: string]: any }} */ (mediaQuery)['addListener']?.bind(mediaQuery);
+
+        async function copyText(value) {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(value);
+            return true;
+          }
+
+          const probe = document.createElement('textarea');
+          probe.value = value;
+          probe.setAttribute('readonly', '');
+          probe.style.position = 'absolute';
+          probe.style.left = '-9999px';
+          document.body.appendChild(probe);
+          probe.select();
+
+          try {
+            return legacyExecCommand?.('copy') !== false;
+          } catch {
+            return false;
+          } finally {
+            document.body.removeChild(probe);
+          }
+        }
+
+        document.addEventListener('click', async (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+
+          const button = target.closest('.copy');
+          if (!(button instanceof HTMLButtonElement)) return;
+
+          const rawCopyValue = button.getAttribute('data-copy');
+          const codeValue = button.getAttribute('data-code');
+          const value = rawCopyValue || decodeURIComponent(codeValue || '');
+          if (!value) return;
+
+          const defaultLabel = button.dataset.resetLabel || button.textContent || 'Copy';
+          const didCopy = await copyText(value);
+          button.textContent = didCopy ? 'Copied' : 'Copy failed';
+
+          window.setTimeout(() => {
+            button.textContent = defaultLabel;
+          }, 1200);
+        });
+
+        /** @param {MediaQueryListEvent} event */
         const onSystemThemeChange = (event) => {
           if (readStoredTheme()) return;
           applyTheme(event.matches ? 'dark' : 'light');
@@ -163,8 +219,8 @@ const alsoLikeLinks = [
 
         if (typeof mediaQuery.addEventListener === 'function') {
           mediaQuery.addEventListener('change', onSystemThemeChange);
-        } else if (typeof mediaQuery.addListener === 'function') {
-          mediaQuery.addListener(onSystemThemeChange);
+        } else if (typeof legacyAddListener === 'function') {
+          legacyAddListener(onSystemThemeChange);
         }
       })();
     </script>
@@ -172,6 +228,24 @@ const alsoLikeLinks = [
 </html>
 
 <style is:global>
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+    z-index: 200;
+    padding: 0.72rem 0.95rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #f6f3ee;
+    text-decoration: none;
+    transform: translateY(-180%);
+    transition: transform 0.18s ease;
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+
   .navbar {
     position: sticky;
     top: 0;
@@ -413,10 +487,18 @@ const alsoLikeLinks = [
 
     .navbar-links {
       width: 100%;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 4px;
     }
 
     .nav-link {
       min-height: 38px;
+      white-space: nowrap;
+    }
+
+    .theme-toggle {
+      flex: 0 0 auto;
     }
   }
 </style>

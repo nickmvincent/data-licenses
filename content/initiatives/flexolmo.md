@@ -7,6 +7,8 @@ actionsSupported:
   - new-infrastructures
 pipelineStages:
   - train
+dataTypes:
+  - text
 tags:
   - collaborative-training
   - data-collaboration

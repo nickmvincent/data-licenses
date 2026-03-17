@@ -9,6 +9,8 @@ actionsSupported:
 pipelineStages:
   - train
   - fine-tune
+dataTypes:
+  - multimodal
 tags:
   - proprietary-data
   - healthcare

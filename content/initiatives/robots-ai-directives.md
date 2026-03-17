@@ -8,6 +8,8 @@ status: live
 website: 'https://platform.openai.com/docs/bots'
 actionsSupported:
   - attach-preference-signal
+dataTypes:
+  - web-content
 evidenceLinks:
   - label: OpenAI bots documentation
     url: 'https://platform.openai.com/docs/bots'

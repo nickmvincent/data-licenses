@@ -1,115 +1,76 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { formatCitation, loadInitiatives, type LoadedInitiative } from '../lib/content-loader';
+import {
+  ACTION_LABELS,
+  SECTION_DETAILS,
+  SECTION_KEYS,
+  STATUS_LABELS,
+  catalogSectionForItem,
+  formatActionSummary,
+  formatDataTypeLabel,
+  formatDate,
+  formatLinkLabel,
+  formatPipelineSummary,
+  sortByLatestThenTitle,
+} from '../lib/catalog';
 
-const ACTION_LABELS: Record<string, string> = {
-  'attach-preference-signal': 'Preference signal',
-  'attach-formal-license': 'Formal license',
-  'join-licensing-collective': 'Licensing collective',
-  'data-market-platform': 'Marketplace',
-  'add-tollgate': 'Tollgate',
-  'technical-blocking': 'Technical blocking',
-  'new-infrastructures': 'New infrastructure',
-  certification: 'Certification',
-};
-
-const PIPELINE_LABELS: Record<string, string> = {
-  collect: 'Collect',
-  train: 'Train',
-  'fine-tune': 'Fine-tune',
-  retrieve: 'Retrieve',
-  generate: 'Generate',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  live: 'Live',
-  wip: 'WIP',
-};
-
-const SECTION_KEYS = ['new-approaches', 'markets-with-new-approaches', 'markets-only'] as const;
-type CatalogSectionKey = typeof SECTION_KEYS[number];
-
-const SECTION_DETAILS: Record<CatalogSectionKey, { title: string; description: string }> = {
-  'new-approaches': {
-    title: 'New approaches',
-    description:
-      'Signals, licenses, infrastructure, blocking, tollgates, certification, and other non-market approaches.',
-  },
-  'markets-with-new-approaches': {
-    title: 'Markets with new approaches',
-    description:
-      'Marketplace entries that also add at least one other approach from the catalog.',
-  },
-  'markets-only': {
-    title: 'Markets only',
-    description: 'Entries whose only catalog approach is a marketplace.',
-  },
-};
-
-function statusRank(status: string) {
-  return status === 'live' ? 0 : 1;
-}
-
-function sortByLatestThenTitle(a: LoadedInitiative, b: LoadedInitiative) {
-  const aLatest = a.latestUpdate ? new Date(a.latestUpdate).getTime() : 0;
-  const bLatest = b.latestUpdate ? new Date(b.latestUpdate).getTime() : 0;
-  if (aLatest !== bLatest) return bLatest - aLatest;
-
-  const rankDiff = statusRank(a.status) - statusRank(b.status);
-  if (rankDiff !== 0) return rankDiff;
-
-  return a.title.localeCompare(b.title);
-}
-
-function formatDate(value: Date | string | undefined) {
-  const date = new Date(String(value));
-  if (Number.isNaN(date.getTime())) return String(value);
-  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
-}
-
-function formatLinkLabel(url: string) {
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.replace(/^www\./, '');
-    const path = parsed.pathname.replace(/\/$/, '');
-    return path && path !== '/' ? `${host}${path}` : host;
-  } catch {
-    return url;
-  }
-}
-
-function formatActionSummary(actionsSupported: string[]) {
-  if (!Array.isArray(actionsSupported) || actionsSupported.length === 0) return 'Uncategorized';
-  return actionsSupported.map((action) => ACTION_LABELS[action] || action).join(' / ');
-}
-
-function formatPipelineSummary(pipelineStages: string[]) {
-  if (!Array.isArray(pipelineStages) || pipelineStages.length === 0) return '';
-  return `Pipeline: ${pipelineStages.map((stage) => PIPELINE_LABELS[stage] || stage).join(' -> ')}`;
-}
-
-function catalogSectionForItem(item: LoadedInitiative): CatalogSectionKey {
-  const actions = Array.isArray(item.actionsSupported) ? item.actionsSupported : [];
-  const hasMarketplace = actions.includes('data-market-platform');
-  const hasOtherApproaches = actions.some((action) => action !== 'data-market-platform');
-
-  if (hasMarketplace && !hasOtherApproaches) return 'markets-only';
-  if (hasMarketplace && hasOtherApproaches) return 'markets-with-new-approaches';
-  return 'new-approaches';
-}
+type CatalogSectionKey = (typeof SECTION_KEYS)[number];
 
 const items: LoadedInitiative[] = (await loadInitiatives()).sort(sortByLatestThenTitle);
 const bySlug = Object.fromEntries(items.map((item) => [item.slug, item]));
 const byId = Object.fromEntries(items.map((item) => [item.id, item]));
-const groupedItems: Array<{ key: CatalogSectionKey; items: LoadedInitiative[]; title: string; description: string }> =
-  SECTION_KEYS.map((key) => ({
-    key,
-    items: items.filter((item) => catalogSectionForItem(item) === key),
-    ...SECTION_DETAILS[key],
-  }));
+const groupedItems: Array<{
+  key: CatalogSectionKey;
+  items: LoadedInitiative[];
+  title: string;
+  description: string;
+}> = SECTION_KEYS.map((key) => ({
+  key,
+  items: items.filter((item) => catalogSectionForItem(item) === key),
+  ...SECTION_DETAILS[key],
+}));
 
-const actions: string[] = Array.from(new Set(items.flatMap((item) => item.actionsSupported || [])))
-  .sort((a, b) => (ACTION_LABELS[a] || a).localeCompare(ACTION_LABELS[b] || b));
+const actions: string[] = Array.from(new Set(items.flatMap((item) => item.actionsSupported || []))).sort(
+  (a, b) => (ACTION_LABELS[a] || a).localeCompare(ACTION_LABELS[b] || b)
+);
+const dataTypes: string[] = Array.from(new Set(items.flatMap((item) => item.dataTypes || []))).sort(
+  (a, b) => formatDataTypeLabel(a).localeCompare(formatDataTypeLabel(b))
+);
+
+const stats = [
+  { label: 'Initiatives', value: String(items.length) },
+  { label: 'Live now', value: String(items.filter((item) => item.status === 'live').length) },
+  { label: 'WIP tracked', value: String(items.filter((item) => item.status === 'wip').length) },
+  { label: 'Approach types', value: String(actions.length) },
+];
+
+const quickPaths = [
+  {
+    kicker: 'Browse',
+    title: 'Only live initiatives',
+    description: 'Start with approaches that look deployable today.',
+    status: 'live',
+  },
+  {
+    kicker: 'Signals',
+    title: 'Preference signals',
+    description: 'Find machine-readable ways to express AI use preferences.',
+    action: 'attach-preference-signal',
+  },
+  {
+    kicker: 'Enforcement',
+    title: 'Block crawlers',
+    description: 'Compare the tools that throttle, gate, or block bot access.',
+    action: 'technical-blocking',
+  },
+  {
+    kicker: 'Markets',
+    title: 'Find marketplaces',
+    description: 'Jump to licensing and pay-per-access platforms.',
+    action: 'data-market-platform',
+  },
+];
 ---
 
 <Layout
@@ -128,30 +89,91 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       </div>
     </header>
 
-    <section class="catalog-toolbar box">
-      <div class="view-switch" aria-label="Catalog view">
-        <button type="button" class="view-button" data-view="spreadsheet" aria-pressed="true">Spreadsheet</button>
-        <button type="button" class="view-button" data-view="cards" aria-pressed="false">Cards</button>
+    <section class="catalog-start box">
+      <div class="catalog-start-copy">
+        <p class="eyebrow">Start here</p>
+        <h2 class="catalog-start-title">Pick a lane, then narrow fast.</h2>
+        <p class="catalog-start-summary">
+          This catalog works best when you start with the question you actually have: what is live,
+          what blocks crawlers, what signals preferences, or what opens a market for access.
+        </p>
+
+        <div class="catalog-start-actions">
+          <a class="btn btn-primary" href="#catalog-tools">Jump into the catalog</a>
+          <a class="btn btn-quiet" href="/methodology">How entries are verified</a>
+        </div>
+      </div>
+
+      <div class="catalog-start-aside">
+        <dl class="catalog-start-stats">
+          {stats.map((stat) => (
+            <div>
+              <dt>{stat.label}</dt>
+              <dd>{stat.value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div class="catalog-quick-grid">
+          {quickPaths.map((path) => (
+            <button
+              type="button"
+              class="catalog-quick-link"
+              data-quick-status={path.status}
+              data-quick-action={path.action}
+            >
+              <span class="catalog-quick-kicker">{path.kicker}</span>
+              <span class="catalog-quick-title">{path.title}</span>
+              <span class="catalog-quick-desc">{path.description}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="catalog-tools" class="catalog-toolbar box">
+      <div class="catalog-toolbar-top">
+        <div class="catalog-search-shell">
+          <label class="sr-only" for="q">Search initiatives</label>
+          <svg class="catalog-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+          </svg>
+          <input
+            id="q"
+            type="search"
+            placeholder="Search title, summary, website, evidence, or approach"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <div class="catalog-toolbar-actions">
+          <div class="view-switch" aria-label="Catalog view">
+            <button type="button" class="view-button" data-view="spreadsheet" aria-pressed="true">Spreadsheet</button>
+            <button type="button" class="view-button" data-view="cards" aria-pressed="false">Cards</button>
+          </div>
+
+          <button type="button" id="share-view" class="catalog-reset catalog-share">Copy this view</button>
+        </div>
       </div>
 
       <details id="catalog-panel" class="catalog-panel">
         <summary class="catalog-panel-toggle">
-          <span>Refine results</span>
-          <span id="panel-summary" class="catalog-panel-summary">All initiatives</span>
+          <span>More filters</span>
+          <span id="panel-summary" class="catalog-panel-summary">All filters off</span>
         </summary>
 
         <div class="catalog-panel-body">
           <div class="catalog-panel-head">
-            <p class="catalog-panel-intro">Search first, then narrow by status or specific actions.</p>
+            <p class="catalog-panel-intro">
+              Search is always on. Open this panel when you want to sort, focus on live vs WIP,
+              or drill into specific approaches and data types.
+            </p>
             <button type="button" id="reset-filters" class="catalog-reset" hidden>Reset all</button>
           </div>
 
           <div class="catalog-panel-grid">
-            <div class="catalog-panel-block">
-              <label class="catalog-panel-label" for="q">Search</label>
-              <input id="q" type="search" placeholder="Search title, summary, site, or evidence" autocomplete="off" spellcheck="false" />
-            </div>
-
             <div class="catalog-panel-block">
               <label class="catalog-panel-label" for="sort">Sort</label>
               <select id="sort" class="catalog-select">
@@ -182,11 +204,21 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
             </div>
           </div>
 
+          <div class="catalog-panel-block">
+            <span class="catalog-panel-label">Data types</span>
+            <div id="data-types" class="catalog-action-list">
+              {dataTypes.map((dataType) => (
+                <button type="button" class="catalog-action" data-data-type={dataType} aria-pressed="false">
+                  {formatDataTypeLabel(dataType)}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </details>
     </section>
 
-    <section class="catalog-results" aria-live="polite">
+    <section id="catalog-results-anchor" class="catalog-results" aria-live="polite">
       <div class="catalog-results-count"><span id="count">{items.length}</span> initiatives</div>
       <p id="active-filters" class="catalog-results-summary">Showing all initiatives.</p>
       <div id="active-filter-chips" class="active-filter-chips" hidden></div>
@@ -194,14 +226,10 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
 
     <div id="spreadsheet-view" class="catalog-group-stack">
       {groupedItems.map((group) => (
-        <section
-          id={`spreadsheet-group-${group.key}`}
-          class="catalog-group"
-          data-catalog-section={group.key}
-        >
+        <section id={`spreadsheet-group-${group.key}`} class="catalog-group" data-catalog-section={group.key}>
           <div class="catalog-group-head">
             <div>
-              <p class="catalog-group-kicker">Spreadsheet view</p>
+              <p class="catalog-group-kicker">Catalog section</p>
               <h2 class="catalog-group-title">{group.title}</h2>
               <p class="catalog-group-copy">{group.description}</p>
             </div>
@@ -224,7 +252,9 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                   const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
                   const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
                   const hasMetrics = Boolean(item.usersCount || item.dataVolume || item.moneyVolume);
-                  const hasRowDetails = (item.evidenceLinks || []).length > 1 ||
+                  const hasRowDetails =
+                    (item.evidenceLinks || []).length > 1 ||
+                    (Array.isArray(item.dataTypes) && item.dataTypes.length > 0) ||
                     (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
                     hasMetrics;
 
@@ -236,6 +266,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                       data-title={item.title.toLowerCase()}
                       data-summary={(item.summary || '').toLowerCase()}
                       data-tags={(item.tags || []).join(' ').toLowerCase()}
+                      data-types={(item.dataTypes || []).join(' ').toLowerCase()}
                       data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
                       data-status={item.status}
                       data-website={formatLinkLabel(item.website).toLowerCase()}
@@ -245,7 +276,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                     >
                       <td class="catalog-row-main" data-label="Initiative">
                         <div class="catalog-row-titleline">
-                          <a class="catalog-row-title" href={item.website} target="_blank" rel="noopener">{item.title}</a>
+                          <a class="catalog-row-title" href={`/initiatives/${item.slug}`}>{item.title}</a>
                           <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
                         </div>
                         <p class="catalog-row-summary">{item.summary}</p>
@@ -267,7 +298,18 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                                 </div>
                               )}
 
-                              {(Array.isArray(item.dependsOn) && item.dependsOn.length > 0) && (
+                              {Array.isArray(item.dataTypes) && item.dataTypes.length > 0 && (
+                                <div class="catalog-row-detail">
+                                  <span class="catalog-row-detail-label">Data types</span>
+                                  <div class="catalog-row-detail-chips">
+                                    {item.dataTypes.map((dataType) => (
+                                      <span class="chip">{formatDataTypeLabel(dataType)}</span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {Array.isArray(item.dependsOn) && item.dependsOn.length > 0 && (
                                 <div class="catalog-row-detail">
                                   <span class="catalog-row-detail-label">Uses</span>
                                   <div class="catalog-row-detail-chips">
@@ -338,14 +380,10 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
 
     <section id="cards-view" class="catalog-group-stack" hidden>
       {groupedItems.map((group) => (
-        <section
-          id={`cards-group-${group.key}`}
-          class="catalog-group"
-          data-catalog-section={group.key}
-        >
+        <section id={`cards-group-${group.key}`} class="catalog-group" data-catalog-section={group.key}>
           <div class="catalog-group-head">
             <div>
-              <p class="catalog-group-kicker">Card view</p>
+              <p class="catalog-group-kicker">Catalog section</p>
               <h2 class="catalog-group-title">{group.title}</h2>
               <p class="catalog-group-copy">{group.description}</p>
             </div>
@@ -357,9 +395,13 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
               const pipelineSummary = formatPipelineSummary(item.pipelineStages);
               const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
               const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
-              const hasDetails = (item.evidenceLinks || []).length > 0 ||
+              const hasDetails =
+                (item.evidenceLinks || []).length > 0 ||
+                (Array.isArray(item.dataTypes) && item.dataTypes.length > 0) ||
                 (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
-                item.usersCount || item.dataVolume || item.moneyVolume ||
+                item.usersCount ||
+                item.dataVolume ||
+                item.moneyVolume ||
                 (Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) ||
                 (Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0);
 
@@ -371,6 +413,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                   data-title={item.title.toLowerCase()}
                   data-summary={(item.summary || '').toLowerCase()}
                   data-tags={(item.tags || []).join(' ').toLowerCase()}
+                  data-types={(item.dataTypes || []).join(' ').toLowerCase()}
                   data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
                   data-status={item.status}
                   data-website={formatLinkLabel(item.website).toLowerCase()}
@@ -380,7 +423,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                 >
                   <div class="catalog-card-header">
                     <h2 class="catalog-card-title">
-                      <a class="catalog-card-title-link" href={item.website} target="_blank" rel="noopener">{item.title}</a>
+                      <a class="catalog-card-title-link" href={`/initiatives/${item.slug}`}>{item.title}</a>
                     </h2>
                     <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
                   </div>
@@ -413,6 +456,11 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
 
                   {pipelineSummary && <p class="catalog-card-subtle">{pipelineSummary}</p>}
 
+                  <div class="catalog-card-actions">
+                    <a class="btn btn-quiet catalog-card-button" href={`/initiatives/${item.slug}`}>Open profile</a>
+                    <a class="btn btn-quiet catalog-card-button" href={item.website} target="_blank" rel="noopener">Visit website</a>
+                  </div>
+
                   {hasDetails && (
                     <details class="card-details">
                       <summary class="details-toggle">Details</summary>
@@ -431,7 +479,16 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                           </div>
                         )}
 
-                        {(Array.isArray(item.dependsOn) && item.dependsOn.length > 0) && (
+                        {Array.isArray(item.dataTypes) && item.dataTypes.length > 0 && (
+                          <div class="detail-section">
+                            <span class="detail-label">Data types</span>
+                            {item.dataTypes.map((dataType) => (
+                              <span class="chip">{formatDataTypeLabel(dataType)}</span>
+                            ))}
+                          </div>
+                        )}
+
+                        {Array.isArray(item.dependsOn) && item.dependsOn.length > 0 && (
                           <div class="detail-section">
                             <span class="detail-label">Uses</span>
                             {item.dependsOn.map((dependency) => {
@@ -465,7 +522,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                           </div>
                         )}
 
-                        {(Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) && (
+                        {Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0 && (
                           <div class="detail-section detail-stack">
                             <span class="detail-label">Related references</span>
                             <ul class="references-list">
@@ -529,11 +586,15 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       const controlsPanel = queryOne('#catalog-panel');
       const panelSummary = queryOne('#panel-summary');
       const actionsContainer = queryOne('#actions');
+      const dataTypesContainer = queryOne('#data-types');
       const countText = queryOne('#count');
       const activeFiltersText = queryOne('#active-filters');
       const chipsContainer = queryOne('#active-filter-chips');
       const spreadsheetView = queryOne('#spreadsheet-view');
       const cardsView = queryOne('#cards-view');
+      const catalogResultsAnchor = queryOne('#catalog-results-anchor');
+      const shareButton = queryOne('#share-view');
+      const quickButtons = queryAll('.catalog-quick-link');
       const sectionKeys = ['new-approaches', 'markets-with-new-approaches', 'markets-only'];
       const tableBodies = Object.fromEntries(
         sectionKeys.map((key) => [key, queryOne(`#table-body-${key}`)])
@@ -552,6 +613,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       const resetButton = queryOne('#reset-filters');
       const viewButtons = queryAll('.view-button');
       const statusButtons = queryAll('.status-button');
+      const compactCatalogMedia = window.matchMedia('(max-width: 720px)');
       const statusLabels = { live: 'Live', wip: 'WIP' };
       const legacyGoalActions = {
         signal: ['attach-preference-signal', 'attach-formal-license'],
@@ -563,6 +625,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         searchInput,
         sortSelect,
         actionsContainer,
+        dataTypesContainer,
         countText,
         activeFiltersText,
         chipsContainer,
@@ -581,20 +644,69 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       if (requiredElements.some((element) => !element)) return;
 
       let currentView = 'spreadsheet';
+      let shareResetTimer = 0;
 
       const actionButtons = () => queryAll('.catalog-action', actionsContainer);
+      const dataTypeButtons = () => queryAll('.catalog-action', dataTypesContainer);
       const rowNodes = () => queryAll('.catalog-row', spreadsheetView);
       const cardNodes = () => queryAll('.catalog-card', cardsView);
       const cardsById = () => new Map(cardNodes().map((card) => [card.dataset.item || '', card]));
+      const isCompactCatalog = () => compactCatalogMedia.matches;
       const getActionLabel = (action) =>
         actionButtons().find((button) => button.dataset.action === action)?.textContent?.trim() || action;
+      const getDataTypeLabel = (dataType) =>
+        dataTypeButtons().find((button) => button.dataset.dataType === dataType)?.textContent?.trim() || dataType;
       const getSortLabel = (sortMode) =>
         Array.from(sortSelect.options).find((option) => option.value === sortMode)?.text || sortMode;
+
+      function normalizeView(view) {
+        if (isCompactCatalog()) return 'spreadsheet';
+        return view === 'cards' ? 'cards' : 'spreadsheet';
+      }
+
+      async function copyCurrentView() {
+        if (!shareButton) return;
+
+        const setLabel = (text) => {
+          shareButton.textContent = text;
+          window.clearTimeout(shareResetTimer);
+          shareResetTimer = window.setTimeout(() => {
+            shareButton.textContent = 'Copy this view';
+          }, 1400);
+        };
+
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(location.href);
+          } else {
+            const probe = document.createElement('textarea');
+            probe.value = location.href;
+            probe.setAttribute('readonly', '');
+            probe.style.position = 'absolute';
+            probe.style.left = '-9999px';
+            document.body.appendChild(probe);
+            probe.select();
+            document.execCommand('copy');
+            document.body.removeChild(probe);
+          }
+
+          setLabel('Link copied');
+        } catch {
+          setLabel('Copy failed');
+        }
+      }
 
       function getSelectedActions() {
         return actionButtons()
           .filter((button) => button.getAttribute('aria-pressed') === 'true')
           .map((button) => (button.dataset.action || '').toLowerCase())
+          .filter(Boolean);
+      }
+
+      function getSelectedDataTypes() {
+        return dataTypeButtons()
+          .filter((button) => button.getAttribute('aria-pressed') === 'true')
+          .map((button) => (button.dataset.dataType || '').toLowerCase())
           .filter(Boolean);
       }
 
@@ -613,8 +725,12 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         actionButtons().forEach((button) => setPressed(button, false));
       }
 
+      function clearDataTypeButtons() {
+        dataTypeButtons().forEach((button) => setPressed(button, false));
+      }
+
       function setView(view) {
-        currentView = view === 'cards' ? 'cards' : 'spreadsheet';
+        currentView = normalizeView(view);
         viewButtons.forEach((button) => {
           setPressed(button, button.dataset.view === currentView);
         });
@@ -645,15 +761,26 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         return aTitle.localeCompare(bTitle);
       }
 
-      function buildActiveChips(rawQuery, statusValue, selectedActions, sortMode) {
+      function buildActiveChips(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode) {
         const chips = [];
 
         if (rawQuery) chips.push({ kind: 'search', label: `Search: ${rawQuery}` });
-        if (statusValue !== 'all') chips.push({ kind: 'status', value: statusValue, label: `Status: ${statusLabels[statusValue] || statusValue}` });
+        if (statusValue !== 'all') {
+          chips.push({
+            kind: 'status',
+            value: statusValue,
+            label: `Status: ${statusLabels[statusValue] || statusValue}`,
+          });
+        }
         selectedActions.forEach((action) => {
           chips.push({ kind: 'action', value: action, label: `Action: ${getActionLabel(action)}` });
         });
-        if (sortMode !== 'latest') chips.push({ kind: 'sort', value: sortMode, label: `Sort: ${getSortLabel(sortMode)}` });
+        selectedDataTypes.forEach((dataType) => {
+          chips.push({ kind: 'data-type', value: dataType, label: `Data type: ${getDataTypeLabel(dataType)}` });
+        });
+        if (sortMode !== 'latest') {
+          chips.push({ kind: 'sort', value: sortMode, label: `Sort: ${getSortLabel(sortMode)}` });
+        }
 
         return chips;
       }
@@ -686,14 +813,18 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         chipsContainer.hidden = chips.length === 0;
       }
 
-      function updateSummaries(chips) {
-        activeFiltersText.textContent = chips.length > 0
-          ? 'Active selections'
-          : 'Showing all initiatives.';
+      function updateSummaries(chips, visibleCount, rawQuery) {
+        if (chips.length > 0 || rawQuery) {
+          activeFiltersText.textContent = `Showing ${visibleCount} ${
+            visibleCount === 1 ? 'initiative' : 'initiatives'
+          }${rawQuery ? ` for "${rawQuery}"` : ''}.`;
+        } else {
+          activeFiltersText.textContent = 'Showing all initiatives.';
+        }
 
         panelSummary.textContent = chips.length > 0
-          ? `${chips.length} active ${chips.length === 1 ? 'selection' : 'selections'}`
-          : 'All initiatives';
+          ? `${chips.length} active ${chips.length === 1 ? 'filter' : 'filters'}`
+          : 'All filters off';
 
         if (resetButton) {
           resetButton.hidden = chips.length === 0;
@@ -702,13 +833,14 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         renderActiveChips(chips);
       }
 
-      function syncUrl(rawQuery, statusValue, selectedActions, sortMode) {
+      function syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode) {
         const params = new URLSearchParams();
         if (rawQuery) params.set('q', rawQuery);
         if (statusValue !== 'all') params.set('status', statusValue);
         selectedActions.forEach((action) => params.append('actions', action));
+        selectedDataTypes.forEach((dataType) => params.append('types', dataType));
         if (sortMode !== 'latest') params.set('sort', sortMode);
-        if (currentView !== 'spreadsheet') params.set('view', currentView);
+        if (!isCompactCatalog() && currentView !== 'spreadsheet') params.set('view', currentView);
 
         const nextUrl = params.toString() ? `?${params.toString()}` : location.pathname;
         history.replaceState(null, '', nextUrl);
@@ -718,6 +850,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         const rawQuery = (searchInput.value || '').trim();
         const query = rawQuery.toLowerCase();
         const selectedActions = getSelectedActions();
+        const selectedDataTypes = getSelectedDataTypes();
         const statusValue = getStatusFilter();
         const sortMode = sortSelect.value || 'latest';
 
@@ -734,7 +867,11 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
           let matches = true;
 
           if (query) {
-            const searchable = `${item.row.dataset.title || ''} ${item.row.dataset.summary || ''} ${item.row.dataset.tags || ''} ${item.row.dataset.website || ''} ${item.row.dataset.approach || ''} ${item.row.dataset.evidence || ''}`;
+            const searchable = `${item.row.dataset.title || ''} ${item.row.dataset.summary || ''} ${
+              item.row.dataset.tags || ''
+            } ${item.row.dataset.types || ''} ${item.row.dataset.website || ''} ${item.row.dataset.approach || ''} ${
+              item.row.dataset.evidence || ''
+            }`;
             matches = searchable.includes(query);
           }
 
@@ -745,6 +882,11 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
           if (matches && selectedActions.length > 0) {
             const itemActions = (item.row.dataset.actions || '').split(' ').filter(Boolean);
             matches = selectedActions.some((action) => itemActions.includes(action));
+          }
+
+          if (matches && selectedDataTypes.length > 0) {
+            const itemDataTypes = (item.row.dataset.types || '').split(' ').filter(Boolean);
+            matches = selectedDataTypes.some((dataType) => itemDataTypes.includes(dataType));
           }
 
           item.row.hidden = !matches;
@@ -771,9 +913,9 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         countText.textContent = String(visibleItems.length);
         emptyState.hidden = visibleItems.length !== 0;
 
-        const chips = buildActiveChips(rawQuery, statusValue, selectedActions, sortMode);
-        updateSummaries(chips);
-        syncUrl(rawQuery, statusValue, selectedActions, sortMode);
+        const chips = buildActiveChips(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode);
+        updateSummaries(chips, visibleItems.length, rawQuery);
+        syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode);
       }
 
       function clearFilters() {
@@ -781,7 +923,25 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         sortSelect.value = 'latest';
         setStatusFilter('all');
         clearActionButtons();
+        clearDataTypeButtons();
         applyFilters();
+      }
+
+      function applyQuickPreset(button) {
+        clearFilters();
+
+        const statusValue = button.dataset.quickStatus;
+        const actionValue = button.dataset.quickAction;
+        if (statusValue && ['all', 'live', 'wip'].includes(statusValue)) {
+          setStatusFilter(statusValue);
+        }
+        if (actionValue) {
+          const actionButton = actionButtons().find((item) => item.dataset.action === actionValue);
+          if (actionButton) setPressed(actionButton, true);
+        }
+
+        applyFilters();
+        if (catalogResultsAnchor) catalogResultsAnchor.scrollIntoView({ block: 'start' });
       }
 
       function initializeFromUrl() {
@@ -792,6 +952,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         const sortValue = params.get('sort');
         const viewValue = params.get('view');
         const preselectedActions = new Set(params.getAll('actions'));
+        const preselectedDataTypes = new Set(params.getAll('types'));
         const legacyActions = legacyGoalActions[goalValue] || [];
 
         if (queryValue) searchInput.value = queryValue;
@@ -805,12 +966,20 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
             setPressed(button, preselectedActions.has(button.dataset.action || ''));
           });
         }
-        if (viewValue === 'cards') setView('cards');
+        if (preselectedDataTypes.size > 0) {
+          dataTypeButtons().forEach((button) => {
+            setPressed(button, preselectedDataTypes.has(button.dataset.dataType || ''));
+          });
+        }
+        if (!isCompactCatalog() && viewValue === 'cards') setView('cards');
 
-        const hasStatusFilter = statusValue && statusValue !== 'all';
-        const hasSortOverride = sortValue && sortValue !== 'latest';
+        const hasAdvancedFilters =
+          (statusValue && statusValue !== 'all') ||
+          (sortValue && sortValue !== 'latest') ||
+          preselectedActions.size > 0 ||
+          preselectedDataTypes.size > 0;
 
-        if (controlsPanel && (queryValue || hasStatusFilter || hasSortOverride || preselectedActions.size > 0)) {
+        if (controlsPanel && hasAdvancedFilters) {
           controlsPanel.open = true;
         }
       }
@@ -841,6 +1010,18 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         applyFilters();
       });
 
+      dataTypesContainer.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const dataTypeButton = target.closest('.catalog-action');
+        if (!(dataTypeButton instanceof HTMLElement)) return;
+
+        const nextPressed = dataTypeButton.getAttribute('aria-pressed') !== 'true';
+        setPressed(dataTypeButton, nextPressed);
+        applyFilters();
+      });
+
       if (chipsContainer) {
         chipsContainer.addEventListener('click', (event) => {
           const target = event.target;
@@ -858,11 +1039,25 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
             const actionButton = actionButtons().find((button) => button.dataset.action === value);
             if (actionButton) setPressed(actionButton, false);
           }
+          if (kind === 'data-type') {
+            const dataTypeButton = dataTypeButtons().find((button) => button.dataset.dataType === value);
+            if (dataTypeButton) setPressed(dataTypeButton, false);
+          }
           if (kind === 'sort') sortSelect.value = 'latest';
 
           applyFilters();
         });
       }
+
+      if (shareButton) {
+        shareButton.addEventListener('click', () => {
+          void copyCurrentView();
+        });
+      }
+
+      quickButtons.forEach((button) => {
+        button.addEventListener('click', () => applyQuickPreset(button));
+      });
 
       searchInput.addEventListener('input', applyFilters);
       sortSelect.addEventListener('change', applyFilters);
@@ -870,25 +1065,16 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       if (clearButton) clearButton.addEventListener('click', clearFilters);
       if (resetButton) resetButton.addEventListener('click', clearFilters);
 
-      document.addEventListener('click', async (event) => {
-        const target = event.target;
-        if (!(target instanceof Element)) return;
+      const onCompactCatalogChange = () => {
+        setView('spreadsheet');
+        applyFilters();
+      };
 
-        const button = target.closest('.copy');
-        if (!(button instanceof HTMLButtonElement)) return;
-
-        const code = decodeURIComponent(button.getAttribute('data-code') || '');
-        try {
-          await navigator.clipboard.writeText(code);
-          button.textContent = 'Copied';
-        } catch {
-          button.textContent = 'Copy failed';
-        }
-
-        setTimeout(() => {
-          button.textContent = 'Copy';
-        }, 1200);
-      });
+      if (typeof compactCatalogMedia.addEventListener === 'function') {
+        compactCatalogMedia.addEventListener('change', onCompactCatalogChange);
+      } else if (typeof compactCatalogMedia.addListener === 'function') {
+        compactCatalogMedia.addListener(onCompactCatalogChange);
+      }
 
       initializeFromUrl();
       setView(currentView);

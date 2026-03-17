@@ -10,6 +10,8 @@ jurisdictions:
 pipelineStages:
   - collect
   - train
+dataTypes:
+  - text
 tags:
   - books
   - digital-commons

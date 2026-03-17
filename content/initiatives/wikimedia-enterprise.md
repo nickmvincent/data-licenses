@@ -8,6 +8,9 @@ actionsSupported:
 pipelineStages:
   - retrieve
   - train
+dataTypes:
+  - text
+  - structured-data
 tags:
   - wikipedia
   - api

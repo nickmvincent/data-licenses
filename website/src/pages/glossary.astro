@@ -20,6 +20,16 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 
+const searchTextForTerm = (item: GlossaryTerm) =>
+  [
+    item.term,
+    item.definition,
+    item.related.join(' '),
+    item.externalLinks.map((externalLink) => externalLink.label).join(' '),
+  ]
+    .join(' ')
+    .toLowerCase();
+
 const initiatives = await loadInitiatives();
 const catalogInitiativeBySlug = new Map(initiatives.map((item) => [item.slug, item]));
 
@@ -266,6 +276,7 @@ const grouped = terms.reduce((acc, t) => {
   return acc;
 }, {} as Record<string, typeof terms>);
 const letters = Object.keys(grouped).sort();
+const totalTerms = terms.length;
 ---
 
 <Layout title="Glossary">
@@ -277,7 +288,25 @@ const letters = Object.keys(grouped).sort();
       </p>
     </header>
 
-    <nav class="letter-nav">
+    <section class="glossary-toolbar box">
+      <div class="glossary-search-shell">
+        <label class="sr-only" for="glossary-search">Search glossary terms</label>
+        <svg class="glossary-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input
+          id="glossary-search"
+          type="search"
+          placeholder="Search terms, definitions, and related concepts"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <p class="glossary-meta"><span id="glossary-count">{totalTerms}</span> terms</p>
+    </section>
+
+    <nav id="letter-nav" class="letter-nav">
       {letters.map(letter => (
         <a href={`#letter-${letter}`} class="letter-link">{letter}</a>
       ))}
@@ -289,7 +318,7 @@ const letters = Object.keys(grouped).sort();
           <h2 class="letter-heading">{letter}</h2>
           <div class="terms">
             {grouped[letter].map(item => (
-              <article class="term-card" id={slugify(item.term)}>
+              <article class="term-card" id={slugify(item.term)} data-search={searchTextForTerm(item)}>
                 <h3 class="term-name">{item.term}</h3>
                 <p class="term-definition">{item.definition}</p>
                 {item.externalLinks.length > 0 && (
@@ -326,5 +355,106 @@ const letters = Object.keys(grouped).sort();
         </section>
       ))}
     </div>
+
+    <p id="glossary-empty" class="glossary-empty muted" hidden>No glossary terms match that search.</p>
   </main>
+
+  <script>
+    // @ts-nocheck
+    (() => {
+      const searchInput = document.getElementById('glossary-search');
+      const count = document.getElementById('glossary-count');
+      const emptyState = document.getElementById('glossary-empty');
+      const letterNav = document.getElementById('letter-nav');
+      const cards = Array.from(document.querySelectorAll('.term-card'));
+      const sections = Array.from(document.querySelectorAll('.letter-section'));
+
+      if (
+        !(searchInput instanceof HTMLInputElement) ||
+        !(count instanceof HTMLElement) ||
+        !(emptyState instanceof HTMLElement) ||
+        !(letterNav instanceof HTMLElement)
+      ) {
+        return;
+      }
+
+      function applySearch() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          if (!(card instanceof HTMLElement)) return;
+          const matches = !query || (card.dataset.search || '').includes(query);
+          card.hidden = !matches;
+          if (matches) visibleCount += 1;
+        });
+
+        sections.forEach((section) => {
+          if (!(section instanceof HTMLElement)) return;
+          const hasVisibleCards = Boolean(section.querySelector('.term-card:not([hidden])'));
+          section.hidden = !hasVisibleCards;
+        });
+
+        count.textContent = String(visibleCount);
+        emptyState.hidden = visibleCount !== 0;
+        letterNav.hidden = Boolean(query);
+      }
+
+      searchInput.addEventListener('input', applySearch);
+      applySearch();
+    })();
+  </script>
 </Layout>
+
+<style>
+  .glossary-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+
+  .glossary-search-shell {
+    position: relative;
+    flex: 1 1 320px;
+    min-width: 260px;
+  }
+
+  .glossary-search-shell input {
+    min-height: 48px;
+    padding-left: 2.85rem;
+  }
+
+  .glossary-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .glossary-meta {
+    margin: 0;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .term-card {
+    scroll-margin-top: 100px;
+  }
+
+  .glossary-empty {
+    margin: 18px 2px 0;
+  }
+
+  @media (max-width: 720px) {
+    .glossary-search-shell {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+</style>

@@ -12,6 +12,8 @@ pipelineStages:
   - collect
   - train
   - fine-tune
+dataTypes:
+  - multimodal
 signals:
   - all
   - train-ai

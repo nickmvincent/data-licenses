@@ -10,14 +10,16 @@ actionsSupported:
   - attach-formal-license
 jurisdictions:
   - EU
+dataTypes:
+  - web-content
 tags:
   - text-data-mining
   - dsm-directive
   - opt-out
 evidenceLinks:
-  - label: W3C Community Group active
+  - label: Version 3 final report listed
     url: 'https://www.w3.org/community/tdmrep/'
-    date: '2024-06-01'
+    date: '2024-08-09'
 visibility: public
 type: data_license_initiative
 implementationSnippets:

@@ -8,6 +8,8 @@ website: 'https://tollbit.com/'
 actionsSupported:
   - data-market-platform
   - add-tollgate
+dataTypes:
+  - text
 usersCount: '4,000+ premium publishers'
 metricEvidence:
   usersCount:

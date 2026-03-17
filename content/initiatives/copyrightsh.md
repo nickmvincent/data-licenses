@@ -5,6 +5,8 @@ status: live
 website: 'https://copyright.sh/'
 actionsSupported:
   - attach-formal-license
+dataTypes:
+  - web-content
 evidenceLinks:
   - label: WordPress plugin launched
     url: 'https://blog.copyright.sh/2025/10/28/wordpress-plugin-launch-one-click-ai-licensing/'

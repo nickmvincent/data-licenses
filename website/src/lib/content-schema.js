@@ -20,6 +20,7 @@
  * @property {string[]} jurisdictions
  * @property {string[]} signals
  * @property {string[]} pipelineStages
+ * @property {string[]} dataTypes
  * @property {string | undefined} considerations
  * @property {string[]} tags
  * @property {string[]} dependsOn
@@ -266,6 +267,7 @@ export function normalizeInitiativeFrontmatter(data, context, options = {}) {
     jurisdictions: normalizeStringArray(data.jurisdictions, 'jurisdictions', context),
     signals: normalizeStringArray(data.signals, 'signals', context),
     pipelineStages: normalizeStringArray(data.pipelineStages, 'pipelineStages', context),
+    dataTypes: normalizeStringArray(data.dataTypes, 'dataTypes', context),
     considerations: optionalString(data.considerations),
     tags: normalizeStringArray(data.tags, 'tags', context),
     dependsOn: normalizeStringArray(data.dependsOn, 'dependsOn', context),

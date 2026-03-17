@@ -3,18 +3,35 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Contribute" showNetworkFooter={false}>
-  <main class="wrap narrow">
-    <header class="page-header">
+  <main class="wrap narrow contribute-page">
+    <header class="page-header contribute-hero">
+      <p class="eyebrow">Help improve the catalog</p>
       <h1>Contribute</h1>
-      <p class="muted">Help keep this catalog concrete, current, and useful.</p>
+      <p class="muted contribute-intro">Help keep this catalog concrete, current, and useful.</p>
+
+      <div class="contribute-actions">
+        <a class="btn btn-primary" href="https://github.com/nickmvincent/data-licenses/issues/new/choose" target="_blank" rel="noopener">Open an issue</a>
+        <a class="btn" href="https://github.com/nickmvincent/data-licenses/compare" target="_blank" rel="noopener">Open a PR</a>
+        <a class="btn btn-quiet" href="https://nickmvincent.com" target="_blank" rel="noopener">Contact Nick</a>
+      </div>
     </header>
+
+    <section class="box section">
+      <h2>Quick checklist</h2>
+      <ul class="contribute-checklist">
+        <li>Confirm the initiative has a clear AI data rights angle, not just general anti-AI security or abstract research.</li>
+        <li>Include one canonical website and at least one dated public source for any factual update.</li>
+        <li>Keep summaries short, neutral, and specific about what actually ships or changed.</li>
+        <li>If you add a user, data, or payment metric, add matching <code>metricEvidence</code> sources too.</li>
+      </ul>
+    </section>
 
     <section class="box section">
       <h2>What we're capturing</h2>
       <ul>
         <li>Initiatives that shape AI data flows via preference signals, licenses/terms, collectives, data market platforms, technical controls, certification, or new infrastructures.</li>
         <li>Concrete implementation details, canonical websites, and dated evidence links for updates or adoption.</li>
-        <li>Practical metadata: live or wip status, pipeline stages, jurisdictions, and adoption signals (users/data/money).</li>
+        <li>Practical metadata: live or wip status, pipeline stages, data types, jurisdictions, and adoption signals (users/data/money).</li>
       </ul>
     </section>
 
@@ -23,18 +40,18 @@ import Layout from '../layouts/Layout.astro';
       <ul>
         <li>General-purpose anti-AI cybersecurity without a clear data rights angle.</li>
         <li>Pure research concepts without a public artifact or path to adoption.</li>
-        <li>Content provenance-only work unless it directly informs data licensing/preferences.</li>
+        <li>Content provenance-only work unless it directly informs data licensing or preferences.</li>
       </ul>
     </section>
 
     <section class="box section">
       <h2>How to contribute</h2>
       <ul>
-        <li>Suggest a new initiative or update an existing one (links appreciated: canonical website plus dated evidence links).</li>
-        <li>Provide short, neutral summaries; include adoption metrics only when they are public and source-backed.</li>
+        <li>Suggest a new initiative or update an existing one, ideally with a canonical site and dated evidence links.</li>
+        <li>Use the issue tracker when you want to flag a lead or discuss scope before writing content.</li>
+        <li>Open a PR when you already have the source-backed wording and metadata ready to review.</li>
       </ul>
-      <p>Send a note to <a href="https://nickmvincent.com" target="_blank" rel="noopener">Nick</a>.</p>
-      <p class="muted small">Developers: you can also open a PR by adding or updating a markdown file under <code>content/initiatives/</code>. Each entry should have one canonical <code>website</code>, a <code>status</code> of <code>live</code> or <code>wip</code>, <code>visibility: public</code>, <code>type: data_license_initiative</code>, and optional dated <code>evidenceLinks</code>.</p>
+      <p class="muted small">Developers can add or update a markdown file under <code>content/initiatives/</code>. Each entry should have one canonical <code>website</code>, a <code>status</code> of <code>live</code> or <code>wip</code>, <code>visibility: public</code>, <code>type: data_license_initiative</code>, and optional dated <code>evidenceLinks</code>.</p>
     </section>
 
     <section class="box section">
@@ -47,3 +64,36 @@ import Layout from '../layouts/Layout.astro';
     </section>
   </main>
 </Layout>
+
+<style>
+  .contribute-page {
+    display: grid;
+    gap: 2px;
+  }
+
+  .contribute-hero {
+    display: grid;
+    gap: 12px;
+  }
+
+  .contribute-intro {
+    margin: 0;
+    max-width: 40rem;
+  }
+
+  .contribute-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .contribute-checklist {
+    margin-top: 12px;
+  }
+
+  @media (max-width: 720px) {
+    .contribute-actions .btn {
+      width: 100%;
+    }
+  }
+</style>

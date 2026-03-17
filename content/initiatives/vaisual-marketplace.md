@@ -8,6 +8,8 @@ actionsSupported:
 pipelineStages:
   - train
   - fine-tune
+dataTypes:
+  - images
 tags:
   - visual-data
   - biometric
@@ -17,13 +19,13 @@ metricEvidence:
   dataVolume:
     basis: explicit
     sources:
-      - label: Diversity image database described
-        url: 'https://vaisual.com/artificial-intelligence-and-diversity-building-an-image-database-for-inclusive-ai/'
-        date: '2023-05-01'
+      - label: Diversity image database for better AI described
+        url: 'https://vaisual.com/creating-a-diversity-and-inclusion-image-database-for-better-ai/'
+        date: '2024-08-14'
 evidenceLinks:
-  - label: Diversity image database described
-    url: 'https://vaisual.com/artificial-intelligence-and-diversity-building-an-image-database-for-inclusive-ai/'
-    date: '2023-05-01'
+  - label: Diversity image database for better AI described
+    url: 'https://vaisual.com/creating-a-diversity-and-inclusion-image-database-for-better-ai/'
+    date: '2024-08-14'
 considerations: vAIsual is a specialized computer-vision vendor rather than a general licensing standard or cross-domain policy initiative.
 visibility: public
 type: data_license_initiative

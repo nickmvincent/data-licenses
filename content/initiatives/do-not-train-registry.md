@@ -9,10 +9,19 @@ actionsSupported:
 pipelineStages:
   - collect
   - train
+dataTypes:
+  - images
 tags:
   - opt-out
   - registry
   - image-training
+evidenceLinks:
+  - label: Face Reveal launched for Have I Been Trained
+    url: 'https://spawning.ai/blog/have-i-been-traineds-2025-face-reveal'
+    date: '2025-09-15'
+  - label: Project status update published
+    url: 'https://spawning.ai/blog/have-i-been-traineds-project-status'
+    date: '2025-08-28'
 considerations: >-
   The public site is currently under maintenance, and the registry only works
   when model builders choose to honor it in dataset curation and training

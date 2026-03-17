@@ -1,0 +1,525 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getMarkdownProcessor } from '../../lib/markdown';
+import { formatCitation, loadInitiatives } from '../../lib/content-loader';
+import {
+  ACTION_LABELS,
+  PIPELINE_LABELS,
+  STATUS_LABELS,
+  formatActionSummary,
+  formatDataTypeLabel,
+  formatDate,
+  formatLinkLabel,
+  sortByLatestThenTitle,
+} from '../../lib/catalog';
+
+export async function getStaticPaths() {
+  const initiatives = await loadInitiatives();
+  return initiatives.map((item) => ({
+    params: { slug: item.slug },
+  }));
+}
+
+const allItems = (await loadInitiatives()).sort(sortByLatestThenTitle);
+const item = allItems.find((candidate) => candidate.slug === Astro.params.slug);
+
+if (!item) {
+  throw new Error(`Unknown initiative slug: ${Astro.params.slug}`);
+}
+
+const markdown = await getMarkdownProcessor();
+const renderedBody = item.body.trim() ? await markdown.render(item.body) : undefined;
+const bySlug = Object.fromEntries(allItems.map((candidate) => [candidate.slug, candidate]));
+const byId = Object.fromEntries(allItems.map((candidate) => [candidate.id, candidate]));
+
+const dependencyItems = (item.dependsOn || [])
+  .map((dependency) => bySlug[dependency] || byId[dependency])
+  .filter(Boolean);
+
+const metricLabels = {
+  usersCount: 'Users',
+  dataVolume: 'Data volume',
+  moneyVolume: 'Payments',
+};
+
+const metricEntries = (['usersCount', 'dataVolume', 'moneyVolume'] as const)
+  .filter((field) => Boolean(item[field]))
+  .map((field) => ({
+    field,
+    label: metricLabels[field],
+    value: item[field],
+    evidence: item.metricEvidence?.[field],
+  }));
+
+const relatedItems = allItems
+  .map((candidate) => ({
+    item: candidate,
+    sharedActions: candidate.slug === item.slug
+      ? 0
+      : candidate.actionsSupported.filter((action) => item.actionsSupported.includes(action)).length,
+  }))
+  .filter((candidate) => candidate.sharedActions > 0)
+  .sort((a, b) => {
+    if (a.sharedActions !== b.sharedActions) return b.sharedActions - a.sharedActions;
+    return sortByLatestThenTitle(a.item, b.item);
+  })
+  .slice(0, 4)
+  .map((candidate) => candidate.item);
+
+const metadataGroups = [
+  {
+    label: 'Actions',
+    values: item.actionsSupported.map((action) => ACTION_LABELS[action] || action),
+  },
+  {
+    label: 'Pipeline stages',
+    values: item.pipelineStages.map((stage) => PIPELINE_LABELS[stage] || stage),
+  },
+  {
+    label: 'Data types',
+    values: item.dataTypes.map((dataType) => formatDataTypeLabel(dataType)),
+  },
+  {
+    label: 'Signals',
+    values: item.signals,
+  },
+  {
+    label: 'Jurisdictions',
+    values: item.jurisdictions,
+  },
+  {
+    label: 'Tags',
+    values: item.tags,
+  },
+].filter((group) => group.values.length > 0);
+
+const latest = item.latestEvidenceLink;
+---
+
+<Layout title={item.title} description={item.summary}>
+  <main class="wrap initiative-page">
+    <nav class="initiative-breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Catalog</a>
+      <span>/</span>
+      <span>{item.title}</span>
+    </nav>
+
+    <header class="initiative-hero box">
+      <div class="initiative-hero-copy">
+        <p class="eyebrow">Initiative profile</p>
+        <div class="initiative-titleline">
+          <h1>{item.title}</h1>
+          <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
+        </div>
+        <p class="initiative-summary">{item.summary}</p>
+
+        <div class="initiative-hero-actions">
+          <a class="btn btn-primary" href={item.website} target="_blank" rel="noopener">Visit website</a>
+          <a class="btn btn-quiet" href="/">Back to catalog</a>
+        </div>
+      </div>
+
+      <dl class="initiative-hero-meta">
+        <div>
+          <dt>Website</dt>
+          <dd><a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a></dd>
+        </div>
+        <div>
+          <dt>Latest update</dt>
+          <dd>
+            {latest ? (
+              <>
+                <span class="initiative-meta-date">{formatDate(latest.date)}</span>
+                <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
+              </>
+            ) : (
+              <span class="muted">No evidence links yet</span>
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>Approach</dt>
+          <dd>{formatActionSummary(item.actionsSupported)}</dd>
+        </div>
+        {item.pipelineStages.length > 0 && (
+          <div>
+            <dt>Pipeline</dt>
+            <dd>{item.pipelineStages.map((stage) => PIPELINE_LABELS[stage] || stage).join(' / ')}</dd>
+          </div>
+        )}
+      </dl>
+    </header>
+
+    <div class="initiative-layout">
+      <article class="initiative-main">
+        {renderedBody && (
+          <section class="box section initiative-section">
+            <h2>What it is</h2>
+            <div class="initiative-prose" set:html={renderedBody.code}></div>
+          </section>
+        )}
+
+        {item.considerations && (
+          <section class="box section initiative-section">
+            <h2>Watchouts</h2>
+            <p class="initiative-callout">{item.considerations}</p>
+          </section>
+        )}
+
+        {item.evidenceLinks.length > 0 && (
+          <section class="box section initiative-section">
+            <h2>Evidence trail</h2>
+            <ul class="initiative-evidence-list">
+              {item.evidenceLinks.map((link) => (
+                <li>
+                  <span class="initiative-evidence-date">{formatDate(link.date)}</span>
+                  <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {metricEntries.length > 0 && (
+          <section class="box section initiative-section">
+            <h2>Adoption signals</h2>
+            <div class="initiative-metric-grid">
+              {metricEntries.map((metric) => (
+                <article class="initiative-metric-card">
+                  <p class="initiative-metric-label">{metric.label}</p>
+                  <p class="initiative-metric-value">{metric.value}</p>
+                  {metric.evidence?.notes && <p class="initiative-metric-note">{metric.evidence.notes}</p>}
+                  {metric.evidence?.sources && metric.evidence.sources.length > 0 && (
+                    <ul class="initiative-source-list">
+                      {metric.evidence.sources.map((source) => (
+                        <li>
+                          <a href={source.url} target="_blank" rel="noopener">{source.label}</a>
+                          <span class="initiative-source-date">{formatDate(source.date)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {item.implementationSnippets && item.implementationSnippets.length > 0 && (
+          <section class="box section initiative-section">
+            <h2>Implementation snippets</h2>
+            <div class="snippets-wrap">
+              {item.implementationSnippets.map((snippet) => (
+                <div class="snippet">
+                  <div class="snippet-head">
+                    <span class="chip">{snippet.title}</span>
+                    {snippet.sourceUrl && (
+                      <a href={snippet.sourceUrl} target="_blank" rel="noopener">Source</a>
+                    )}
+                    <button type="button" class="copy" data-code={encodeURIComponent(snippet.code || '')}>Copy</button>
+                  </div>
+                  <pre class="code"><code>{snippet.code}</code></pre>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {item.referencesResolved.length > 0 && (
+          <section class="box section initiative-section">
+            <h2>References</h2>
+            <ul class="references-list">
+              {item.referencesResolved.map((reference) => (
+                <li>
+                  {reference.url ? (
+                    <a href={reference.url} target="_blank" rel="noopener">{formatCitation(reference)}</a>
+                  ) : (
+                    <span>{formatCitation(reference)}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </article>
+
+      <aside class="initiative-sidebar">
+        {metadataGroups.map((group) => (
+          <section class="box section initiative-sidecard">
+            <h2>{group.label}</h2>
+            <div class="initiative-chip-list">
+              {group.values.map((value) => (
+                <span class="chip">{value}</span>
+              ))}
+            </div>
+          </section>
+        ))}
+
+        {dependencyItems.length > 0 && (
+          <section class="box section initiative-sidecard">
+            <h2>Uses</h2>
+            <ul class="initiative-link-list">
+              {dependencyItems.map((dependency) => (
+                <li>
+                  <a href={`/initiatives/${dependency.slug}`}>{dependency.title}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {relatedItems.length > 0 && (
+          <section class="box section initiative-sidecard">
+            <h2>Related in catalog</h2>
+            <ul class="initiative-link-list">
+              {relatedItems.map((related) => (
+                <li>
+                  <a href={`/initiatives/${related.slug}`}>{related.title}</a>
+                  {related.latestUpdate && (
+                    <span class="initiative-link-meta">Updated {formatDate(related.latestUpdate)}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </aside>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .initiative-page {
+    display: grid;
+    gap: 18px;
+  }
+
+  .initiative-breadcrumbs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .initiative-breadcrumbs a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .initiative-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 20px;
+    padding: clamp(24px, 4vw, 34px);
+    border-color: color-mix(in srgb, var(--accent) 25%, var(--border));
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--card) 88%, transparent), color-mix(in srgb, var(--accent-soft) 26%, var(--card)));
+  }
+
+  .initiative-hero-copy {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+  }
+
+  .initiative-titleline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .initiative-summary {
+    margin: 0;
+    max-width: 42rem;
+    color: color-mix(in srgb, var(--text) 84%, var(--muted));
+    font-size: 1.06rem;
+  }
+
+  .initiative-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .initiative-hero-meta {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .initiative-hero-meta div {
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 94%, var(--accent-soft));
+  }
+
+  .initiative-hero-meta dt {
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .initiative-hero-meta dd {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0.45rem 0 0;
+  }
+
+  .initiative-meta-date {
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .initiative-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.72fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .initiative-main {
+    display: grid;
+    gap: 14px;
+  }
+
+  .initiative-sidebar {
+    position: sticky;
+    top: 90px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .initiative-section h2,
+  .initiative-sidecard h2 {
+    margin-bottom: 0.8rem;
+    font-size: 1.45rem;
+  }
+
+  .initiative-prose :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .initiative-prose :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .initiative-prose :global(p),
+  .initiative-prose :global(li) {
+    font-size: 1rem;
+    line-height: 1.68;
+  }
+
+  .initiative-prose :global(h2),
+  .initiative-prose :global(h3) {
+    scroll-margin-top: 100px;
+  }
+
+  .initiative-callout {
+    margin: 0;
+    padding: 14px 16px;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 16px 16px 0;
+    background: color-mix(in srgb, var(--accent-soft) 52%, var(--card));
+    color: color-mix(in srgb, var(--text) 84%, var(--muted));
+  }
+
+  .initiative-evidence-list,
+  .initiative-source-list,
+  .initiative-link-list {
+    margin: 0;
+    padding-left: 1rem;
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .initiative-evidence-list li,
+  .initiative-source-list li,
+  .initiative-link-list li {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .initiative-evidence-date,
+  .initiative-source-date,
+  .initiative-link-meta {
+    font-size: 0.84rem;
+    color: var(--muted);
+  }
+
+  .initiative-metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+
+  .initiative-metric-card {
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 96%, transparent);
+  }
+
+  .initiative-metric-label {
+    margin: 0;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .initiative-metric-value {
+    margin: 0.45rem 0 0.7rem;
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    line-height: 1.12;
+  }
+
+  .initiative-metric-note {
+    margin: 0 0 0.75rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .initiative-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 960px) {
+    .initiative-hero,
+    .initiative-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .initiative-sidebar {
+      position: static;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .initiative-hero {
+      padding: 22px;
+    }
+
+    .initiative-hero-actions .btn {
+      width: 100%;
+    }
+
+    .initiative-titleline {
+      align-items: flex-start;
+    }
+  }
+</style>

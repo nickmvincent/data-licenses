@@ -13,6 +13,10 @@ tags:
   - indigenous-data-governance
   - cultural-heritage
   - labels
+evidenceLinks:
+  - label: Guide to using TK Labels and Notices updated
+    url: 'https://localcontexts.org/blog/how-to-use-tk-labels-and-notices/'
+    date: '2025-09-18'
 considerations: >-
   TK Labels are community-governance signals that rely on institutional and
   downstream respect; they are not a substitute for copyright law or a standard

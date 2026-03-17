@@ -8,6 +8,8 @@ actionsSupported:
 pipelineStages:
   - train
   - retrieve
+dataTypes:
+  - text
 tags:
   - publishers
   - licensing

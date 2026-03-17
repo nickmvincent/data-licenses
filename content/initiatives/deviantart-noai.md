@@ -8,12 +8,17 @@ actionsSupported:
 pipelineStages:
   - collect
   - train
+dataTypes:
+  - images
 tags:
   - art
   - meta-tag
   - x-robots-tag
   - opt-out
 evidenceLinks:
+  - label: NoAI labels added to DeviantArt Studio
+    url: 'https://www.deviantart.com/team/journal/Bringing-NoAI-labels-to-DeviantArt-Studio-1043690888'
+    date: '2024-04-17'
   - label: DeviantArt rolls out default opt-out and publishes noai/noimageai directives
     url: 'https://www.deviantart.com/team/journal/UPDATE-All-Deviations-Are-OptedOut-of-AI-Datasets-934500371'
     date: '2022-11-11'
