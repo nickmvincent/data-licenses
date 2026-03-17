@@ -4,8 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "check": "astro check",
+    "build": "npm run lint:content && astro build",
+    "check": "npm run lint:content && astro check",
     "preview": "astro preview",
     "astro": "astro",
     "cf:deploy": "npx wrangler pages deploy dist --project-name datalicenses",

@@ -1,5 +1,5 @@
 ---
-title: FairlyTrained
+title: Fairly Trained
 summary: Certify that models are fairly trained
 status: live
 website: 'https://www.fairlytrained.org/'

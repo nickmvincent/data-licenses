@@ -6,11 +6,13 @@ import networkData from '../data/network.json';
 interface Props {
   title?: string;
   description?: string;
+  showNetworkFooter?: boolean;
 }
 
 const {
   title = 'DataLicenses.org',
   description = 'A curated catalog of public initiatives shaping AI data access, licensing, technical enforcement, and creator leverage.',
+  showNetworkFooter = true,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
@@ -122,8 +124,7 @@ const alsoLikeLinks = [
         </div>
       </div>
     </footer>
-
-    <NetworkFooter links={networkLinks} label="Part of a broader research network:" />
+    {showNetworkFooter && <NetworkFooter links={networkLinks} label="Part of a broader research network:" />}
 
     <script is:inline>
       (() => {

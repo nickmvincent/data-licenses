@@ -5,7 +5,7 @@ This Astro site renders the public catalog for DataLicenses.org from the shared 
 ## Project structure
 
 Key paths:
-- `src/content.config.ts` — Astro-side schema for initiative frontmatter
+- `src/lib/content-schema.js` — Shared runtime validation rules for the loader and linter
 - `../content/initiatives/*.md` — Main dataset
 - `../content/shared-references/bibtex-entries/*.md` — Optional bibliography records used by `references`
 - `src/data/initiative-curation.json` — Editorial tracking for evidence/adoption research backlog
@@ -24,6 +24,8 @@ Required frontmatter:
 - `summary`: string
 - `status`: `live` | `wip`
 - `website`: URL
+- `visibility`: `public` | `private` | `draft`
+- `type`: `data_license_initiative`
 
 Common optional fields:
 - `actionsSupported`: array of `attach-preference-signal`, `attach-formal-license`, `join-licensing-collective`, `data-market-platform`, `add-tollgate`, `technical-blocking`, `new-infrastructures`, `certification`
@@ -43,6 +45,8 @@ title: Example Initiative
 summary: One-line neutral summary.
 status: live
 website: https://example.org/
+visibility: public
+type: data_license_initiative
 evidenceLinks:
   - label: Partner program announced
     url: https://example.org/blog/partners

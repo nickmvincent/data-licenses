@@ -1,313 +1,87 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const sourceTiers = [
+const principles = [
   {
-    title: 'Tier 1: Primary sources',
-    body: 'Official websites, docs, specs, repos, changelogs, press releases, filings, and product announcements. These should anchor most evidence links and all adoption metrics when possible.',
+    title: 'Human-curated',
+    body: 'People decide what belongs in the catalog, how entries are described, and which caveats need to stay attached.',
   },
   {
-    title: 'Tier 2: Reputable secondary coverage',
-    body: 'Independent reporting can confirm timing or context, but it should usually supplement a primary source rather than replace one.',
+    title: 'AI-supported, not AI-published',
+    body: 'AI agents can help gather candidate links, summarize changes, and draft update packets, but they do not make final decisions or publish directly to the site.',
   },
   {
-    title: 'Tier 3: Weak signals',
-    body: 'Social chatter, scraped profiles, vague marketing language, or undated pages can suggest leads, but they should not be treated as settled catalog facts.',
+    title: 'Evidence-led',
+    body: 'A useful update should point to public sources that a human reviewer can open, inspect, and challenge.',
   },
 ];
 
-const goals = [
-  'Keep the catalog grounded in concrete initiatives that shape AI data access, licensing, enforcement, compensation, or negotiation.',
-  'Make every meaningful claim inspectable through dated public evidence that a reader can click and sanity-check.',
-  'Track updates and adoption signals without overstating what the evidence proves.',
-  'Keep the contribution path friendly to humans, while allowing tools and agents to help with first-pass research.',
+const idealFlow = [
+  'Start with a person. A contributor or editor identifies a new initiative or an existing entry that may need an update.',
+  'Read the current entry first. Before changing anything, check what the catalog already says and what evidence is already attached.',
+  'Look for the strongest public sources. Official websites, docs, announcements, changelogs, repos, and public filings should usually come before secondary coverage.',
+  'Use AI carefully, if helpful. An agent can scan for recent changes, gather candidate links, and draft a compact proposed update, but it should stay close to the source material and keep uncertainty visible.',
+  'Review every proposed claim by hand. A human should open the links, confirm the dates, check that the summary is fair, and throw out anything weak, vague, or overstated.',
+  'Keep the update conservative. If the evidence is partial or ambiguous, the entry should say so plainly rather than smoothing it over.',
+  'Publish through human review. A person makes the final merge decision and remains responsible for the wording and the evidence attached to the entry.',
 ];
 
-const generalFlow = [
-  'Confirm the initiative is in scope and identify its canonical website or public home.',
-  'Read the existing entry first so you know what evidence, metrics, and caveats are already recorded.',
-  'Check official sources first: website, docs, repo, spec, changelog, press page, or announcement post.',
-  'Add the newest meaningful dated update to `evidenceLinks`; if no dated source exists, leave recency sparse rather than inventing it.',
-  'Add adoption metrics only when a public source explicitly states them, and pair each one with matching `metricEvidence`.',
-  'Write down ambiguity, weak evidence, or missing pieces in `considerations`, the PR, or the review note.',
-  'Have a human reviewer make the merge decision and the final call on wording.',
+const goodUpdate = [
+  'A short factual summary of what changed.',
+  'At least one public source that supports the update.',
+  'Clear dates when timing matters.',
+  'Plain language about any uncertainty, limits, or open questions.',
 ];
-
-const humanContributionTips = [
-  'Start small. One well-sourced initiative update is more useful than a shallow sweep of many.',
-  'Use short, neutral summaries that describe what the initiative does, not what its backers hope it will do.',
-  'Every proposed update should have at least one clickable source and a date.',
-  'Every `usersCount`, `dataVolume`, or `moneyVolume` value should be grounded in public evidence and paired with `metricEvidence`.',
-  'If evidence is weak, stale, or contradictory, say so plainly instead of smoothing it over.',
-  'When you cannot verify a number, omit it instead of rounding, inferring, or translating hype into certainty.',
-  'Use absolute dates, short factual labels, and explicit caveats.',
-  'Do not infer adoption from website traffic, social followers, GitHub stars, or general media attention.',
-];
-
-const agentWorkflowSteps = [
-  'Start from the public catalog JSON, curation JSON, and the current initiative record.',
-  'Prefer primary sources and dated official pages. Use secondary coverage only to confirm or contextualize.',
-  'Propose the newest meaningful `evidenceLinks` item first, then only the fields that actually changed.',
-  'Add `usersCount`, `dataVolume`, or `moneyVolume` only when a public source explicitly supports them, and include matching `metricEvidence`.',
-  'Use `considerations` to flag weak, stale, conflicting, or partial evidence instead of smoothing it over.',
-  'Return a flat initiative object using the catalog\'s current field names so a human can review it quickly.',
-];
-
-const fieldRows = [
-  {
-    field: 'website',
-    use: 'The canonical home for the initiative. Prefer the initiative itself over a news story about it.',
-  },
-  {
-    field: 'evidenceLinks',
-    use: 'Dated public links that show updates, launches, deployments, partnerships, or adoption signals. The newest one drives the catalog\'s "Latest update" display.',
-  },
-  {
-    field: 'evidenceStatus',
-    use: 'Derived editorial status: `tracked` when an initiative already has at least one dated evidence link, `needs-sourcing` when it still needs a basic public source pass.',
-  },
-  {
-    field: 'usersCount',
-    use: 'A short public count of adopters, publishers, partners, customers, or users. Only include it if a source explicitly states a number.',
-  },
-  {
-    field: 'dataVolume',
-    use: 'A short public measure of data flow or corpus size, such as datasets, pages, tokens, or downloads.',
-  },
-  {
-    field: 'moneyVolume',
-    use: 'A short public measure of payments, revenue share, contract value, or other directly relevant economic activity.',
-  },
-  {
-    field: 'metricEvidence',
-    use: 'Per-metric attribution for `usersCount`, `dataVolume`, and `moneyVolume`. Use `basis: explicit` for direct source claims and `basis: derived` only for simple, well-explained rollups across official sources.',
-  },
-  {
-    field: 'considerations',
-    use: 'Caveats about scope, compliance, enforcement, uncertainty, or what the evidence does not prove.',
-  },
-  {
-    field: 'adoptionResearchStatus',
-    use: 'Editorial research bucket for adoption metrics: `populated`, `needs-research`, or `hard-to-quantify`.',
-  },
-  {
-    field: 'adoptionResearchNotes',
-    use: 'Short explanation of why the initiative currently sits in that adoption-research bucket.',
-  },
-];
-
-const exampleJson = `{
-  "slug": "example-initiative",
-  "title": "Example Initiative",
-  "website": "https://example.org",
-  "evidenceLinks": [
-    {
-      "label": "Partner program announced",
-      "url": "https://example.org/blog/partners",
-      "date": "2026-01-15"
-    },
-    {
-      "label": "Docs updated with rollout details",
-      "url": "https://example.org/docs/partners",
-      "date": "2025-12-02"
-    }
-  ],
-  "usersCount": "10+ announced partners",
-  "metricEvidence": {
-    "usersCount": {
-      "basis": "explicit",
-      "sources": [
-        {
-          "label": "Partner program announced",
-          "url": "https://example.org/blog/partners",
-          "date": "2026-01-15"
-        }
-      ]
-    }
-  },
-  "considerations": "Partner count comes from the launch post and may understate current uptake."
-}`;
-
-const exampleFrontmatter = `---
-title: Example Initiative
-summary: One-line neutral summary.
-status: live
-website: 'https://example.org/'
-evidenceLinks:
-  - label: Partner program announced
-    url: 'https://example.org/blog/partners'
-    date: '2026-01-15'
-  - label: Docs updated with rollout details
-    url: 'https://example.org/docs/partners'
-    date: '2025-12-02'
-usersCount: '10+ announced partners'
-metricEvidence:
-  usersCount:
-    basis: explicit
-    sources:
-      - label: Partner program announced
-        url: 'https://example.org/blog/partners'
-        date: '2026-01-15'
-considerations: Partner count comes from the launch post and may understate current uptake.
----`;
 ---
 
 <Layout
   title="Methodology"
-  description="How DataLicenses.org scopes initiatives, reviews human contributions, and optionally uses AI-assisted first-pass research."
+  description="How DataLicenses.org stays human-curated while using AI carefully to support research and updates."
 >
   <main class="wrap narrow methodology-page">
     <header class="page-header">
-      <p class="eyebrow">How we verify things</p>
+      <p class="eyebrow">How we work</p>
       <h1>Methodology</h1>
       <p class="muted methodology-intro">
-        DataLicenses.org is human-curated and evidence-led. The first pass on this catalog was assembled
-        manually, and this page should not imply otherwise. AI tools can help collect candidate evidence,
-        but contributors and editors decide what belongs in the catalog, how claims are phrased, and which
-        caveats stay attached.
+        DataLicenses.org is a human-curated catalog. People decide what belongs here, how entries are
+        phrased, and what caveats should stay visible. AI agents can be useful research assistants, but
+        they are only there to support update work, not replace editorial judgment.
       </p>
     </header>
 
     <section class="methodology-grid">
-      <article class="box section methodology-card">
-        <h2>Human-curated</h2>
-        <p>
-          Contributors and editors make the inclusion decisions, choose the wording, and decide how much
-          uncertainty to carry into the final record.
-        </p>
-      </article>
-
-      <article class="box section methodology-card">
-        <h2>Public evidence</h2>
-        <p>
-          The site's "Latest update" comes from the newest dated <code>evidenceLinks</code> entry attached
-          to an initiative. If we cannot click and date a claim, we should treat it as unconfirmed.
-        </p>
-      </article>
-
-      <article class="box section methodology-card">
-        <h2>Conservative metrics</h2>
-        <p>
-          Counts like <code>usersCount</code>, <code>dataVolume</code>, and <code>moneyVolume</code> should
-          stay close to explicit public claims and carry matching <code>metricEvidence</code>.
-        </p>
-      </article>
+      {principles.map((principle) => (
+        <article class="box section methodology-card">
+          <h2>{principle.title}</h2>
+          <p>{principle.body}</p>
+        </article>
+      ))}
     </section>
 
     <section class="box section">
-      <h2>General Goals</h2>
-      <ul class="method-list">
-        {goals.map((goal) => (
-          <li>{goal}</li>
-        ))}
-      </ul>
-    </section>
-
-    <section class="box section">
-      <h2>General Contribution Flow</h2>
+      <h2>Ideal Flow</h2>
+      <p class="muted">
+        The ideal process is simple: use tools to make the research work easier, then keep the editorial
+        decision-making firmly human.
+      </p>
       <ol class="method-list">
-        {generalFlow.map((step) => (
+        {idealFlow.map((step) => (
           <li>{step}</li>
         ))}
       </ol>
     </section>
 
     <section class="box section">
-      <h2>Tips for Human Contributions</h2>
+      <h2>What A Good Update Includes</h2>
       <ul class="method-list">
-        {humanContributionTips.map((tip) => (
-          <li>{tip}</li>
+        {goodUpdate.map((item) => (
+          <li>{item}</li>
         ))}
       </ul>
       <p class="muted small">
-        Contributions are easier to review when the PR or note also says which sources were checked and what
-        was ruled out as too weak to include.
+        When AI is involved, the best outcome is usually a small review packet: candidate sources, a proposed
+        summary, and clear notes about anything uncertain or unresolved.
       </p>
-    </section>
-
-    <section class="box section">
-      <h2>Source Ladder</h2>
-      <div class="methodology-grid">
-        {sourceTiers.map((tier) => (
-          <article class="methodology-card tier-card">
-            <h3>{tier.title}</h3>
-            <p>{tier.body}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="box section">
-      <h2>What We Record</h2>
-      <div class="method-table-wrap">
-        <table class="method-table">
-          <thead>
-            <tr>
-              <th>Field</th>
-              <th>How we use it</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fieldRows.map((row) => (
-              <tr>
-                <td><code>{row.field}</code></td>
-                <td>{row.use}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="box section">
-      <h2>Rules For Adoption Metrics</h2>
-      <ul class="method-list">
-        <li>Use explicit public counts or ranges whenever possible. If a source does not state a number, omit the metric.</li>
-        <li>Keep the wording close to the source. Examples: <code>700+ publishers</code>, <code>10+ announced partners</code>, <code>200,000+ declarations</code>.</li>
-        <li>If a metric is a simple rollup across multiple official sources, record that in <code>metricEvidence</code> with <code>basis: derived</code> and a short note.</li>
-        <li>Do not translate soft marketing language like "widely used" into a numeric claim.</li>
-        <li>Do not estimate adoption from stars, followers, backlinks, or scraped traffic tools.</li>
-        <li>If the best available evidence is old or partial, keep the metric conservative and note the caveat.</li>
-      </ul>
-    </section>
-
-    <section class="box section">
-      <h2>Curation Backlog</h2>
-      <p>
-        We now track two editorial statuses in structured form. <code>evidenceStatus</code> tells us whether an
-        initiative has at least one dated public evidence link. <code>adoptionResearchStatus</code> tells us whether
-        adoption metrics are already populated, still worth researching, or probably hard to quantify for now.
-      </p>
-      <p>
-        Contributors can inspect the current backlog at <a href="/data/curation.json">/data/curation.json</a>.
-      </p>
-    </section>
-
-    <section class="box section">
-      <h2>Optional AI Agent Workflow</h2>
-      <p>
-        AI assistance is optional and mostly useful for terse, merge-friendly first-pass packets. The goal
-        is to hand a human reviewer something structured and easy to challenge, not something that
-        auto-publishes.
-      </p>
-      <ol class="method-list">
-        {agentWorkflowSteps.map((step) => (
-          <li>{step}</li>
-        ))}
-      </ol>
-      <p class="muted small">
-        Starter assets: <a href="/data/initiatives.json">catalog JSON</a>,
-        <a href="/data/curation.json"> curation JSON</a>, and the
-        <a href="/prompts/find-updates.txt"> update-research prompt</a>.
-      </p>
-      <h3>Structured output</h3>
-      <pre class="method-code"><code>{exampleJson}</code></pre>
-      <p>
-        After review, the mergeable catalog object should stay compact. The key thing is that the public
-        evidence remains attached to the initiative entry.
-      </p>
-      <h3>Mergeable catalog snippet</h3>
-      <pre class="method-code"><code>{exampleFrontmatter}</code></pre>
     </section>
   </main>
 </Layout>
@@ -325,18 +99,10 @@ considerations: Partner count comes from the launch post and may understate curr
 
   .methodology-card {
     background: color-mix(in srgb, var(--card) 94%, transparent);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 18px;
   }
 
-  .tier-card h3,
   .methodology-card h2 {
     margin-bottom: 0.55rem;
-  }
-
-  .section h3 {
-    margin: 1.35rem 0 0.6rem;
   }
 
   .method-list {
@@ -344,39 +110,5 @@ considerations: Partner count comes from the launch post and may understate curr
     padding-left: 1.2rem;
     display: grid;
     gap: 0.65rem;
-  }
-
-  .method-table-wrap {
-    overflow-x: auto;
-  }
-
-  .method-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .method-table th,
-  .method-table td {
-    border-bottom: 1px solid var(--border);
-    padding: 0.9rem 0.75rem;
-    text-align: left;
-    vertical-align: top;
-  }
-
-  .method-table th {
-    font-size: 0.78rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .method-code {
-    overflow-x: auto;
-    padding: 16px 18px;
-    border-radius: 18px;
-    border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--surface-muted) 88%, transparent);
-    font-size: 0.88rem;
-    line-height: 1.55;
   }
 </style>

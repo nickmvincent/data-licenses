@@ -1140,14 +1140,23 @@ input[type='search'] {
   margin: 0 0 0.8rem;
 }
 
+.term-links,
 .term-related {
   font-size: 0.9rem;
   color: var(--muted);
 }
 
-.related-label {
+.term-links {
+  margin-bottom: 0.4rem;
+}
+
+.term-meta-label {
   margin-right: 0.35rem;
   font-weight: 600;
+}
+
+.related-link {
+  text-underline-offset: 0.14em;
 }
 
 .references-list {
@@ -1375,48 +1384,6 @@ input[type='search'] {
   display: inline-flex;
   gap: 8px;
   flex-wrap: wrap;
-}
-
-.goal-switch {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.goal-button {
-  display: grid;
-  gap: 4px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--card) 96%, transparent);
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition:
-    border-color 0.18s ease,
-    background 0.18s ease,
-    transform 0.18s ease;
-}
-
-.goal-button:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-}
-
-.goal-button[aria-pressed='true'] {
-  background: var(--accent-soft);
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-}
-
-.goal-button-title {
-  font-weight: 700;
-}
-
-.goal-button-copy {
-  color: var(--muted);
-  font-size: 0.88rem;
-  line-height: 1.45;
 }
 
 .catalog-action-list {
@@ -1825,7 +1792,6 @@ input[type='search'] {
   }
 
   .catalog-panel-grid,
-  .goal-switch,
   .catalog-card-meta {
     grid-template-columns: 1fr;
   }

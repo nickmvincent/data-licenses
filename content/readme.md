@@ -7,6 +7,7 @@ The `initiatives/` directory stores the public catalog records consumed by the w
 Each initiative is a Markdown file with frontmatter for merge-ready fields such as:
 
 - `title`, `summary`, `status`, `website`
+- `visibility: public` and `type: data_license_initiative`
 - `evidenceLinks`
 - `usersCount`, `dataVolume`, `moneyVolume`
 - `metricEvidence`

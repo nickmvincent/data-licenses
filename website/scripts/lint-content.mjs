@@ -2,11 +2,27 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { load as loadYaml } from 'js-yaml';
+import {
+  ADOPTION_METRIC_FIELDS,
+  ADOPTION_RESEARCH_STATUSES,
+  normalizeEvidenceLinks,
+  normalizeImplementationSnippets,
+  normalizeMetricEvidence,
+  normalizeStringArray,
+  normalizeUrl,
+  looksLikeRootHomepage,
+  parseStatus,
+  parseVisibility,
+  requireInitiativeType,
+  requireString,
+  requireUrlString,
+  stripContextFromMessage,
+} from '../src/lib/content-schema.js';
 
 const dir = join(process.cwd(), '..', 'content', 'initiatives');
 const sharedRefsDir = join(process.cwd(), '..', 'content', 'shared-references', 'bibtex-entries');
 const curationPath = join(process.cwd(), 'src', 'data', 'initiative-curation.json');
-const allowedAdoptionResearchStatuses = new Set(['populated', 'needs-research', 'hard-to-quantify']);
+const allowedAdoptionResearchStatuses = new Set(ADOPTION_RESEARCH_STATUSES);
 let sharedRefsAvailable = false;
 
 function extractFrontmatter(content) {
@@ -14,55 +30,12 @@ function extractFrontmatter(content) {
   return m ? m[1] : '';
 }
 
-function hasKey(fm, key) {
-  const re = new RegExp(`^${key}\s*:`, 'm');
-  return re.test(fm);
-}
-
-function getValue(fm, key) {
-  const re = new RegExp(`^${key}\s*:\s*(.+)$`, 'm');
-  const m = fm.match(re);
-  return m ? m[1].trim() : undefined;
-}
-
-function isUrl(s) {
-  return /^https?:\/\//i.test(s || '');
-}
-
-function stripQuotes(value) {
-  return String(value || '').replace(/^['"]|['"]$/g, '');
-}
-
-function validateEvidenceCollection(collection, prefix, warns) {
-  if (!Array.isArray(collection)) return;
-  collection.forEach((link, index) => {
-    if (!link || typeof link !== 'object') {
-      warns.push(`${prefix}[${index}] is not an object`);
-      return;
-    }
-    if (!isUrl(stripQuotes(link.url))) warns.push(`${prefix}[${index}].url does not look like a URL`);
-    if (!link.date || Number.isNaN(new Date(String(link.date)).getTime())) {
-      warns.push(`${prefix}[${index}].date is not a valid date`);
-    }
-  });
-}
-
-function normalizeUrl(value) {
-  if (!value || typeof value !== 'string') return null;
+function collectIssue(list, context, fn) {
   try {
-    const url = new URL(value);
-    return `${url.origin}${url.pathname.replace(/\/$/, '') || '/'}`;
-  } catch {
-    return null;
-  }
-}
-
-function looksLikeRootHomepage(value) {
-  try {
-    const url = new URL(String(value || ''));
-    return url.pathname === '/' || url.pathname === '';
-  } catch {
-    return false;
+    return fn();
+  } catch (error) {
+    list.push(stripContextFromMessage(error, context));
+    return undefined;
   }
 }
 
@@ -104,58 +77,75 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.md'))) {
   const p = join(dir, file);
   const txt = readFileSync(p, 'utf8');
   const fm = extractFrontmatter(txt);
-  const parsedFm = fm ? loadYaml(fm) || {} : {};
+  let parsedFm = {};
+  try {
+    parsedFm = fm ? loadYaml(fm) || {} : {};
+  } catch (error) {
+    console.error(`ERROR content/initiatives/${file}: invalid frontmatter YAML: ${error.message || error}`);
+    errors += 1;
+    continue;
+  }
+
   const slug = file.replace(/\.md$/, '');
   seenSlugs.add(slug);
   const issues = [];
   const warns = [];
+  const context = `Initiative ${file}`;
 
-  if (!hasKey(fm, 'title')) issues.push('missing title');
-  if (!hasKey(fm, 'summary')) issues.push('missing summary');
-  if (!hasKey(fm, 'status')) issues.push('missing status');
-
-  const allowed = new Set(['live', 'wip']);
-  if (hasKey(fm, 'status')) {
-    const v = (getValue(fm, 'status') || '').replace(/#.*/, '').trim();
-    if (v && !allowed.has(v)) warns.push(`status not in allowed set: ${v}`);
-  }
-
-  ['website'].forEach((k) => {
-    if (hasKey(fm, k)) {
-      const v = stripQuotes(getValue(fm, k)?.replace(/#.*/, '').trim());
-      if (v && !isUrl(v)) warns.push(`field ${k} does not look like a URL`);
-    }
-  });
-
-  validateEvidenceCollection(parsedFm.evidenceLinks, 'evidenceLinks', warns);
+  collectIssue(issues, context, () => requireString(parsedFm.title, 'title', context));
+  collectIssue(issues, context, () => requireString(parsedFm.summary, 'summary', context));
+  collectIssue(issues, context, () => parseStatus(parsedFm.status, context));
+  collectIssue(issues, context, () => requireUrlString(parsedFm.website, 'website', context));
+  collectIssue(issues, context, () => parseVisibility(parsedFm.visibility, context));
+  collectIssue(issues, context, () => requireInitiativeType(parsedFm.type, context));
+  collectIssue(issues, context, () =>
+    normalizeStringArray(parsedFm.actionsSupported, 'actionsSupported', context)
+  );
+  collectIssue(issues, context, () =>
+    normalizeStringArray(parsedFm.jurisdictions, 'jurisdictions', context)
+  );
+  collectIssue(issues, context, () => normalizeStringArray(parsedFm.signals, 'signals', context));
+  collectIssue(issues, context, () =>
+    normalizeStringArray(parsedFm.pipelineStages, 'pipelineStages', context)
+  );
+  collectIssue(issues, context, () => normalizeStringArray(parsedFm.tags, 'tags', context));
+  collectIssue(issues, context, () =>
+    normalizeStringArray(parsedFm.dependsOn, 'dependsOn', context)
+  );
+  collectIssue(issues, context, () =>
+    normalizeStringArray(parsedFm.references, 'references', context)
+  );
+  collectIssue(issues, context, () =>
+    normalizeEvidenceLinks(parsedFm, context, { allowLegacyFallback: false })
+  );
+  collectIssue(issues, context, () => normalizeMetricEvidence(parsedFm.metricEvidence, context));
+  collectIssue(issues, context, () =>
+    normalizeImplementationSnippets(parsedFm.implementationSnippets, context)
+  );
 
   const body = txt.replace(/^---\n[\s\S]*?\n---\n?/, '').trim();
   if (body === '...') issues.push('placeholder body');
   if (/\[citation needed\]/i.test(body)) issues.push('contains [citation needed]');
 
-  const adoptionMetricKeys = ['usersCount', 'dataVolume', 'moneyVolume'];
-  const populatedAdoptionMetricKeys = adoptionMetricKeys.filter((key) => hasKey(fm, key));
+  const populatedAdoptionMetricKeys = ADOPTION_METRIC_FIELDS.filter((key) =>
+    typeof parsedFm[key] === 'string' && parsedFm[key].trim()
+  );
   const hasAdoptionMetric = populatedAdoptionMetricKeys.length > 0;
   const hasEvidenceLinks = Array.isArray(parsedFm.evidenceLinks) && parsedFm.evidenceLinks.length > 0;
   if (hasAdoptionMetric && !hasEvidenceLinks) {
     warns.push('adoption metric present without evidenceLinks');
   }
 
-  if (parsedFm.metricEvidence && typeof parsedFm.metricEvidence === 'object') {
-    for (const key of adoptionMetricKeys) {
+  if (parsedFm.metricEvidence && typeof parsedFm.metricEvidence === 'object' && !Array.isArray(parsedFm.metricEvidence)) {
+    for (const key of ADOPTION_METRIC_FIELDS) {
       const entry = parsedFm.metricEvidence[key];
       if (!entry) continue;
       if (!populatedAdoptionMetricKeys.includes(key)) {
         warns.push(`metricEvidence.${key} is present without ${key}`);
       }
-      if (entry.basis && !new Set(['explicit', 'derived']).has(entry.basis)) {
-        warns.push(`metricEvidence.${key}.basis must be explicit or derived`);
-      }
       if (!Array.isArray(entry.sources) || entry.sources.length === 0) {
         warns.push(`metricEvidence.${key}.sources must contain at least one source`);
-        continue;
       }
-      validateEvidenceCollection(entry.sources, `metricEvidence.${key}.sources`, warns);
     }
   }
 
@@ -203,12 +193,8 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.md'))) {
     }
   }
 
-  if (hasKey(fm, 'implementationSnippets')) {
-    warns.push('implementationSnippets present (not deeply validated)');
-  }
-
   if (issues.length || warns.length) {
-      const rel = `content/initiatives/${file}`;
+    const rel = `content/initiatives/${file}`;
     if (issues.length) {
       console.error(`ERROR ${rel}: ${issues.join('; ')}`);
       errors += issues.length;

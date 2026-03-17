@@ -4,71 +4,17 @@ import { join, resolve } from 'node:path';
 import { parseFrontmatter, slugFromFilename } from '../../../helpers/markdown';
 import { loadReferences, type Reference } from '../../../helpers/shared-references';
 import initiativeCuration from '../data/initiative-curation.json';
+import {
+  ADOPTION_METRIC_FIELDS,
+  normalizeInitiativeFrontmatter,
+  parseVisibility,
+  requireMemoType,
+} from './content-schema.js';
 
 const DEFAULT_CONTENT_DIR =
   process.env.DATA_LICENSES_CONTENT_DIR ||
   // Default to standalone repo layout: website -> ../content
   resolve(process.cwd(), '../content');
-
-function coerceDate(value: unknown): Date | undefined {
-  if (!value) return undefined;
-  const d = new Date(String(value));
-  return isNaN(d.getTime()) ? undefined : d;
-}
-
-function normalizeStatus(value: unknown): 'live' | 'wip' {
-  const normalized = String(value || '').trim().toLowerCase();
-  if (String(value || '').trim() === 'WIP') return 'wip';
-  if (normalized === 'wip' || normalized === 'w.i.p.' || normalized === 'wip.') return 'wip';
-  return 'live';
-}
-
-function cleanLegacyEvidenceLabel(value: unknown): string {
-  const text = String(value || '').replace(/\s+/g, ' ').trim();
-  if (!text) return 'Latest update';
-  const withoutUrl = text.replace(/\s*\(https?:\/\/[^)]+\)\s*$/, '').trim();
-  return withoutUrl || 'Latest update';
-}
-
-function extractUrl(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined;
-  const match = value.match(/https?:\/\/[^\s)]+/);
-  return match ? match[0] : undefined;
-}
-
-function normalizeEvidenceLinks(data: Record<string, unknown>) {
-  const rawLinks = Array.isArray(data.evidenceLinks) ? data.evidenceLinks : [];
-  const normalized = rawLinks
-    .map((link) => {
-      if (!link || typeof link !== 'object') return null;
-      const url = typeof link.url === 'string' ? link.url : '';
-      const label = typeof link.label === 'string' ? link.label : '';
-      const date = coerceDate((link as Record<string, unknown>).date);
-      if (!url || !date) return null;
-      return { label: label || 'Evidence link', url, date };
-    })
-    .filter(Boolean) as Array<{ label: string; url: string; date: Date }>;
-
-  if (normalized.length === 0) {
-    const legacyDate = coerceDate(data.recentActivity) || coerceDate(data.lastUpdated);
-    const legacyUrl =
-      (typeof data.linkWithEvidenceOfUse === 'string' && data.linkWithEvidenceOfUse) ||
-      (typeof data.pressPage === 'string' && data.pressPage) ||
-      extractUrl(data.recentActivityNote) ||
-      (typeof data.website === 'string' && data.website) ||
-      undefined;
-
-    if (legacyDate && legacyUrl) {
-      normalized.push({
-        label: cleanLegacyEvidenceLabel(data.recentActivityNote),
-        url: legacyUrl,
-        date: legacyDate,
-      });
-    }
-  }
-
-  return normalized.sort((a, b) => b.date.getTime() - a.date.getTime());
-}
 
 type AdoptionResearchStatus = 'populated' | 'needs-research' | 'hard-to-quantify';
 type EvidenceStatus = 'tracked' | 'needs-sourcing';
@@ -86,29 +32,6 @@ type ImplementationSnippet = {
   code: string;
   sourceUrl: string;
 };
-type InitiativeFrontmatter = Record<string, unknown> & {
-  id?: string;
-  title?: string;
-  summary?: string;
-  website?: string;
-  status?: string;
-  actionsSupported?: string[];
-  jurisdictions?: string[];
-  signals?: string[];
-  pipelineStages?: string[];
-  considerations?: string;
-  tags?: string[];
-  dependsOn?: string[];
-  usersCount?: string;
-  dataVolume?: string;
-  moneyVolume?: string;
-  metricEvidence?: Record<string, MetricEvidenceEntry | undefined>;
-  implementationSnippets?: ImplementationSnippet[];
-  references?: string[];
-  visibility?: string;
-  type?: string;
-};
-
 export type LoadedInitiative = {
   id: string;
   slug: string;
@@ -177,14 +100,14 @@ export async function loadInitiatives(): Promise<LoadedInitiative[]> {
   for (const file of files) {
     const raw = await fs.readFile(join(dir, file), 'utf8');
     const { data } = parseFrontmatter(raw);
-    const frontmatter = (data || {}) as InitiativeFrontmatter;
-
-    if (frontmatter.visibility && frontmatter.visibility !== 'public') continue;
-    if (frontmatter.type && frontmatter.type !== 'data_license_initiative') continue;
-
-    const referenceKeys = Array.isArray(frontmatter.references)
-      ? frontmatter.references.filter((k): k is string => typeof k === 'string')
-      : [];
+    const context = `Initiative ${file}`;
+    const frontmatter = normalizeInitiativeFrontmatter(
+      (data || {}) as Record<string, unknown>,
+      context
+    );
+    const { visibility, type } = frontmatter;
+    if (visibility !== 'public') continue;
+    const referenceKeys = frontmatter.references;
     if (referenceKeys.length > 0 && allReferences.size === 0) {
       throw new Error(
         `Initiative ${file} declares references, but no shared references could be loaded from content/shared-references/bibtex-entries.`
@@ -201,16 +124,20 @@ export async function loadInitiatives(): Promise<LoadedInitiative[]> {
       .filter((reference): reference is Reference => Boolean(reference));
 
     const slug = slugFromFilename(file);
-    const evidenceLinks = normalizeEvidenceLinks(frontmatter) as EvidenceLink[];
+    const evidenceLinks = frontmatter.evidenceLinks as EvidenceLink[];
     const latestEvidenceLink = evidenceLinks[0];
-    const adoptionMetricFields = ['usersCount', 'dataVolume', 'moneyVolume'].filter(
-      (field) => typeof frontmatter[field] === 'string' && String(frontmatter[field]).trim()
-    );
+    const adoptionMetricFields = ADOPTION_METRIC_FIELDS.filter((field) => {
+      const value =
+        field === 'usersCount'
+          ? frontmatter.usersCount
+          : field === 'dataVolume'
+            ? frontmatter.dataVolume
+            : frontmatter.moneyVolume;
+
+      return typeof value === 'string' && value.trim();
+    });
     const hasAdoptionMetrics = adoptionMetricFields.length > 0;
-    const metricEvidence =
-      frontmatter.metricEvidence && typeof frontmatter.metricEvidence === 'object'
-        ? frontmatter.metricEvidence
-        : {};
+    const metricEvidence = frontmatter.metricEvidence || {};
     const metricEvidenceFields = adoptionMetricFields.filter((field) => {
       const entry = metricEvidence[field];
       return Array.isArray(entry?.sources) && entry.sources.length > 0;
@@ -230,40 +157,26 @@ export async function loadInitiatives(): Promise<LoadedInitiative[]> {
     items.push({
       id: frontmatter.id || slug,
       slug,
-      title: typeof frontmatter.title === 'string' ? frontmatter.title : slug,
-      summary: typeof frontmatter.summary === 'string' ? frontmatter.summary : '',
-      website: typeof frontmatter.website === 'string' ? frontmatter.website : '',
-      actionsSupported: Array.isArray(frontmatter.actionsSupported)
-        ? frontmatter.actionsSupported.filter((value): value is string => typeof value === 'string')
-        : [],
-      jurisdictions: Array.isArray(frontmatter.jurisdictions)
-        ? frontmatter.jurisdictions.filter((value): value is string => typeof value === 'string')
-        : [],
-      signals: Array.isArray(frontmatter.signals)
-        ? frontmatter.signals.filter((value): value is string => typeof value === 'string')
-        : [],
-      pipelineStages: Array.isArray(frontmatter.pipelineStages)
-        ? frontmatter.pipelineStages.filter((value): value is string => typeof value === 'string')
-        : [],
-      considerations: typeof frontmatter.considerations === 'string' ? frontmatter.considerations : undefined,
-      tags: Array.isArray(frontmatter.tags)
-        ? frontmatter.tags.filter((value): value is string => typeof value === 'string')
-        : [],
-      dependsOn: Array.isArray(frontmatter.dependsOn)
-        ? frontmatter.dependsOn.filter((value): value is string => typeof value === 'string')
-        : [],
-      usersCount: typeof frontmatter.usersCount === 'string' ? frontmatter.usersCount : undefined,
-      dataVolume: typeof frontmatter.dataVolume === 'string' ? frontmatter.dataVolume : undefined,
-      moneyVolume: typeof frontmatter.moneyVolume === 'string' ? frontmatter.moneyVolume : undefined,
+      title: frontmatter.title,
+      summary: frontmatter.summary,
+      website: frontmatter.website,
+      actionsSupported: frontmatter.actionsSupported,
+      jurisdictions: frontmatter.jurisdictions,
+      signals: frontmatter.signals,
+      pipelineStages: frontmatter.pipelineStages,
+      considerations: frontmatter.considerations,
+      tags: frontmatter.tags,
+      dependsOn: frontmatter.dependsOn,
+      usersCount: frontmatter.usersCount,
+      dataVolume: frontmatter.dataVolume,
+      moneyVolume: frontmatter.moneyVolume,
       metricEvidence: Object.keys(metricEvidence).length > 0 ? metricEvidence : undefined,
-      implementationSnippets: Array.isArray(frontmatter.implementationSnippets)
-        ? frontmatter.implementationSnippets
-        : undefined,
-      visibility: frontmatter.visibility,
-      type: frontmatter.type,
+      implementationSnippets: frontmatter.implementationSnippets,
+      visibility,
+      type,
       references: referenceKeys,
       referencesResolved: resolvedReferences,
-      status: normalizeStatus(frontmatter.status),
+      status: frontmatter.status,
       evidenceLinks,
       latestEvidenceLink,
       latestUpdate: latestEvidenceLink?.date,
@@ -286,20 +199,15 @@ export async function loadMemo(slug = 'memo') {
   const filePath = join(root, 'memos', `${slug}.md`);
   const raw = await fs.readFile(filePath, 'utf8');
   const { data, body } = parseFrontmatter(raw);
+  const context = `Memo ${slug}.md`;
+  const visibility = parseVisibility(data?.visibility, context);
+  requireMemoType(data?.type, context);
 
-  if (data?.visibility && data.visibility !== 'public') {
-    throw new Error(`Memo ${slug} is not marked public (visibility: ${data.visibility})`);
-  }
-  if (data?.type && data.type !== 'data_license_memo') {
-    throw new Error(`Memo ${slug} has unexpected type: ${data.type}`);
+  if (visibility !== 'public') {
+    throw new Error(`Memo ${slug} is not marked public (visibility: ${visibility})`);
   }
 
   return { slug, frontmatter: data, body };
-}
-
-export async function loadContentMeta() {
-  const root = await ensureContentRoot();
-  return { root };
 }
 
 export { loadReferences, loadReferencesByKeys, formatCitation } from '../../../helpers/shared-references';

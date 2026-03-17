@@ -6,7 +6,7 @@ const ACTION_LABELS: Record<string, string> = {
   'attach-preference-signal': 'Preference signal',
   'attach-formal-license': 'Formal license',
   'join-licensing-collective': 'Licensing collective',
-  'data-market-platform': 'Data market platform',
+  'data-market-platform': 'Marketplace',
   'add-tollgate': 'Tollgate',
   'technical-blocking': 'Technical blocking',
   'new-infrastructures': 'New infrastructure',
@@ -26,37 +26,23 @@ const STATUS_LABELS: Record<string, string> = {
   wip: 'WIP',
 };
 
-const GOAL_OPTIONS = [
-  {
-    goal: 'signal',
-    label: 'State preferences',
-    description: 'Signals, licenses, and machine-readable permissions.',
-    actions: 'attach-preference-signal,attach-formal-license',
-  },
-  {
-    goal: 'block',
-    label: 'Reduce scraping',
-    description: 'Technical controls that block, meter, or slow crawlers.',
-    actions: 'technical-blocking',
-  },
-  {
-    goal: 'paid',
-    label: 'Get compensated',
-    description: 'Tollgates, marketplaces, collectives, and certification-based leverage.',
-    actions: 'add-tollgate,data-market-platform,join-licensing-collective,certification',
-  },
-];
+const SECTION_KEYS = ['new-approaches', 'markets-with-new-approaches', 'markets-only'] as const;
+type CatalogSectionKey = typeof SECTION_KEYS[number];
 
-type MarketGroup = 'primary' | 'market';
-
-const GROUP_DETAILS: Record<MarketGroup, { title: string; description: string }> = {
-  primary: {
-    title: 'Everything else',
-    description: 'Signals, standards, controls, collectives, and mixed models.',
+const SECTION_DETAILS: Record<CatalogSectionKey, { title: string; description: string }> = {
+  'new-approaches': {
+    title: 'New approaches',
+    description:
+      'Signals, licenses, infrastructure, blocking, tollgates, certification, and other non-market approaches.',
   },
-  market: {
-    title: 'Pure markets/platforms',
-    description: 'Entries whose only catalog approach is `data-market-platform`.',
+  'markets-with-new-approaches': {
+    title: 'Markets with new approaches',
+    description:
+      'Marketplace entries that also add at least one other approach from the catalog.',
+  },
+  'markets-only': {
+    title: 'Markets only',
+    description: 'Entries whose only catalog approach is a marketplace.',
   },
 };
 
@@ -102,27 +88,25 @@ function formatPipelineSummary(pipelineStages: string[]) {
   return `Pipeline: ${pipelineStages.map((stage) => PIPELINE_LABELS[stage] || stage).join(' -> ')}`;
 }
 
-function marketGroupForItem(item: LoadedInitiative): MarketGroup {
-  return item.actionsSupported.length === 1 && item.actionsSupported[0] === 'data-market-platform'
-    ? 'market'
-    : 'primary';
+function catalogSectionForItem(item: LoadedInitiative): CatalogSectionKey {
+  const actions = Array.isArray(item.actionsSupported) ? item.actionsSupported : [];
+  const hasMarketplace = actions.includes('data-market-platform');
+  const hasOtherApproaches = actions.some((action) => action !== 'data-market-platform');
+
+  if (hasMarketplace && !hasOtherApproaches) return 'markets-only';
+  if (hasMarketplace && hasOtherApproaches) return 'markets-with-new-approaches';
+  return 'new-approaches';
 }
 
 const items: LoadedInitiative[] = (await loadInitiatives()).sort(sortByLatestThenTitle);
 const bySlug = Object.fromEntries(items.map((item) => [item.slug, item]));
 const byId = Object.fromEntries(items.map((item) => [item.id, item]));
-const groupedItems: Array<{ key: MarketGroup; items: LoadedInitiative[]; title: string; description: string }> = [
-  {
-    key: 'primary',
-    items: items.filter((item) => marketGroupForItem(item) === 'primary'),
-    ...GROUP_DETAILS.primary,
-  },
-  {
-    key: 'market',
-    items: items.filter((item) => marketGroupForItem(item) === 'market'),
-    ...GROUP_DETAILS.market,
-  },
-];
+const groupedItems: Array<{ key: CatalogSectionKey; items: LoadedInitiative[]; title: string; description: string }> =
+  SECTION_KEYS.map((key) => ({
+    key,
+    items: items.filter((item) => catalogSectionForItem(item) === key),
+    ...SECTION_DETAILS[key],
+  }));
 
 const actions: string[] = Array.from(new Set(items.flatMap((item) => item.actionsSupported || [])))
   .sort((a, b) => (ACTION_LABELS[a] || a).localeCompare(ACTION_LABELS[b] || b));
@@ -158,7 +142,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
 
         <div class="catalog-panel-body">
           <div class="catalog-panel-head">
-            <p class="catalog-panel-intro">Search first, then narrow by status. Goal presets select matching actions, and you can still fine-tune them below.</p>
+            <p class="catalog-panel-intro">Search first, then narrow by status or specific actions.</p>
             <button type="button" id="reset-filters" class="catalog-reset" hidden>Reset all</button>
           </div>
 
@@ -188,24 +172,6 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
           </div>
 
           <div class="catalog-panel-block">
-            <span class="catalog-panel-label">Goal presets</span>
-            <div class="goal-switch">
-              {GOAL_OPTIONS.map((option) => (
-                <button
-                  type="button"
-                  class="goal-button"
-                  data-goal={option.goal}
-                  data-actions={option.actions}
-                  aria-pressed="false"
-                >
-                  <span class="goal-button-title">{option.label}</span>
-                  <span class="goal-button-copy">{option.description}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div class="catalog-panel-block">
             <span class="catalog-panel-label">Specific actions</span>
             <div id="actions" class="catalog-action-list">
               {actions.map((action) => (
@@ -231,7 +197,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         <section
           id={`spreadsheet-group-${group.key}`}
           class="catalog-group"
-          data-market-group={group.key}
+          data-catalog-section={group.key}
         >
           <div class="catalog-group-head">
             <div>
@@ -266,7 +232,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                     <tr
                       class="catalog-row"
                       data-item={item.slug}
-                      data-market-group={group.key}
+                      data-catalog-section={group.key}
                       data-title={item.title.toLowerCase()}
                       data-summary={(item.summary || '').toLowerCase()}
                       data-tags={(item.tags || []).join(' ').toLowerCase()}
@@ -375,7 +341,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         <section
           id={`cards-group-${group.key}`}
           class="catalog-group"
-          data-market-group={group.key}
+          data-catalog-section={group.key}
         >
           <div class="catalog-group-head">
             <div>
@@ -401,7 +367,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
                 <article
                   class="catalog-card"
                   data-item={item.slug}
-                  data-market-group={group.key}
+                  data-catalog-section={group.key}
                   data-title={item.title.toLowerCase()}
                   data-summary={(item.summary || '').toLowerCase()}
                   data-tags={(item.tags || []).join(' ').toLowerCase()}
@@ -568,29 +534,30 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       const chipsContainer = queryOne('#active-filter-chips');
       const spreadsheetView = queryOne('#spreadsheet-view');
       const cardsView = queryOne('#cards-view');
-      const tableBodies = {
-        primary: queryOne('#table-body-primary'),
-        market: queryOne('#table-body-market'),
-      };
-      const spreadsheetGroups = {
-        primary: queryOne('#spreadsheet-group-primary'),
-        market: queryOne('#spreadsheet-group-market'),
-      };
-      const cardGrids = {
-        primary: queryOne('#cards-grid-primary'),
-        market: queryOne('#cards-grid-market'),
-      };
-      const cardGroups = {
-        primary: queryOne('#cards-group-primary'),
-        market: queryOne('#cards-group-market'),
-      };
+      const sectionKeys = ['new-approaches', 'markets-with-new-approaches', 'markets-only'];
+      const tableBodies = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`#table-body-${key}`)])
+      );
+      const spreadsheetGroups = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`#spreadsheet-group-${key}`)])
+      );
+      const cardGrids = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`#cards-grid-${key}`)])
+      );
+      const cardGroups = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`#cards-group-${key}`)])
+      );
       const emptyState = queryOne('#empty');
       const clearButton = queryOne('#clear');
       const resetButton = queryOne('#reset-filters');
       const viewButtons = queryAll('.view-button');
-      const goalButtons = queryAll('.goal-button');
       const statusButtons = queryAll('.status-button');
       const statusLabels = { live: 'Live', wip: 'WIP' };
+      const legacyGoalActions = {
+        signal: ['attach-preference-signal', 'attach-formal-license'],
+        block: ['technical-blocking'],
+        paid: ['add-tollgate', 'data-market-platform', 'join-licensing-collective', 'certification'],
+      };
 
       const requiredElements = [
         searchInput,
@@ -601,33 +568,24 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         chipsContainer,
         spreadsheetView,
         cardsView,
-        tableBodies.primary,
-        tableBodies.market,
-        spreadsheetGroups.primary,
-        spreadsheetGroups.market,
-        cardGrids.primary,
-        cardGrids.market,
-        cardGroups.primary,
-        cardGroups.market,
+        ...sectionKeys.flatMap((key) => [
+          tableBodies[key],
+          spreadsheetGroups[key],
+          cardGrids[key],
+          cardGroups[key],
+        ]),
         emptyState,
         panelSummary,
       ];
 
       if (requiredElements.some((element) => !element)) return;
 
-      let activeGoal = null;
       let currentView = 'spreadsheet';
 
       const actionButtons = () => queryAll('.catalog-action', actionsContainer);
       const rowNodes = () => queryAll('.catalog-row', spreadsheetView);
       const cardNodes = () => queryAll('.catalog-card', cardsView);
       const cardsById = () => new Map(cardNodes().map((card) => [card.dataset.item || '', card]));
-      const getGoalButton = (goal) => goalButtons.find((button) => button.dataset.goal === goal) || null;
-      const getGoalLabel = (goal) =>
-        getGoalButton(goal)
-          ?.querySelector('.goal-button-title')
-          ?.textContent
-          ?.trim() || goal;
       const getActionLabel = (action) =>
         actionButtons().find((button) => button.dataset.action === action)?.textContent?.trim() || action;
       const getSortLabel = (sortMode) =>
@@ -655,24 +613,6 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         actionButtons().forEach((button) => setPressed(button, false));
       }
 
-      function setGoalActions(goal) {
-        const goalButton = getGoalButton(goal);
-        if (!goalButton) return false;
-
-        const matchedActions = new Set(
-          (goalButton.dataset.actions || '')
-            .split(',')
-            .map((action) => action.trim())
-            .filter(Boolean)
-        );
-
-        actionButtons().forEach((actionButton) => {
-          setPressed(actionButton, matchedActions.has(actionButton.dataset.action || ''));
-        });
-
-        return true;
-      }
-
       function setView(view) {
         currentView = view === 'cards' ? 'cards' : 'spreadsheet';
         viewButtons.forEach((button) => {
@@ -680,26 +620,6 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         });
         spreadsheetView.hidden = currentView !== 'spreadsheet';
         cardsView.hidden = currentView !== 'cards';
-      }
-
-      function updateGoalButtons() {
-        goalButtons.forEach((button) => {
-          setPressed(button, button.dataset.goal === activeGoal);
-        });
-      }
-
-      function toggleGoalFilter(button) {
-        const goal = button.dataset.goal;
-        if (!goal) return;
-
-        if (activeGoal === goal) {
-          activeGoal = null;
-          clearActionButtons();
-          return;
-        }
-
-        activeGoal = goal;
-        setGoalActions(goal);
       }
 
       function compareItems(a, b, sortMode) {
@@ -730,13 +650,9 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
 
         if (rawQuery) chips.push({ kind: 'search', label: `Search: ${rawQuery}` });
         if (statusValue !== 'all') chips.push({ kind: 'status', value: statusValue, label: `Status: ${statusLabels[statusValue] || statusValue}` });
-        if (activeGoal) {
-          chips.push({ kind: 'goal', value: activeGoal, label: `Goal preset: ${getGoalLabel(activeGoal)}` });
-        } else {
-          selectedActions.forEach((action) => {
-            chips.push({ kind: 'action', value: action, label: `Action: ${getActionLabel(action)}` });
-          });
-        }
+        selectedActions.forEach((action) => {
+          chips.push({ kind: 'action', value: action, label: `Action: ${getActionLabel(action)}` });
+        });
         if (sortMode !== 'latest') chips.push({ kind: 'sort', value: sortMode, label: `Sort: ${getSortLabel(sortMode)}` });
 
         return chips;
@@ -790,11 +706,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         const params = new URLSearchParams();
         if (rawQuery) params.set('q', rawQuery);
         if (statusValue !== 'all') params.set('status', statusValue);
-        if (activeGoal) {
-          params.set('goal', activeGoal);
-        } else {
-          selectedActions.forEach((action) => params.append('actions', action));
-        }
+        selectedActions.forEach((action) => params.append('actions', action));
         if (sortMode !== 'latest') params.set('sort', sortMode);
         if (currentView !== 'spreadsheet') params.set('view', currentView);
 
@@ -841,18 +753,20 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         });
 
         visibleItems.sort((a, b) => compareItems(a, b, sortMode));
-        const visibleByGroup = { primary: 0, market: 0 };
+        const visibleBySection = Object.fromEntries(sectionKeys.map((key) => [key, 0]));
         visibleItems.forEach((item) => {
-          const marketGroup = item.row.dataset.marketGroup === 'market' ? 'market' : 'primary';
-          visibleByGroup[marketGroup] += 1;
-          tableBodies[marketGroup].appendChild(item.row);
-          if (item.card) cardGrids[marketGroup].appendChild(item.card);
+          const section = sectionKeys.includes(item.row.dataset.catalogSection)
+            ? item.row.dataset.catalogSection
+            : 'new-approaches';
+          visibleBySection[section] += 1;
+          tableBodies[section].appendChild(item.row);
+          if (item.card) cardGrids[section].appendChild(item.card);
         });
 
-        spreadsheetGroups.primary.hidden = visibleByGroup.primary === 0;
-        spreadsheetGroups.market.hidden = visibleByGroup.market === 0;
-        cardGroups.primary.hidden = visibleByGroup.primary === 0;
-        cardGroups.market.hidden = visibleByGroup.market === 0;
+        sectionKeys.forEach((key) => {
+          spreadsheetGroups[key].hidden = visibleBySection[key] === 0;
+          cardGroups[key].hidden = visibleBySection[key] === 0;
+        });
 
         countText.textContent = String(visibleItems.length);
         emptyState.hidden = visibleItems.length !== 0;
@@ -867,8 +781,6 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         sortSelect.value = 'latest';
         setStatusFilter('all');
         clearActionButtons();
-        activeGoal = null;
-        updateGoalButtons();
         applyFilters();
       }
 
@@ -880,15 +792,15 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         const sortValue = params.get('sort');
         const viewValue = params.get('view');
         const preselectedActions = new Set(params.getAll('actions'));
+        const legacyActions = legacyGoalActions[goalValue] || [];
 
         if (queryValue) searchInput.value = queryValue;
         if (statusValue && ['all', 'live', 'wip'].includes(statusValue)) setStatusFilter(statusValue);
         if (sortValue && Array.from(sortSelect.options).some((option) => option.value === sortValue)) {
           sortSelect.value = sortValue;
         }
-        if (goalValue && setGoalActions(goalValue)) {
-          activeGoal = goalValue;
-        } else if (preselectedActions.size > 0) {
+        legacyActions.forEach((action) => preselectedActions.add(action));
+        if (preselectedActions.size > 0) {
           actionButtons().forEach((button) => {
             setPressed(button, preselectedActions.has(button.dataset.action || ''));
           });
@@ -898,7 +810,7 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
         const hasStatusFilter = statusValue && statusValue !== 'all';
         const hasSortOverride = sortValue && sortValue !== 'latest';
 
-        if (controlsPanel && (queryValue || hasStatusFilter || hasSortOverride || goalValue || preselectedActions.size > 0)) {
+        if (controlsPanel && (queryValue || hasStatusFilter || hasSortOverride || preselectedActions.size > 0)) {
           controlsPanel.open = true;
         }
       }
@@ -906,14 +818,6 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
       viewButtons.forEach((button) => {
         button.addEventListener('click', () => {
           setView(button.dataset.view || 'spreadsheet');
-          applyFilters();
-        });
-      });
-
-      goalButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-          toggleGoalFilter(button);
-          updateGoalButtons();
           applyFilters();
         });
       });
@@ -934,8 +838,6 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
 
         const nextPressed = actionButton.getAttribute('aria-pressed') !== 'true';
         setPressed(actionButton, nextPressed);
-        activeGoal = null;
-        updateGoalButtons();
         applyFilters();
       });
 
@@ -952,16 +854,9 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
 
           if (kind === 'search') searchInput.value = '';
           if (kind === 'status') setStatusFilter('all');
-          if (kind === 'goal') {
-            activeGoal = null;
-            clearActionButtons();
-            updateGoalButtons();
-          }
           if (kind === 'action') {
             const actionButton = actionButtons().find((button) => button.dataset.action === value);
             if (actionButton) setPressed(actionButton, false);
-            activeGoal = null;
-            updateGoalButtons();
           }
           if (kind === 'sort') sortSelect.value = 'latest';
 
@@ -997,7 +892,6 @@ const actions: string[] = Array.from(new Set(items.flatMap((item) => item.action
 
       initializeFromUrl();
       setView(currentView);
-      updateGoalButtons();
       applyFilters();
     })();
   </script>

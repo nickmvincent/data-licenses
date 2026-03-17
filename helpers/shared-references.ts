@@ -1,18 +1,3 @@
-/**
- * Shared utility for loading references from content/shared-references/bibtex-entries/
- *
- * Can be used by Astro projects to load bibliographic data.
- *
- * Usage:
- *   import { loadReferences, loadReferencesByKeys } from '../../helpers/shared-references';
- *
- *   // Load all references
- *   const allRefs = await loadReferences();
- *
- *   // Load specific references by citation keys
- *   const specificRefs = await loadReferencesByKeys(['vincent2019datastrikes', 'bender_stochastic_parrots_2021']);
- */
-
 import { existsSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -66,9 +51,6 @@ const SHARED_REFS_PATH = resolveSharedRefsPath();
 
 let cachedReferences: Map<string, Reference> | null = null;
 
-/**
- * Load all references from shared-references directory
- */
 export async function loadReferences(options: { force?: boolean; basePath?: string } = {}): Promise<Map<string, Reference>> {
   if (cachedReferences && !options.force && !options.basePath) {
     return cachedReferences;
@@ -129,9 +111,6 @@ export async function loadReferences(options: { force?: boolean; basePath?: stri
   return refs;
 }
 
-/**
- * Load specific references by citation keys
- */
 export async function loadReferencesByKeys(keys: string[], options: { basePath?: string } = {}): Promise<Reference[]> {
   const allRefs = await loadReferences(options);
   const result: Reference[] = [];
@@ -145,27 +124,6 @@ export async function loadReferencesByKeys(keys: string[], options: { basePath?:
 
   return result;
 }
-
-/**
- * Load references that have any of the specified tags
- */
-export async function loadReferencesByTags(tags: string[], options: { basePath?: string } = {}): Promise<Reference[]> {
-  const allRefs = await loadReferences(options);
-  const results: Reference[] = [];
-  const tagSet = new Set(tags.map(t => t.toLowerCase()));
-
-  for (const ref of allRefs.values()) {
-    if (ref.tags?.some(t => tagSet.has(t.toLowerCase()))) {
-      results.push(ref);
-    }
-  }
-
-  return results;
-}
-
-/**
- * Format a reference as a citation string
- */
 export function formatCitation(ref: Reference, style: 'apa' | 'short' = 'short'): string {
   if (style === 'short') {
     const firstAuthor = ref.authors[0]?.split(',')[0] || 'Unknown';
@@ -176,22 +134,4 @@ export function formatCitation(ref: Reference, style: 'apa' | 'short' = 'short')
   // APA-ish format
   const authors = ref.authors.join(', ');
   return `${authors} (${ref.year}). ${ref.title}. ${ref.venue || ref.journal || ref.booktitle || ''}`;
-}
-
-/**
- * Get the priority number for a reference
- * Looks for tags like 'priority:1', 'priority:2', etc.
- * Returns the priority number, or Infinity if no priority tag
- */
-export function getPriority(ref: Reference): number {
-  if (!ref.tags) return Infinity;
-
-  for (const tag of ref.tags) {
-    const lower = tag.toLowerCase();
-    if (lower.startsWith('priority:')) {
-      const num = parseInt(lower.slice('priority:'.length), 10);
-      if (!isNaN(num)) return num;
-    }
-  }
-  return Infinity;
 }

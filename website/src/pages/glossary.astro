@@ -1,5 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { loadInitiatives } from '../lib/content-loader';
+
+type GlossaryLink = {
+  label: string;
+  url: string;
+};
+
+type GlossaryTerm = {
+  term: string;
+  definition: string;
+  related: string[];
+  externalLinks: GlossaryLink[];
+};
 
 const slugify = (value: string) =>
   value
@@ -7,111 +20,243 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 
-const terms = [
+const initiatives = await loadInitiatives();
+const catalogInitiativeBySlug = new Map(initiatives.map((item) => [item.slug, item]));
+
+const link = (label: string, url: string): GlossaryLink => ({ label, url });
+
+const catalogLink = (slug: string, label?: string): GlossaryLink => {
+  const initiative = catalogInitiativeBySlug.get(slug);
+  if (!initiative) {
+    throw new Error(`Glossary expected catalog initiative slug "${slug}" to exist.`);
+  }
+
+  return {
+    label: label ?? initiative.title,
+    url: initiative.website,
+  };
+};
+
+const catalogEvidenceLink = (
+  slug: string,
+  labelContains: string,
+  label?: string
+): GlossaryLink => {
+  const initiative = catalogInitiativeBySlug.get(slug);
+  if (!initiative) {
+    throw new Error(`Glossary expected catalog initiative slug "${slug}" to exist.`);
+  }
+
+  const target = initiative.evidenceLinks.find((item) =>
+    item.label.toLowerCase().includes(labelContains.toLowerCase())
+  );
+  if (!target) {
+    throw new Error(
+      `Glossary expected catalog initiative slug "${slug}" to have evidence matching "${labelContains}".`
+    );
+  }
+
+  return {
+    label: label ?? target.label,
+    url: target.url,
+  };
+};
+
+const terms: GlossaryTerm[] = [
   {
     term: 'Preference Signal',
     definition: 'A machine-readable hint that tells AI agents or web crawlers how content may or may not be used. Examples include robots.txt directives, ai.txt files, and HTTP headers. These rely on voluntary compliance by the crawler.',
     related: ['robots.txt', 'ai.txt', 'TDMRep'],
+    externalLinks: [
+      catalogLink('ai-pref', 'IETF AI Preferences'),
+      catalogLink('tdmrep', 'W3C TDMRep'),
+    ],
   },
   {
     term: 'robots.txt',
     definition: 'A text file placed at the root of a website that instructs web crawlers which pages they may or may not access. Originally designed for search engines, now being extended for AI training crawlers with user-agent specific rules.',
     related: ['Preference Signal'],
+    externalLinks: [link('Robot Exclusion Protocol (RFC 9309)', 'https://www.rfc-editor.org/rfc/rfc9309')],
   },
   {
     term: 'ai.txt',
     definition: 'A proposed standard (similar to robots.txt) specifically for communicating AI-related permissions. Allows site owners to express preferences about AI training, retrieval, and generation uses of their content.',
     related: ['Preference Signal', 'robots.txt'],
+    externalLinks: [catalogLink('ai-txt', 'Spawning ai.txt')],
+  },
+  {
+    term: 'API',
+    definition: 'A programmatic interface for requesting data or services. In this catalog, APIs can become tollgates, licensed delivery channels, or enforcement points for AI-relevant data access.',
+    related: ['Tollgate', 'Data Market Platform'],
+    externalLinks: [link('MDN API glossary', 'https://developer.mozilla.org/en-US/docs/Glossary/API')],
+  },
+  {
+    term: 'Attribution',
+    definition: 'Credit connecting content back to its source, author, or steward. It can involve citations, links, provenance metadata, or contractual reporting requirements.',
+    related: ['Data Provenance', 'Training Data'],
+    externalLinks: [link('Creative Commons attribution guidance', 'https://wiki.creativecommons.org/wiki/Recommended_practices_for_attribution')],
+  },
+  {
+    term: 'Certification',
+    definition: 'A third-party review or badge signaling that a model, dataset, or vendor meets a stated standard, such as consented training-data sourcing.',
+    related: ['Consent', 'Fairly Trained'],
+    externalLinks: [catalogLink('fairlytrained', 'Fairly Trained')],
+  },
+  {
+    term: 'Compensation',
+    definition: 'Payment, revenue sharing, licensing fees, or other economic return to the people or organizations supplying content or data.',
+    related: ['Data Market Platform', 'Licensing Collective'],
+    externalLinks: [
+      catalogLink('prorata', 'ProRata / Gist'),
+      catalogEvidenceLink(
+        'bria-artist-program',
+        'Licensed training catalog',
+        'Bria licensed training catalog'
+      ),
+    ],
+  },
+  {
+    term: 'Consent',
+    definition: 'Permission granted by the relevant rights holder or contributor before data is used for AI training, retrieval, or other downstream purposes.',
+    related: ['Opt-in', 'Opt-out'],
+    externalLinks: [
+      catalogLink('created-by-humans', 'Created by Humans'),
+      catalogLink('fairlytrained', 'Fairly Trained'),
+    ],
   },
   {
     term: 'TDMRep',
-    definition: 'Text and Data Mining Reservation Protocol. A W3C community standard for expressing rights reservations about text and data mining, including AI training. Uses HTTP headers or HTML meta tags.',
+    definition: 'Text and Data Mining Reservation Protocol. A W3C Community Group effort for expressing TDM policies, typically via a machine-readable `/.well-known/tdmrep.json` file designed to support EU DSM Directive opt-outs.',
     related: ['Preference Signal', 'W3C'],
+    externalLinks: [catalogLink('tdmrep', 'W3C TDMRep')],
   },
   {
     term: 'Licensing Collective',
-    definition: 'An organization that manages rights on behalf of multiple creators, negotiating licenses and distributing payments. Examples include ASCAP for music and new AI-focused collectives like Fairly Trained.',
+    definition: 'An organization that manages rights on behalf of multiple creators, negotiating licenses and distributing payments. Examples include ASCAP for music and newer publisher or creator collectives negotiating AI-related uses.',
     related: ['RSL', 'Compensation'],
+    externalLinks: [catalogLink('publishers-rights', "Publishers' Rights Organization")],
   },
   {
     term: 'RSL (Really Simple Licensing)',
     definition: 'A machine-readable licensing format that allows content creators to specify terms for AI use of their work. Designed to be easily parsed by automated systems for compliance checking.',
     related: ['Licensing Collective', 'Preference Signal'],
+    externalLinks: [catalogLink('rsl', 'RSL standard')],
   },
   {
     term: 'Tollgate',
     definition: 'A technical mechanism that requires payment, authentication, or rate limiting for automated access to content. Allows monetization of bot traffic while maintaining control over access.',
     related: ['Technical Control', 'API'],
+    externalLinks: [catalogLink('tollbit', 'TollBit')],
   },
   {
     term: 'Technical Control',
     definition: 'Measures that detect, limit, or block unwanted automated access to content. Includes rate limiting, CAPTCHAs, bot detection, and fingerprinting. Unlike preference signals, these are enforced rather than advisory.',
     related: ['Tollgate', 'Scraping'],
+    externalLinks: [catalogLink('cloudflare-anti-scraping', 'Cloudflare AI Crawl Control')],
   },
   {
     term: 'Scraping',
     definition: 'The automated extraction of content from websites. AI companies scrape the web to collect training data. May violate terms of service or copyright depending on jurisdiction and use.',
     related: ['Technical Control', 'Training Data'],
+    externalLinks: [catalogLink('cloudflare-anti-scraping', 'Cloudflare AI Crawl Control')],
   },
   {
     term: 'Training Data',
     definition: 'The collection of text, images, code, or other content used to train machine learning models. The provenance, licensing, and consent around training data is a central issue in AI governance.',
     related: ['Scraping', 'Pipeline Stage'],
+    externalLinks: [
+      catalogEvidenceLink(
+        'bria-artist-program',
+        'Licensed training catalog',
+        'Bria licensed training catalog'
+      ),
+    ],
   },
   {
     term: 'Pipeline Stage',
     definition: 'A phase in the AI data lifecycle. Common stages include: Collect/Scrape (gathering data), Train (initial model training), Fine-tune (specialization), Retrieve (RAG lookups), and Generate (output creation).',
     related: ['Training Data', 'RAG'],
+    externalLinks: [link('NIST AI lifecycle tasks', 'https://airc.nist.gov/airmf-resources/airmf/appendices/app-a-descriptions-of-ai-actor-tasks/')],
+  },
+  {
+    term: 'Generate',
+    definition: 'The stage where a model produces text, images, code, or other outputs for users. Licensing and attribution questions here often differ from those at collection or training time.',
+    related: ['Pipeline Stage', 'RAG'],
+    externalLinks: [link('Google generative AI glossary', 'https://developers.google.com/machine-learning/glossary/generative')],
   },
   {
     term: 'RAG (Retrieval-Augmented Generation)',
     definition: 'A technique where AI models retrieve relevant documents at inference time to augment their responses. Raises different licensing questions than training since content is accessed dynamically.',
     related: ['Pipeline Stage', 'Generate'],
+    externalLinks: [link('Original RAG paper (DOI)', 'https://doi.org/10.48550/arXiv.2005.11401')],
   },
   {
     term: 'Data Market Platform',
     definition: 'A platform that helps rights holders or data owners offer licensed access to content or datasets for AI use. These systems often handle discovery, permissions, pricing, delivery, and reporting for training or retrieval use cases.',
     related: ['Tollgate', 'Licensing Collective', 'Training Data'],
+    externalLinks: [
+      catalogLink('defined-ai-marketplace', 'Defined.ai'),
+      catalogLink('protege', 'Protege'),
+    ],
   },
   {
     term: 'Data Provenance',
     definition: 'The documented history of a piece of data: where it came from, how it was processed, and what permissions apply. Critical for compliance and attribution in AI systems.',
     related: ['Training Data', 'Attribution'],
+    externalLinks: [link('W3C PROV overview', 'https://www.w3.org/TR/prov-overview/')],
   },
   {
     term: 'Opt-out',
     definition: 'A mechanism allowing content creators to indicate they do not want their work used for AI training. May be technical (robots.txt) or legal (GDPR rights). Effectiveness depends on crawler compliance.',
     related: ['Preference Signal', 'Consent'],
+    externalLinks: [catalogLink('do-not-train-registry', 'Spawning Do Not Train Registry')],
   },
   {
     term: 'Opt-in',
     definition: 'A consent model where explicit permission is required before content can be used. More protective than opt-out but harder to scale. Some licensing collectives operate on opt-in basis.',
     related: ['Licensing Collective', 'Consent'],
+    externalLinks: [catalogLink('created-by-humans', 'Created by Humans')],
   },
   {
     term: 'IETF AIPref',
     definition: 'A proposed Internet Engineering Task Force standard for AI preference signaling. Aims to create a standardized, extensible format for expressing AI-related permissions across the internet.',
     related: ['Preference Signal', 'ai.txt'],
+    externalLinks: [catalogLink('ai-pref', 'IETF AI Preferences')],
   },
   {
     term: 'Fairly Trained',
     definition: 'A certification program that verifies AI models were trained with proper consent and licensing. Provides third-party validation that a model meets ethical training criteria.',
-    related: ['Certification', 'Licensing Collective'],
+    related: ['Certification', 'Consent'],
+    externalLinks: [catalogLink('fairlytrained', 'Fairly Trained')],
+  },
+  {
+    term: 'W3C',
+    definition: 'The World Wide Web Consortium, a standards body that incubates web specifications and community group proposals relevant to machine-readable signals and protocols.',
+    related: ['TDMRep'],
+    externalLinks: [link('W3C about page', 'https://www.w3.org/about/')],
   },
   {
     term: 'Status: WIP',
     definition: 'Work in Progress. The initiative is still forming, changing quickly, or not ready for dependable use yet.',
     related: ['Status: Live'],
+    externalLinks: [link('Merriam-Webster: work in progress', 'https://www.merriam-webster.com/dictionary/work%20in%20progress')],
   },
   {
     term: 'Status: Live',
     definition: 'The initiative is publicly live or deployable today, even if adoption is still limited or emerging.',
     related: ['Status: WIP'],
+    externalLinks: [link('Merriam-Webster: go live', 'https://www.merriam-webster.com/dictionary/go%20live')],
   },
 ];
 
 // Sort alphabetically
 terms.sort((a, b) => a.term.localeCompare(b.term));
+const relatedAliases = new Map([
+  ['RAG', 'RAG (Retrieval-Augmented Generation)'],
+  ['RSL', 'RSL (Really Simple Licensing)'],
+]);
+const termSlugByName = new Map(terms.map((item) => [item.term, slugify(item.term)]));
+const relatedSlug = (value: string) => termSlugByName.get(relatedAliases.get(value) || value);
 
 // Group by first letter
 const grouped = terms.reduce((acc, t) => {
@@ -147,12 +292,29 @@ const letters = Object.keys(grouped).sort();
               <article class="term-card" id={slugify(item.term)}>
                 <h3 class="term-name">{item.term}</h3>
                 <p class="term-definition">{item.definition}</p>
+                {item.externalLinks.length > 0 && (
+                  <div class="term-links">
+                    <span class="term-meta-label">External:</span>
+                    {item.externalLinks.map((externalLink, i) => (
+                      <span>
+                        <a href={externalLink.url} target="_blank" rel="noopener" class="related-link">
+                          {externalLink.label}
+                        </a>
+                        {i < item.externalLinks.length - 1 && ', '}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {item.related && item.related.length > 0 && (
                   <div class="term-related">
-                    <span class="related-label">Related:</span>
+                    <span class="term-meta-label">Related:</span>
                     {item.related.map((r, i) => (
                       <span>
-                        <a href={`#${slugify(r)}`} class="related-link">{r}</a>
+                        {relatedSlug(r) ? (
+                          <a href={`#${relatedSlug(r)}`} class="related-link">{r}</a>
+                        ) : (
+                          <span>{r}</span>
+                        )}
                         {i < item.related.length - 1 && ', '}
                       </span>
                     ))}

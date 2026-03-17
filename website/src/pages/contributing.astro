@@ -1,9 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import networkData from '../data/network.json';
 ---
 
-<Layout title="Contribute">
+<Layout title="Contribute" showNetworkFooter={false}>
   <main class="wrap narrow">
     <header class="page-header">
       <h1>Contribute</h1>
@@ -35,7 +34,7 @@ import networkData from '../data/network.json';
         <li>Provide short, neutral summaries; include adoption metrics only when they are public and source-backed.</li>
       </ul>
       <p>Send a note to <a href="https://nickmvincent.com" target="_blank" rel="noopener">Nick</a>.</p>
-      <p class="muted small">Developers: you can also open a PR by adding or updating a markdown file under <code>content/initiatives/</code>. Each entry should have one canonical <code>website</code>, a <code>status</code> of <code>live</code> or <code>wip</code>, and optional dated <code>evidenceLinks</code>.</p>
+      <p class="muted small">Developers: you can also open a PR by adding or updating a markdown file under <code>content/initiatives/</code>. Each entry should have one canonical <code>website</code>, a <code>status</code> of <code>live</code> or <code>wip</code>, <code>visibility: public</code>, <code>type: data_license_initiative</code>, and optional dated <code>evidenceLinks</code>.</p>
     </section>
 
     <section class="box section">
@@ -44,19 +43,6 @@ import networkData from '../data/network.json';
         <li>Read the <a href="/methodology">methodology</a> before proposing updates. It explains how we decide what counts as a real update and how metrics are grounded.</li>
         <li>AI-assisted first passes are welcome, but every suggested <code>evidenceLinks</code>, <code>usersCount</code>, <code>dataVolume</code>, or <code>moneyVolume</code> value should come with a clickable source and date. If you add a metric, also add matching <code>metricEvidence</code>.</li>
         <li>You can start from the public <a href="/prompts/find-updates.txt">research prompt</a>, the current <a href="/data/initiatives.json">catalog JSON</a>, and the curation backlog at <a href="/data/curation.json">/data/curation.json</a>.</li>
-      </ul>
-    </section>
-
-    <section class="box section">
-      <h2>Discussions</h2>
-      <p class="muted">Join the conversation about data licensing initiatives.</p>
-      <ul class="discussion-list">
-        {networkData.discussions?.map((d) => (
-          <li>
-            <a href={d.url} target="_blank" rel="noopener">{d.label}</a>
-            {d.description && <span class="muted"> — {d.description}</span>}
-          </li>
-        ))}
       </ul>
     </section>
   </main>
