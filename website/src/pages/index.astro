@@ -11,6 +11,7 @@ import {
   formatDataTypeLabel,
   formatDate,
   formatLinkLabel,
+  formatLinkTitle,
   formatPipelineSummary,
   sortByLatestThenTitle,
 } from '../lib/catalog';
@@ -45,32 +46,7 @@ const stats = [
   { label: 'Approach types', value: String(actions.length) },
 ];
 
-const quickPaths = [
-  {
-    kicker: 'Browse',
-    title: 'Only live initiatives',
-    description: 'Start with approaches that look deployable today.',
-    status: 'live',
-  },
-  {
-    kicker: 'Signals',
-    title: 'Preference signals',
-    description: 'Find machine-readable ways to express AI use preferences.',
-    action: 'attach-preference-signal',
-  },
-  {
-    kicker: 'Enforcement',
-    title: 'Block crawlers',
-    description: 'Compare the tools that throttle, gate, or block bot access.',
-    action: 'technical-blocking',
-  },
-  {
-    kicker: 'Markets',
-    title: 'Find marketplaces',
-    description: 'Jump to licensing and pay-per-access platforms.',
-    action: 'data-market-platform',
-  },
-];
+const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 ---
 
 <Layout
@@ -89,46 +65,54 @@ const quickPaths = [
       </div>
     </header>
 
-    <section class="catalog-start box">
-      <div class="catalog-start-copy">
-        <p class="eyebrow">Start here</p>
-        <h2 class="catalog-start-title">Pick a lane, then narrow fast.</h2>
-        <p class="catalog-start-summary">
-          This catalog works best when you start with the question you actually have: what is live,
-          what blocks crawlers, what signals preferences, or what opens a market for access.
-        </p>
+    <section class="catalog-start box" aria-label="Catalog snapshot">
+      <p class="catalog-start-summary">
+        A current snapshot of live and emerging initiatives shaping AI data access, licensing, and
+        enforcement.
+      </p>
 
-        <div class="catalog-start-actions">
-          <a class="btn btn-primary" href="#catalog-tools">Jump into the catalog</a>
-          <a class="btn btn-quiet" href="/methodology">How entries are verified</a>
-        </div>
-      </div>
+      <dl class="catalog-start-stats">
+        {stats.map((stat) => (
+          <div>
+            <dt>{stat.label}</dt>
+            <dd>{stat.value}</dd>
+          </div>
+        ))}
+      </dl>
 
-      <div class="catalog-start-aside">
-        <dl class="catalog-start-stats">
-          {stats.map((stat) => (
-            <div>
-              <dt>{stat.label}</dt>
-              <dd>{stat.value}</dd>
-            </div>
-          ))}
+      <details class="catalog-start-explainer">
+        <summary class="catalog-start-explainer-toggle">What these labels mean</summary>
+        <dl class="catalog-start-definition-list">
+          <div>
+            <dt>Initiative</dt>
+            <dd>
+              One tracked effort in the catalog, such as a standard, product, registry, protocol,
+              marketplace, or organizational program.
+            </dd>
+          </div>
+          <div>
+            <dt>Live</dt>
+            <dd>
+              Publicly available now, with enough concrete evidence that someone could inspect or
+              use it today.
+            </dd>
+          </div>
+          <div>
+            <dt>WIP</dt>
+            <dd>
+              Work in progress that matters to track, but is still emerging, incomplete, or not yet
+              clearly deployable.
+            </dd>
+          </div>
+          <div>
+            <dt>Approach type</dt>
+            <dd>
+              The kind of mechanism an initiative uses, like preference signals, blocking,
+              licensing, marketplaces, tollgates, or certification.
+            </dd>
+          </div>
         </dl>
-
-        <div class="catalog-quick-grid">
-          {quickPaths.map((path) => (
-            <button
-              type="button"
-              class="catalog-quick-link"
-              data-quick-status={path.status}
-              data-quick-action={path.action}
-            >
-              <span class="catalog-quick-kicker">{path.kicker}</span>
-              <span class="catalog-quick-title">{path.title}</span>
-              <span class="catalog-quick-desc">{path.description}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      </details>
     </section>
 
     <section id="catalog-tools" class="catalog-toolbar box">
@@ -269,7 +253,7 @@ const quickPaths = [
                       data-types={(item.dataTypes || []).join(' ').toLowerCase()}
                       data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
                       data-status={item.status}
-                      data-website={formatLinkLabel(item.website).toLowerCase()}
+                      data-website={item.website.toLowerCase()}
                       data-approach={searchableApproach}
                       data-evidence={evidenceSearchText}
                       data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
@@ -290,7 +274,16 @@ const quickPaths = [
                                   <ul class="catalog-row-links">
                                     {(item.evidenceLinks || []).map((link) => (
                                       <li>
-                                        <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
+                                        <a
+                                          class="link-shell"
+                                          href={link.url}
+                                          target="_blank"
+                                          rel="noopener"
+                                          title={formatLinkTitle(link.url, link.label)}
+                                          aria-label={newTabAriaLabel(link.label)}
+                                        >
+                                          <span class="link-label link-label-multi">{link.label}</span>
+                                        </a>
                                         <span class="catalog-evidence-date">{formatDate(link.date)}</span>
                                       </li>
                                     ))}
@@ -352,13 +345,31 @@ const quickPaths = [
                         )}
                       </td>
                       <td class="catalog-row-site" data-label="Website">
-                        <a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a>
+                        <a
+                          class="link-shell"
+                          href={item.website}
+                          target="_blank"
+                          rel="noopener"
+                          title={formatLinkTitle(item.website)}
+                          aria-label={newTabAriaLabel(formatLinkLabel(item.website))}
+                        >
+                          <span class="link-label link-label-single">{formatLinkLabel(item.website)}</span>
+                        </a>
                       </td>
                       <td class="catalog-row-update" data-label="Latest update">
                         {latest ? (
                           <>
                             <span class="catalog-row-date">{formatDate(latest.date)}</span>
-                            <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
+                            <a
+                              class="link-shell"
+                              href={latest.url}
+                              target="_blank"
+                              rel="noopener"
+                              title={formatLinkTitle(latest.url, latest.label)}
+                              aria-label={newTabAriaLabel(latest.label)}
+                            >
+                              <span class="link-label link-label-multi">{latest.label}</span>
+                            </a>
                           </>
                         ) : (
                           <span class="muted">No evidence links yet</span>
@@ -393,6 +404,7 @@ const quickPaths = [
               const latest = item.latestEvidenceLink;
               const actionSummary = formatActionSummary(item.actionsSupported);
               const pipelineSummary = formatPipelineSummary(item.pipelineStages);
+              const websiteLabel = formatLinkLabel(item.website);
               const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
               const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
               const hasDetails =
@@ -416,7 +428,7 @@ const quickPaths = [
                   data-types={(item.dataTypes || []).join(' ').toLowerCase()}
                   data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
                   data-status={item.status}
-                  data-website={formatLinkLabel(item.website).toLowerCase()}
+                  data-website={item.website.toLowerCase()}
                   data-approach={searchableApproach}
                   data-evidence={evidenceSearchText}
                   data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
@@ -433,14 +445,34 @@ const quickPaths = [
                   <dl class="catalog-card-meta">
                     <div>
                       <dt>Website</dt>
-                      <dd><a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a></dd>
+                      <dd>
+                        <a
+                          class="catalog-card-meta-link catalog-card-external-link"
+                          href={item.website}
+                          target="_blank"
+                          rel="noopener"
+                          title={formatLinkTitle(item.website)}
+                          aria-label={newTabAriaLabel(websiteLabel)}
+                        >
+                          <span class="link-label link-label-single">{websiteLabel}</span>
+                        </a>
+                      </dd>
                     </div>
                     <div>
                       <dt>Latest update</dt>
                       <dd>
                         {latest ? (
                           <>
-                            <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
+                            <a
+                              class="catalog-card-meta-link catalog-card-external-link"
+                              href={latest.url}
+                              target="_blank"
+                              rel="noopener"
+                              title={formatLinkTitle(latest.url, latest.label)}
+                              aria-label={newTabAriaLabel(latest.label)}
+                            >
+                              <span class="link-label link-label-multi">{latest.label}</span>
+                            </a>
                             <span class="catalog-card-date">{formatDate(latest.date)}</span>
                           </>
                         ) : (
@@ -471,7 +503,16 @@ const quickPaths = [
                             <ul class="catalog-evidence-list">
                               {(item.evidenceLinks || []).map((link) => (
                                 <li>
-                                  <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
+                                  <a
+                                    class="catalog-card-list-link catalog-card-external-link"
+                                    href={link.url}
+                                    target="_blank"
+                                    rel="noopener"
+                                    title={formatLinkTitle(link.url, link.label)}
+                                    aria-label={newTabAriaLabel(link.label)}
+                                  >
+                                    <span class="link-label link-label-multi">{link.label}</span>
+                                  </a>
                                   <span class="catalog-evidence-date">{formatDate(link.date)}</span>
                                 </li>
                               ))}
@@ -529,7 +570,16 @@ const quickPaths = [
                               {item.referencesResolved.map((reference) => (
                                 <li>
                                   {reference.url ? (
-                                    <a href={reference.url} target="_blank" rel="noopener">{formatCitation(reference)}</a>
+                                    <a
+                                      class="catalog-card-list-link catalog-card-external-link"
+                                      href={reference.url}
+                                      target="_blank"
+                                      rel="noopener"
+                                      title={formatLinkTitle(reference.url, formatCitation(reference))}
+                                      aria-label={newTabAriaLabel(formatCitation(reference))}
+                                    >
+                                      <span class="link-label link-label-multi">{formatCitation(reference)}</span>
+                                    </a>
                                   ) : (
                                     <span>{formatCitation(reference)}</span>
                                   )}
@@ -541,17 +591,39 @@ const quickPaths = [
 
                         {Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0 && (
                           <div class="detail-section detail-stack">
-                            <span class="detail-label">Implementation</span>
+                            <span class="detail-label">Examples</span>
                             <div class="snippets-wrap">
                               {item.implementationSnippets.map((snippet) => (
                                 <div class="snippet">
                                   <div class="snippet-head">
                                     <span class="chip">{snippet.title}</span>
+                                    {snippet.exampleUrl && (
+                                      <a
+                                        class="catalog-card-source-link catalog-card-external-link"
+                                        href={snippet.exampleUrl}
+                                        target="_blank"
+                                        rel="noopener"
+                                        title={formatLinkTitle(snippet.exampleUrl, snippet.exampleLabel || `${snippet.title} example`)}
+                                        aria-label={newTabAriaLabel(snippet.exampleLabel || `${snippet.title} example`)}
+                                      >
+                                        <span class="link-label link-label-single">{snippet.exampleLabel || 'Example'}</span>
+                                      </a>
+                                    )}
                                     {snippet.sourceUrl && (
-                                      <a href={snippet.sourceUrl} target="_blank" rel="noopener" title="Source">Source</a>
+                                      <a
+                                        class="catalog-card-source-link catalog-card-external-link"
+                                        href={snippet.sourceUrl}
+                                        target="_blank"
+                                        rel="noopener"
+                                        title={formatLinkTitle(snippet.sourceUrl, `${snippet.title} source`)}
+                                        aria-label={newTabAriaLabel(`${snippet.title} source`)}
+                                      >
+                                        <span class="link-label link-label-single">Source</span>
+                                      </a>
                                     )}
                                     <button type="button" class="copy" data-code={encodeURIComponent(snippet.code || '')}>Copy</button>
                                   </div>
+                                  {snippet.summary && <p class="snippet-summary">{snippet.summary}</p>}
                                   <pre class="code"><code>{snippet.code}</code></pre>
                                 </div>
                               ))}
@@ -592,9 +664,7 @@ const quickPaths = [
       const chipsContainer = queryOne('#active-filter-chips');
       const spreadsheetView = queryOne('#spreadsheet-view');
       const cardsView = queryOne('#cards-view');
-      const catalogResultsAnchor = queryOne('#catalog-results-anchor');
       const shareButton = queryOne('#share-view');
-      const quickButtons = queryAll('.catalog-quick-link');
       const sectionKeys = ['new-approaches', 'markets-with-new-approaches', 'markets-only'];
       const tableBodies = Object.fromEntries(
         sectionKeys.map((key) => [key, queryOne(`#table-body-${key}`)])
@@ -927,23 +997,6 @@ const quickPaths = [
         applyFilters();
       }
 
-      function applyQuickPreset(button) {
-        clearFilters();
-
-        const statusValue = button.dataset.quickStatus;
-        const actionValue = button.dataset.quickAction;
-        if (statusValue && ['all', 'live', 'wip'].includes(statusValue)) {
-          setStatusFilter(statusValue);
-        }
-        if (actionValue) {
-          const actionButton = actionButtons().find((item) => item.dataset.action === actionValue);
-          if (actionButton) setPressed(actionButton, true);
-        }
-
-        applyFilters();
-        if (catalogResultsAnchor) catalogResultsAnchor.scrollIntoView({ block: 'start' });
-      }
-
       function initializeFromUrl() {
         const params = new URLSearchParams(location.search);
         const queryValue = params.get('q');
@@ -1054,10 +1107,6 @@ const quickPaths = [
           void copyCurrentView();
         });
       }
-
-      quickButtons.forEach((button) => {
-        button.addEventListener('click', () => applyQuickPreset(button));
-      });
 
       searchInput.addEventListener('input', applyFilters);
       sortSelect.addEventListener('change', applyFilters);

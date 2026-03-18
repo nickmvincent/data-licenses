@@ -12,9 +12,7 @@ dataTypes:
   - text
 tags:
   - publishers
-  - licensing
   - enforcement
-  - litigation
 evidenceLinks:
   - label: Coalition overview published
     url: 'https://publishersrights.org/who-we-are/'

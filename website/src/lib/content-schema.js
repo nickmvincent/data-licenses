@@ -6,7 +6,17 @@
 /** @typedef {'populated' | 'needs-research' | 'hard-to-quantify'} AdoptionResearchStatus */
 /** @typedef {{ label: string, url: string, date: Date }} EvidenceLink */
 /** @typedef {{ basis?: MetricEvidenceBasis, notes?: string, sources: EvidenceLink[] }} MetricEvidenceEntry */
-/** @typedef {{ title: string, language?: string, code: string, sourceUrl: string }} ImplementationSnippet */
+/**
+ * @typedef {{
+ *   title: string,
+ *   summary?: string,
+ *   language?: string,
+ *   code: string,
+ *   sourceUrl: string,
+ *   exampleUrl?: string,
+ *   exampleLabel?: string
+ * }} ImplementationSnippet
+ */
 /**
  * @typedef {Object} NormalizedInitiativeFrontmatter
  * @property {string | undefined} id
@@ -241,6 +251,7 @@ export function normalizeImplementationSnippets(value, context) {
 
     return {
       title: requireString(snippet.title, `implementationSnippets[${index}].title`, context),
+      summary: optionalString(snippet.summary),
       language: optionalString(snippet.language),
       code: requireString(snippet.code, `implementationSnippets[${index}].code`, context),
       sourceUrl: requireUrlString(
@@ -248,6 +259,11 @@ export function normalizeImplementationSnippets(value, context) {
         `implementationSnippets[${index}].sourceUrl`,
         context
       ),
+      exampleUrl:
+        snippet.exampleUrl === undefined
+          ? undefined
+          : requireUrlString(snippet.exampleUrl, `implementationSnippets[${index}].exampleUrl`, context),
+      exampleLabel: optionalString(snippet.exampleLabel),
     };
   });
 }

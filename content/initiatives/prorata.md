@@ -13,7 +13,6 @@ dataTypes:
   - text
 tags:
   - revenue-share
-  - licensing-marketplace
   - publishers
 usersCount: '700+ publishers'
 metricEvidence:

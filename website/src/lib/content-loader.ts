@@ -28,9 +28,12 @@ type MetricEvidenceEntry = {
 };
 type ImplementationSnippet = {
   title: string;
+  summary?: string;
   language?: string;
   code: string;
   sourceUrl: string;
+  exampleUrl?: string;
+  exampleLabel?: string;
 };
 export type LoadedInitiative = {
   id: string;

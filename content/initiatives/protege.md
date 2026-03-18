@@ -13,9 +13,6 @@ dataTypes:
   - multimodal
 tags:
   - proprietary-data
-  - healthcare
-  - media
-  - marketplace
 usersCount: 'hundreds of organizations'
 metricEvidence:
   usersCount:

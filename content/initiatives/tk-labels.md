@@ -12,11 +12,29 @@ pipelineStages:
 tags:
   - indigenous-data-governance
   - cultural-heritage
-  - labels
 evidenceLinks:
   - label: Guide to using TK Labels and Notices updated
     url: 'https://localcontexts.org/blog/how-to-use-tk-labels-and-notices/'
     date: '2025-09-18'
+implementationSnippets:
+  - title: TK Attribution label
+    summary: Local Contexts publishes each label with a short code plus customizable template text.
+    language: text
+    code: |
+      TK Attribution (TK A)
+      Apply the correct attribution in any future use of this work.
+    sourceUrl: 'https://localcontexts.org/label/tk-attribution/'
+    exampleUrl: 'https://localcontexts.org/labels-in-use-oriana-tv/'
+    exampleLabel: 'In use'
+  - title: TK Non-Commercial label
+    summary: This is the template signal Local Contexts uses when a community wants downstream use limited to non-commercial contexts.
+    language: text
+    code: |
+      TK Non-Commercial (TK NC)
+      This material has been designated as being available for non-commercial use.
+    sourceUrl: 'https://localcontexts.org/label/tk-non-commercial/'
+    exampleUrl: 'https://localcontexts.org/labels-in-use-oriana-tv/'
+    exampleLabel: 'In use'
 considerations: >-
   TK Labels are community-governance signals that rely on institutional and
   downstream respect; they are not a substitute for copyright law or a standard

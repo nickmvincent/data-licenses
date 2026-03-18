@@ -22,7 +22,6 @@ signals:
   - search
 tags:
   - tdm
-  - ai-preferences
   - iscc
   - verifiable-credentials
 dependsOn:

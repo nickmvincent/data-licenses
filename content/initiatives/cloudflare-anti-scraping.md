@@ -6,10 +6,7 @@ summary: >-
 status: live
 website: 'https://blog.cloudflare.com/control-content-use-for-ai-training/'
 tags:
-  - scraping
   - bot-management
-  - mitigation
-  - monetization
 actionsSupported:
   - technical-blocking
   - add-tollgate
@@ -41,6 +38,34 @@ evidenceLinks:
   - label: AI Audit and marketplace features launched
     url: 'https://blog.cloudflare.com/control-content-use-for-ai-training/'
     date: '2025-07-01'
+implementationSnippets:
+  - title: Real-world robots.txt blocklist
+    summary: Cloudflare's Robotcop post uses this abbreviated news-site policy as a concrete AI crawler blocklist example.
+    language: text
+    code: |
+      User-agent: GPTBot
+      Disallow: /
+
+      User-agent: ChatGPT-User
+      Disallow: /
+
+      User-agent: anthropic-ai
+      Disallow: /
+
+      User-agent: Google-Extended
+      Disallow: /
+
+      User-agent: Bytespider
+      Disallow: /
+    sourceUrl: 'https://blog.cloudflare.com/ai-audit-enforcing-robots-txt/'
+  - title: Content Signals robots.txt example
+    summary: Cloudflare's Content Signals post shows how a site can allow search while disallowing AI training in robots.txt.
+    language: text
+    code: |
+      User-Agent: *
+      Content-Signal: search=yes, ai-train=no
+      Allow: /
+    sourceUrl: 'https://blog.cloudflare.com/content-signals-policy/'
 visibility: public
 type: data_license_initiative
 ---

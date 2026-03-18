@@ -12,9 +12,6 @@ dataTypes:
   - text
 tags:
   - publishers
-  - marketplace
-  - copilot
-  - monetization
 usersCount: '7 launch publisher partners'
 metricEvidence:
   usersCount:

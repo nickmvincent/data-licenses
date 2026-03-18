@@ -14,8 +14,6 @@ dataTypes:
 tags:
   - publishers
   - rag
-  - monetization
-  - marketplace
 evidenceLinks:
   - label: Licensing program launch announced
     url: 'https://www.dappier.com/newsroom/dappier-launches-licensing-program-to-help-brands-and-publishers-monetize-content-in-ai-search/'

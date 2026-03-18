@@ -12,9 +12,7 @@ dataTypes:
   - text
 tags:
   - books
-  - authors
   - rights-cleared
-  - licensing
 usersCount: '100+ bestselling authors'
 metricEvidence:
   usersCount:

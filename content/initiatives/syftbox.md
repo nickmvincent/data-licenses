@@ -10,9 +10,7 @@ pipelineStages:
   - retrieve
 tags:
   - privacy-preserving
-  - federated-learning
   - distributed-data
-  - network-sourced-ai
 evidenceLinks:
   - label: syft-flwr release demonstrates active federated learning workflows on SyftBox
     url: 'https://github.com/OpenMined/syft-flwr'

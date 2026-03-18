@@ -35,6 +35,29 @@ evidenceLinks:
   - label: TechCrunch launch coverage
     url: 'https://techcrunch.com/2024/08/14/really-simple-licensing-standard-wants-to-help-publishers-protect-their-content-from-ai/'
     date: '2024-08-14'
+implementationSnippets:
+  - title: Site-wide RSL file
+    summary: The RSL 1.0 spec includes a compact XML example for prohibiting AI use across a site.
+    language: xml
+    code: |
+      <rsl xmlns="https://rslstandard.org/rsl">
+        <content url="/">
+          <license>
+            <prohibits type="usage">ai-all</prohibits>
+          </license>
+        </content>
+      </rsl>
+    sourceUrl: 'https://rslstandard.org/rsl'
+  - title: Schema.org license pointer
+    summary: RSL's Schema.org guide shows how structured metadata on a page can point to an RSL license file.
+    language: json
+    code: |
+      {
+        "@context": "https://schema.org",
+        "@type": "Book",
+        "license": "https://gutenberg.org/ebooks-rsl-license.xml"
+      }
+    sourceUrl: 'https://rslstandard.org/guide/schema-org'
 visibility: public
 type: data_license_initiative
 ---

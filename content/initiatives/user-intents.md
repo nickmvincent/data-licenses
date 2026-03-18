@@ -13,14 +13,34 @@ signals:
   - org.user-intents.syntheticContentGeneration
 tags:
   - atproto
-  - bluesky
-  - aipref
 dependsOn:
   - ai-pref
 evidenceLinks:
   - label: Proposal discussion opened
     url: 'https://github.com/bluesky-social/atproto/discussions/3617'
     date: '2025-03-08'
+implementationSnippets:
+  - title: Declaration record example
+    summary: The atproto proposal discussion includes a concrete account-level declaration record with AI generation disallowed.
+    language: json
+    code: |
+      {
+        "$type": "org.user-intents.declaration",
+        "updatedAt": "2025-02-20T21:37:20.362Z",
+        "org.user-intents.syntheticContentGeneration": {
+          "allow": false,
+          "updatedAt": "2025-02-20T21:37:20.362Z"
+        }
+      }
+    sourceUrl: 'https://github.com/bluesky-social/atproto/discussions/3617'
+  - title: HTTP header mapped from the declaration
+    summary: The public demo says these declarations can be translated into a Content-Usage header on web profile pages.
+    language: http
+    code: |
+      Content-Usage: train-ai=n
+    sourceUrl: 'https://demo.user-intents.org/'
+    exampleUrl: 'https://demo.user-intents.org/'
+    exampleLabel: 'Demo'
 considerations: >-
   This is still a proposal plus demo implementation, and its enforcement model
   is voluntary in the same sense as other preference-signal approaches.

@@ -10,6 +10,7 @@ import {
   formatDataTypeLabel,
   formatDate,
   formatLinkLabel,
+  formatLinkTitle,
   sortByLatestThenTitle,
 } from '../../lib/catalog';
 
@@ -94,6 +95,7 @@ const metadataGroups = [
 ].filter((group) => group.values.length > 0);
 
 const latest = item.latestEvidenceLink;
+const websiteLabel = formatLinkLabel(item.website);
 ---
 
 <Layout title={item.title} description={item.summary}>
@@ -122,7 +124,17 @@ const latest = item.latestEvidenceLink;
       <dl class="initiative-hero-meta">
         <div>
           <dt>Website</dt>
-          <dd><a href={item.website} target="_blank" rel="noopener">{formatLinkLabel(item.website)}</a></dd>
+          <dd>
+            <a
+              class="link-shell"
+              href={item.website}
+              target="_blank"
+              rel="noopener"
+              title={formatLinkTitle(item.website)}
+            >
+              <span class="link-label link-label-single">{websiteLabel}</span>
+            </a>
+          </dd>
         </div>
         <div>
           <dt>Latest update</dt>
@@ -130,7 +142,15 @@ const latest = item.latestEvidenceLink;
             {latest ? (
               <>
                 <span class="initiative-meta-date">{formatDate(latest.date)}</span>
-                <a href={latest.url} target="_blank" rel="noopener">{latest.label}</a>
+                <a
+                  class="link-shell"
+                  href={latest.url}
+                  target="_blank"
+                  rel="noopener"
+                  title={formatLinkTitle(latest.url, latest.label)}
+                >
+                  <span class="link-label link-label-multi">{latest.label}</span>
+                </a>
               </>
             ) : (
               <span class="muted">No evidence links yet</span>
@@ -173,7 +193,15 @@ const latest = item.latestEvidenceLink;
               {item.evidenceLinks.map((link) => (
                 <li>
                   <span class="initiative-evidence-date">{formatDate(link.date)}</span>
-                  <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
+                  <a
+                    class="link-shell"
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener"
+                    title={formatLinkTitle(link.url, link.label)}
+                  >
+                    <span class="link-label link-label-multi">{link.label}</span>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -193,7 +221,15 @@ const latest = item.latestEvidenceLink;
                     <ul class="initiative-source-list">
                       {metric.evidence.sources.map((source) => (
                         <li>
-                          <a href={source.url} target="_blank" rel="noopener">{source.label}</a>
+                          <a
+                            class="link-shell"
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener"
+                            title={formatLinkTitle(source.url, source.label)}
+                          >
+                            <span class="link-label link-label-multi">{source.label}</span>
+                          </a>
                           <span class="initiative-source-date">{formatDate(source.date)}</span>
                         </li>
                       ))}
@@ -207,17 +243,37 @@ const latest = item.latestEvidenceLink;
 
         {item.implementationSnippets && item.implementationSnippets.length > 0 && (
           <section class="box section initiative-section">
-            <h2>Implementation snippets</h2>
+            <h2>Examples</h2>
             <div class="snippets-wrap">
               {item.implementationSnippets.map((snippet) => (
                 <div class="snippet">
                   <div class="snippet-head">
                     <span class="chip">{snippet.title}</span>
+                    {snippet.exampleUrl && (
+                      <a
+                        class="link-shell"
+                        href={snippet.exampleUrl}
+                        target="_blank"
+                        rel="noopener"
+                        title={formatLinkTitle(snippet.exampleUrl, snippet.exampleLabel || `${snippet.title} example`)}
+                      >
+                        <span class="link-label link-label-single">{snippet.exampleLabel || 'Example'}</span>
+                      </a>
+                    )}
                     {snippet.sourceUrl && (
-                      <a href={snippet.sourceUrl} target="_blank" rel="noopener">Source</a>
+                      <a
+                        class="link-shell"
+                        href={snippet.sourceUrl}
+                        target="_blank"
+                        rel="noopener"
+                        title={formatLinkTitle(snippet.sourceUrl, `${snippet.title} source`)}
+                      >
+                        <span class="link-label link-label-single">Source</span>
+                      </a>
                     )}
                     <button type="button" class="copy" data-code={encodeURIComponent(snippet.code || '')}>Copy</button>
                   </div>
+                  {snippet.summary && <p class="snippet-summary">{snippet.summary}</p>}
                   <pre class="code"><code>{snippet.code}</code></pre>
                 </div>
               ))}
@@ -232,7 +288,15 @@ const latest = item.latestEvidenceLink;
               {item.referencesResolved.map((reference) => (
                 <li>
                   {reference.url ? (
-                    <a href={reference.url} target="_blank" rel="noopener">{formatCitation(reference)}</a>
+                    <a
+                      class="link-shell"
+                      href={reference.url}
+                      target="_blank"
+                      rel="noopener"
+                      title={formatLinkTitle(reference.url, formatCitation(reference))}
+                    >
+                      <span class="link-label link-label-multi">{formatCitation(reference)}</span>
+                    </a>
                   ) : (
                     <span>{formatCitation(reference)}</span>
                   )}

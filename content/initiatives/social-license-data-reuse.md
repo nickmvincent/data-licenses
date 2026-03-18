@@ -13,7 +13,6 @@ pipelineStages:
 tags:
   - governance
   - community-consent
-  - toolkit
 evidenceLinks:
   - label: Operationalization report released
     url: 'https://blog.thegovlab.org/reimagining-data-governance-for-ai-operationalizing-social-licensing-for-data-reuse'

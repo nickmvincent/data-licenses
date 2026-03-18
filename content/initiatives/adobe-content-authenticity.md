@@ -14,7 +14,6 @@ dataTypes:
 tags:
   - content-credentials
   - metadata
-  - creator-controls
 evidenceLinks:
   - label: Generative AI training and usage preference documentation
     url: 'https://helpx.adobe.com/creative-cloud/apps/adobe-content-authenticity/generative-ai-training-preferences.html'

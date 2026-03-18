@@ -12,8 +12,6 @@ dataTypes:
   - music
 tags:
   - music
-  - audio
-  - licensing
   - royalties
 dataVolume: '14M+ tracks'
 metricEvidence:

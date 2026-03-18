@@ -15,19 +15,19 @@ signals:
 tags:
   - robots-meta
   - x-robots-tag
-  - search
-  - machine-learning
 evidenceLinks:
   - label: Project featured in scholarly article on search and AI opt-out
     url: 'https://noml.info/project-featured-in-scholarly-article-on-search-engine-and-ai-opt-out/'
     date: '2024-05-29'
 implementationSnippets:
   - title: HTML meta tag
+    summary: NoML proposes this as the simplest page-level signal for HTML documents.
     language: html
     code: |
       <meta name="robots" content="noml">
     sourceUrl: 'https://noml.info/'
   - title: HTTP header
+    summary: For non-HTML responses, the proposal uses the parallel X-Robots-Tag form.
     language: http
     code: |
       X-Robots-Tag: noml

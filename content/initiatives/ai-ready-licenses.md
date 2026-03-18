@@ -12,8 +12,6 @@ pipelineStages:
   - retrieve
 tags:
   - standard-contracts
-  - data-sharing
-  - licensing
 evidenceLinks:
   - label: Research findings published
     url: 'https://mlcommons.org/2025/03/unlocking-data-collab/'

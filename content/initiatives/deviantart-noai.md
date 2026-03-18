@@ -11,8 +11,6 @@ pipelineStages:
 dataTypes:
   - images
 tags:
-  - art
-  - meta-tag
   - x-robots-tag
   - opt-out
 evidenceLinks:
@@ -22,6 +20,21 @@ evidenceLinks:
   - label: DeviantArt rolls out default opt-out and publishes noai/noimageai directives
     url: 'https://www.deviantart.com/team/journal/UPDATE-All-Deviations-Are-OptedOut-of-AI-Datasets-934500371'
     date: '2022-11-11'
+implementationSnippets:
+  - title: HTML robots meta tags
+    summary: DeviantArt's team announcement publishes these exact page-level directives for opted-out artwork.
+    language: html
+    code: |
+      <meta name="robots" content="noimageai">
+      <meta name="robots" content="noai">
+    sourceUrl: 'https://www.deviantart.com/team/journal/UPDATE-All-Deviations-Are-OptedOut-of-AI-Datasets-934500371'
+  - title: HTTP response headers
+    summary: The same announcement says DeviantArt sends these directives when the image file is downloaded directly.
+    language: http
+    code: |
+      X-Robots-Tag: noimageai
+      X-Robots-Tag: noai
+    sourceUrl: 'https://www.deviantart.com/team/journal/UPDATE-All-Deviations-Are-OptedOut-of-AI-Datasets-934500371'
 visibility: public
 type: data_license_initiative
 ---

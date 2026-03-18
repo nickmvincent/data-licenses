@@ -10,10 +10,7 @@ pipelineStages:
 dataTypes:
   - images
 tags:
-  - visual-media
-  - contributors
   - compensation
-  - licensed-data
 usersCount: '30+ data partners'
 metricEvidence:
   usersCount:

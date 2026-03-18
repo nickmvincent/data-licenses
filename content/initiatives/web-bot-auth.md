@@ -11,9 +11,7 @@ pipelineStages:
 dataTypes:
   - web-content
 tags:
-  - ietf
   - bot-authentication
-  - ai-agents
 evidenceLinks:
   - label: Use cases draft published
     url: 'https://datatracker.ietf.org/doc/draft-nottingham-webbotauth-use-cases/'

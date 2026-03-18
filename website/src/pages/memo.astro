@@ -43,7 +43,7 @@ const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level,
 ---
 
 <Layout title="Memo">
-  <main class="wrap narrow memo-page">
+  <main class="wrap memo-page">
     <header class="page-header memo-header">
       <div>
         <p class="eyebrow">Briefing</p>
@@ -175,9 +175,10 @@ const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level,
 
   .memo-shell {
     display: grid;
-    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+    grid-template-columns: minmax(220px, 260px) minmax(0, 52rem);
     gap: 18px;
     align-items: start;
+    justify-content: center;
   }
 
   .memo-toc {

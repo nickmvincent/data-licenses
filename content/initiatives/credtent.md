@@ -13,9 +13,7 @@ dataTypes:
   - multimodal
 tags:
   - registry
-  - creators
   - opt-out
-  - compliance
 usersCount: 'thousands of creators'
 metricEvidence:
   usersCount:

@@ -8,7 +8,6 @@ actionsSupported:
 tags:
   - trade-alliance
   - policy
-  - dataset-licensing
 usersCount: '12 announced members'
 metricEvidence:
   usersCount:

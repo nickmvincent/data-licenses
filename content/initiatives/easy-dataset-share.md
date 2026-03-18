@@ -10,9 +10,7 @@ actionsSupported:
 pipelineStages:
   - collect
 tags:
-  - scraping
   - dataset-protection
-  - mitigation
 dependsOn:
   - cloudflare-anti-scraping
 evidenceLinks:

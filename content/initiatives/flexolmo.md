@@ -10,8 +10,6 @@ pipelineStages:
 dataTypes:
   - text
 tags:
-  - collaborative-training
-  - data-collaboration
   - mixture-of-experts
 evidenceLinks:
   - label: Ai2 introduces FlexOlmo and invites organizations with sensitive data to participate

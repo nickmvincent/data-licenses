@@ -10,10 +10,6 @@ pipelineStages:
   - train
 dataTypes:
   - multimodal
-tags:
-  - multimedia
-  - marketplace
-  - licensing
 evidenceLinks:
   - label: Cloudflare acquisition and integration announcement
     url: 'https://blog.cloudflare.com/human-native-joins-cloudflare/'

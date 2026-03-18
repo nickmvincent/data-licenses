@@ -88,6 +88,12 @@ export function formatLinkLabel(url: string) {
   }
 }
 
+export function formatLinkTitle(url: string, label?: string) {
+  const normalizedLabel = typeof label === 'string' ? label.replace(/\s+/g, ' ').trim() : '';
+  if (!normalizedLabel || normalizedLabel === url) return url;
+  return `${normalizedLabel}\n${url}`;
+}
+
 export function formatActionSummary(actionsSupported: string[]) {
   if (!Array.isArray(actionsSupported) || actionsSupported.length === 0) return 'Uncategorized';
   return actionsSupported.map((action) => ACTION_LABELS[action] || action).join(' / ');

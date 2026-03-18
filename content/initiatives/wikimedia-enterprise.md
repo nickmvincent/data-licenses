@@ -13,8 +13,6 @@ dataTypes:
   - structured-data
 tags:
   - wikipedia
-  - api
-  - structured-data
 usersCount: '10+ announced partners'
 dataVolume: '920+ datasets / 300M+ unique project pages'
 metricEvidence:

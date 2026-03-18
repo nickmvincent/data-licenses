@@ -14,7 +14,6 @@ dataTypes:
 tags:
   - opt-out
   - registry
-  - image-training
 evidenceLinks:
   - label: Face Reveal launched for Have I Been Trained
     url: 'https://spawning.ai/blog/have-i-been-traineds-2025-face-reveal'

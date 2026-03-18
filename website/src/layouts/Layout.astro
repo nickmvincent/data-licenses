@@ -1,23 +1,18 @@
 ---
 import '../styles/global.css';
-import NetworkFooter from '../../../helpers/astro/NetworkFooter.astro';
-import networkData from '../data/network.json';
 
 interface Props {
   title?: string;
   description?: string;
-  showNetworkFooter?: boolean;
 }
 
 const {
   title = 'DataLicenses.org',
   description = 'A curated catalog of public initiatives shaping AI data access, licensing, technical enforcement, and creator leverage.',
-  showNetworkFooter = true,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
 const pageTitle = title === 'DataLicenses.org' ? title : `${title} | DataLicenses.org`;
-const networkLinks = networkData.allProjects.map((project) => ({ href: project.website, label: project.title }));
 const isNavActive = (href: string) =>
   href === '/'
     ? currentPath === '/' || currentPath.startsWith('/initiatives/')
@@ -132,7 +127,6 @@ const alsoLikeLinks = [
         </div>
       </div>
     </footer>
-    {showNetworkFooter && <NetworkFooter links={networkLinks} label="Part of a broader research network:" />}
 
     <script is:inline>
       (() => {
@@ -437,39 +431,6 @@ const alsoLikeLinks = [
   .also-like-desc {
     font-size: 0.9rem;
     color: var(--muted);
-  }
-
-  .network-footer {
-    margin-top: 0;
-    padding: 1.6rem 1.5rem 2.2rem;
-    border-top: 1px solid var(--border);
-    background: color-mix(in srgb, var(--card) 58%, transparent);
-    text-align: center;
-    font-size: 0.88rem;
-  }
-
-  .network-footer-content {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .network-label {
-    color: var(--muted);
-    margin-right: 0.35rem;
-  }
-
-  .network-links {
-    display: inline;
-  }
-
-  .network-links a {
-    margin: 0 0.45rem;
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  .network-links a:hover {
-    text-decoration: underline;
   }
 
   @media (max-width: 900px) {

@@ -11,9 +11,7 @@ pipelineStages:
 dataTypes:
   - images
 tags:
-  - visual-data
   - biometric
-  - marketplace
 dataVolume: '600,000+ high-quality images'
 metricEvidence:
   dataVolume:

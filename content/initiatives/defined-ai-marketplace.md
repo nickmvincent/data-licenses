@@ -11,9 +11,7 @@ pipelineStages:
 dataTypes:
   - multimodal
 tags:
-  - datasets
   - annotation
-  - marketplace
   - ethical-sourcing
 moneyVolume: 'several partners generate $1M+/year'
 metricEvidence:

@@ -12,6 +12,7 @@ Each initiative is a Markdown file with frontmatter for merge-ready fields such 
 - `dataTypes` for modality or content-type specificity such as `text`, `images`, `music`, or `web-content`
 - `usersCount`, `dataVolume`, `moneyVolume`
 - `metricEvidence`
+- `implementationSnippets` for concrete examples or deployable syntax
 - `considerations`, `references`, and related metadata
 
 The `shared-references/bibtex-entries/` directory stores any citation records referenced by initiative frontmatter.

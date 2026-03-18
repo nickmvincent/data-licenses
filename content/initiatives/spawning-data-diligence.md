@@ -12,7 +12,6 @@ pipelineStages:
 tags:
   - compliance-tooling
   - opt-out
-  - python
 evidenceLinks:
   - label: PyPI release 0.1.7 published
     url: 'https://pypi.org/project/datadiligence/'

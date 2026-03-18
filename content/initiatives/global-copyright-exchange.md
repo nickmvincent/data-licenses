@@ -12,8 +12,6 @@ dataTypes:
   - music
 tags:
   - music
-  - audio
-  - licensing
   - rights-cleared
 dataVolume: '79M songs / 330,000 hours of music'
 metricEvidence:

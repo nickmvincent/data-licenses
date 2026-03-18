@@ -10,9 +10,6 @@ pipelineStages:
   - generate
 tags:
   - faith
-  - publishers
-  - licensing
-  - marketplace
 moneyVolume: '$5M pooled guarantee'
 metricEvidence:
   moneyVolume:

@@ -34,7 +34,7 @@ Common optional fields:
 - `usersCount`, `dataVolume`, `moneyVolume`
 - `metricEvidence`: per-metric attribution matching any populated adoption metric
 - `considerations`
-- `implementationSnippets`
+- `implementationSnippets` (optional `summary`, `exampleUrl`, and `exampleLabel` supported for online examples)
 - `references`: citation keys from `../content/shared-references/bibtex-entries`
 
 Example:
