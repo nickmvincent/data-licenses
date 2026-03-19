@@ -219,4 +219,19 @@ export async function loadMemo(slug = 'memo') {
   return { slug, frontmatter: data, body };
 }
 
+export async function loadMethodologyPage() {
+  const root = await ensureContentRoot();
+  const filePath = join(root, 'pages', 'methodology.md');
+  const raw = await fs.readFile(filePath, 'utf8');
+  const { data, body } = parseFrontmatter(raw);
+  const context = 'Page methodology.md';
+  const visibility = parseVisibility(data?.visibility, context);
+
+  if (visibility !== 'public') {
+    throw new Error(`Page methodology is not marked public (visibility: ${visibility})`);
+  }
+
+  return { slug: 'methodology', frontmatter: data, body };
+}
+
 export { loadReferences, loadReferencesByKeys, formatCitation } from '../../../helpers/shared-references';

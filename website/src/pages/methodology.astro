@@ -1,82 +1,65 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { loadMethodologyPage } from '../lib/content-loader';
+import { getMarkdownProcessor } from '../lib/markdown';
 
-const principles = [
-  {
-    title: 'Human-curated',
-    body: 'People decide what belongs in the catalog, how entries are written, and which caveats stay visible.',
-  },
-  {
-    title: 'AI can assist',
-    body: 'AI can help find sources and draft updates, but people review every claim and publish the final version.',
-  },
-  {
-    title: 'Show the evidence',
-    body: 'Important claims should point to public sources that a reviewer can open and check.',
-  },
-];
+const guide = await loadMethodologyPage();
+const markdown = await getMarkdownProcessor();
+const rendered = await markdown.render(guide.body);
 
-const idealFlow = [
-  'A person spots a new initiative or a possible update.',
-  'Read the current entry first.',
-  'Check the strongest public sources first: official sites, docs, changelogs, repos, and filings.',
-  'If helpful, use AI to gather links or draft a small update packet.',
-  'Review every claim by hand.',
-  'If the evidence is weak or unclear, say so or leave it out.',
-  'A person makes the final merge.',
-];
+const title =
+  typeof guide.frontmatter?.title === 'string' ? guide.frontmatter.title : 'Method & Contribute';
+const description =
+  typeof guide.frontmatter?.description === 'string'
+    ? guide.frontmatter.description
+    : 'How the catalog is reviewed, what belongs here, and how to contribute.';
+const stripTags = (value: string) => value.replace(/<[^>]+>/g, '');
+const decodeEntities = (value: string) =>
+  value
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+const headingIdPattern = /\sid="([^"]+)"/;
+const seenHeadingIds = new Map<string, number>();
 
-const goodUpdate = [
-  'A short factual summary.',
-  'At least one public source.',
-  'Exact dates when timing matters.',
-  'A clear note on any uncertainty or limits.',
-];
+const guideBodyHtml = rendered.code.replace(/<h([23])([^>]*)>(.*?)<\/h\1>/g, (_match, level, attrs, inner) => {
+  const text = decodeEntities(stripTags(inner)).trim();
+  const existingId = attrs.match(headingIdPattern)?.[1];
+  const base = existingId || slugify(text);
 
-const quickChecklist = [
-  'Make sure it has a clear AI data rights angle.',
-  'Include one canonical website and at least one dated public source for any factual update.',
-  'Keep summaries short, neutral, and specific.',
-  'If you add a metric, add matching metricEvidence too.',
-];
+  if (!base) {
+    return `<h${level}${attrs}>${inner}</h${level}>`;
+  }
 
-const inScope = [
-  'Initiatives that shape AI data flows through preference signals, licenses or terms, collectives, marketplaces, technical controls, certification, or new infrastructure.',
-  'Concrete implementation details, canonical websites, and dated evidence links.',
-  'Metadata like status, pipeline stage, data type, jurisdiction, and adoption signals.',
-];
+  const seenCount = seenHeadingIds.get(base) || 0;
+  seenHeadingIds.set(base, seenCount + 1);
+  const id = seenCount === 0 ? base : `${base}-${seenCount + 1}`;
+  const nextAttrs = existingId
+    ? seenCount === 0
+      ? attrs
+      : attrs.replace(headingIdPattern, ` id="${id}"`)
+    : `${attrs} id="${id}"`;
 
-const outOfScope = [
-  'General anti-AI security work without a data rights angle.',
-  'Pure research without a public artifact or path to use.',
-  'Provenance-only work unless it directly affects licensing or preferences.',
-];
-
-const contributionWays = [
-  'Suggest a new initiative or update an existing one with a canonical site and dated sources.',
-  'Open an issue for leads, scope questions, or early discussion.',
-  'Open a pull request when the wording and metadata are ready to review.',
-];
+  return `<h${level}${nextAttrs}>${inner}</h${level}>`;
+});
 ---
 
-<Layout
-  title="Method & Contribute"
-  description="How the catalog is reviewed, what belongs here, and how to contribute."
->
+<Layout title={title} description={description}>
   <main class="wrap narrow methodology-page">
     <header class="page-header guide-hero">
       <p class="eyebrow">How we work</p>
-      <h1>Method & Contribute</h1>
-      <p class="muted methodology-intro">
-        DataLicenses.org is a human-curated catalog. People decide what belongs here, how entries are
-        written, and which caveats stay visible. AI can help with research, but people review and
-        publish. This page covers the method, scope, and how to contribute.
-      </p>
+      <h1>{title}</h1>
 
       <div class="guide-actions">
-        <a class="btn btn-primary" href="#contribute">Jump to contributing</a>
         <a
-          class="btn"
+          class="btn btn-primary"
           href="https://github.com/nickmvincent/data-licenses/issues/new/choose"
           target="_blank"
           rel="noopener"
@@ -97,120 +80,24 @@ const contributionWays = [
           target="_blank"
           rel="noopener"
         >
-          Contact Nick
+          Contact
         </a>
       </div>
     </header>
 
-    <section class="methodology-grid">
-      {principles.map((principle) => (
-        <article class="box section methodology-card">
-          <h2>{principle.title}</h2>
-          <p>{principle.body}</p>
-        </article>
-      ))}
-    </section>
-
-    <section class="box section">
-      <h2>Workflow</h2>
-      <p class="muted">
-        Keep the research process simple, and keep the final judgment human.
-      </p>
-      <ol class="method-list">
-        {idealFlow.map((step) => (
-          <li>{step}</li>
-        ))}
-      </ol>
-    </section>
-
-    <div class="methodology-grid methodology-grid-wide">
-      <section class="box section">
-        <h2>Good Update</h2>
-        <ul class="method-list">
-          {goodUpdate.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
-        <p class="muted small">
-          If AI is involved, the best output is usually a small review packet with sources, a draft
-          summary, and notes on anything unclear.
-        </p>
-      </section>
-
-      <section class="box section">
-        <h2>Quick Checklist</h2>
-        <ul class="method-list">
-          {quickChecklist.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
-      </section>
-    </div>
-
-    <div class="methodology-grid methodology-grid-wide">
-      <section class="box section">
-        <h2>In Scope</h2>
-        <ul class="method-list">
-          {inScope.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section class="box section">
-        <h2>Out of Scope</h2>
-        <ul class="method-list">
-          {outOfScope.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
-      </section>
-    </div>
-
-    <section id="contribute" class="box section">
-      <h2>Contribute</h2>
-      <ul class="method-list">
-        {contributionWays.map((item) => (
-          <li>{item}</li>
-        ))}
-        <li>
-          Every suggested <code>evidenceLinks</code>, <code>usersCount</code>, <code>dataVolume</code>,
-          or <code>moneyVolume</code> value should include a clickable source and date. If you add a
-          metric, add matching <code>metricEvidence</code>.
-        </li>
-      </ul>
-      <p class="muted small">
-        Developers can add or update a markdown file under <code>content/initiatives/</code>. Each
-        entry should have one canonical <code>website</code>, a <code>status</code> of <code>live</code>
-        or <code>wip</code>, <code>visibility: public</code>, <code>type: data_license_initiative</code>,
-        and optional dated <code>evidenceLinks</code>.
-      </p>
-    </section>
-
-    <section id="resources" class="box section">
-      <h2>Research Inputs</h2>
-      <ul class="method-list">
-        <li>
-          Start from the public <a href="/prompts/find-updates.txt">research prompt</a>, the current{' '}
-          <a href="/data/initiatives.json">catalog JSON</a>, and the curation backlog at{' '}
-          <a href="/data/curation.json">/data/curation.json</a>.
-        </li>
-        <li>Prefer primary sources: official sites, docs, repos, changelogs, announcements, and filings.</li>
-        <li>If evidence is partial or ambiguous, keep the caveat in the entry.</li>
-      </ul>
-    </section>
+    <article class="methodology-body memo box section" set:html={guideBodyHtml}></article>
   </main>
 </Layout>
 
 <style>
+  .methodology-page {
+    display: grid;
+    gap: 16px;
+  }
+
   .guide-hero {
     display: grid;
     gap: 12px;
-  }
-
-  .methodology-intro {
-    margin: 0;
-    max-width: 50rem;
   }
 
   .guide-actions {
@@ -219,34 +106,36 @@ const contributionWays = [
     gap: 12px;
   }
 
-  .methodology-grid {
-    display: grid;
-    gap: 14px;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  .methodology-body {
+    padding: 24px 28px;
   }
 
-  .methodology-grid-wide {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  .methodology-body :global(h2:first-child) {
+    margin-top: 0;
   }
 
-  .methodology-card {
-    background: color-mix(in srgb, var(--card) 94%, transparent);
+  .methodology-body :global(h2),
+  .methodology-body :global(h3) {
+    scroll-margin-top: 100px;
   }
 
-  .methodology-card h2 {
-    margin-bottom: 0.55rem;
+  .methodology-body :global(p),
+  .methodology-body :global(li),
+  .methodology-body :global(a) {
+    overflow-wrap: anywhere;
   }
 
-  .method-list {
-    margin: 0;
-    padding-left: 1.2rem;
-    display: grid;
-    gap: 0.65rem;
+  .methodology-body :global(p:last-child) {
+    margin-bottom: 0;
   }
 
   @media (max-width: 720px) {
     .guide-actions .btn {
       width: 100%;
+    }
+
+    .methodology-body {
+      padding: 22px;
     }
   }
 </style>

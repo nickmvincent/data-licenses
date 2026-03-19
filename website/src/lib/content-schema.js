@@ -44,8 +44,8 @@
  * @property {EvidenceLink[]} evidenceLinks
  */
 
-export const INITIATIVE_TYPE = 'data_license_initiative';
-export const MEMO_TYPE = 'data_license_memo';
+const INITIATIVE_TYPE = 'data_license_initiative';
+const MEMO_TYPE = 'data_license_memo';
 
 export const ADOPTION_METRIC_FIELDS = ['usersCount', 'dataVolume', 'moneyVolume'];
 export const ADOPTION_RESEARCH_STATUSES = ['populated', 'needs-research', 'hard-to-quantify'];
@@ -58,7 +58,7 @@ function hasOwn(value, key) {
   return Object.prototype.hasOwnProperty.call(value, key);
 }
 
-export function optionalString(value) {
+function optionalString(value) {
   if (typeof value !== 'string') return undefined;
   const trimmed = value.trim();
   return trimmed || undefined;
@@ -83,7 +83,7 @@ export function requireUrlString(value, field, context) {
   }
 }
 
-export function coerceDate(value) {
+function coerceDate(value) {
   if (!value) return undefined;
   const date = new Date(String(value));
   return Number.isNaN(date.getTime()) ? undefined : date;
@@ -103,7 +103,7 @@ export function parseVisibility(value, context) {
   throw new Error(`${context} has an invalid visibility: ${visibility}`);
 }
 
-export function requireContentType(value, expectedType, context) {
+function requireContentType(value, expectedType, context) {
   const type = requireString(value, 'type', context);
   if (type === expectedType) return type;
   throw new Error(`${context} has an unexpected type: ${type}`);
@@ -139,20 +139,20 @@ export function requirePrimaryApproachType(value, actionsSupported, context) {
   return primaryApproachType;
 }
 
-export function cleanLegacyEvidenceLabel(value) {
+function cleanLegacyEvidenceLabel(value) {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   if (!text) return 'Latest update';
   const withoutUrl = text.replace(/\s*\(https?:\/\/[^)]+\)\s*$/, '').trim();
   return withoutUrl || 'Latest update';
 }
 
-export function extractUrl(value) {
+function extractUrl(value) {
   if (typeof value !== 'string') return undefined;
   const match = value.match(/https?:\/\/[^\s)]+/);
   return match ? match[0] : undefined;
 }
 
-export function normalizeEvidenceCollection(value, context, field = 'evidenceLinks') {
+function normalizeEvidenceCollection(value, context, field = 'evidenceLinks') {
   if (value === undefined) return [];
   if (!Array.isArray(value)) {
     throw new Error(`${context} has invalid ${field}: expected an array`);

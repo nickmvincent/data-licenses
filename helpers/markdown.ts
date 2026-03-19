@@ -1,6 +1,6 @@
 import { load as loadYaml } from 'js-yaml';
 
-export type Frontmatter = Record<string, unknown>;
+type Frontmatter = Record<string, unknown>;
 
 export function parseFrontmatter(raw: string): { data: Frontmatter; body: string } {
   const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);

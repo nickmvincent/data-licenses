@@ -76,7 +76,7 @@ const terms: GlossaryTerm[] = [
   {
     term: 'Preference Signal',
     definition: 'A machine-readable hint that tells AI agents or web crawlers how content may or may not be used. Examples include robots.txt directives, ai.txt files, and HTTP headers. These rely on voluntary compliance by the crawler.',
-    related: ['robots.txt', 'ai.txt', 'TDMRep'],
+    related: ['robots.txt', 'ai.txt', 'TDMRep', 'Asset-level Signal'],
     externalLinks: [
       catalogLink('ai-pref', 'IETF AI Preferences'),
       catalogLink('tdmrep', 'W3C TDMRep'),
@@ -85,7 +85,7 @@ const terms: GlossaryTerm[] = [
   {
     term: 'robots.txt',
     definition: 'A text file placed at the root of a website that instructs web crawlers which pages they may or may not access. Originally designed for search engines, now being extended for AI training crawlers with user-agent specific rules.',
-    related: ['Preference Signal'],
+    related: ['Preference Signal', 'X-Robots-Tag'],
     externalLinks: [link('Robot Exclusion Protocol (RFC 9309)', 'https://www.rfc-editor.org/rfc/rfc9309')],
   },
   {
@@ -101,38 +101,31 @@ const terms: GlossaryTerm[] = [
     externalLinks: [link('MDN API glossary', 'https://developer.mozilla.org/en-US/docs/Glossary/API')],
   },
   {
+    term: 'Asset-level Signal',
+    definition: 'A preference or rights signal attached to an individual file or work rather than to an entire website or domain. These signals are useful when content moves between platforms or needs permissions that travel with the asset itself.',
+    related: ['Preference Signal', 'Data Provenance', 'X-Robots-Tag'],
+    externalLinks: [
+      catalogLink('adobe-content-authenticity', 'Adobe Content Authenticity'),
+      catalogLink('tdm-ai', 'TDM·AI'),
+    ],
+  },
+  {
     term: 'Attribution',
     definition: 'Credit connecting content back to its source, author, or steward. It can involve citations, links, provenance metadata, or contractual reporting requirements.',
     related: ['Data Provenance', 'Training Data'],
     externalLinks: [link('Creative Commons attribution guidance', 'https://wiki.creativecommons.org/wiki/Recommended_practices_for_attribution')],
   },
   {
+    term: 'Bot Authentication',
+    definition: 'Methods for verifying the identity of an automated client and conveying who operates it. In AI access control, stronger bot identity can make rate limits, differentiated permissions, and enforcement more reliable.',
+    related: ['Technical Control', 'Preference Signal'],
+    externalLinks: [catalogLink('web-bot-auth', 'IETF Web Bot Auth')],
+  },
+  {
     term: 'Certification',
     definition: 'A third-party review or badge signaling that a model, dataset, or vendor meets a stated standard, such as consented training-data sourcing.',
-    related: ['Consent', 'Fairly Trained'],
+    related: ['Fairly Trained'],
     externalLinks: [catalogLink('fairlytrained', 'Fairly Trained')],
-  },
-  {
-    term: 'Compensation',
-    definition: 'Payment, revenue sharing, licensing fees, or other economic return to the people or organizations supplying content or data.',
-    related: ['Data Market Platform', 'Licensing Collective'],
-    externalLinks: [
-      catalogLink('prorata', 'ProRata / Gist'),
-      catalogEvidenceLink(
-        'bria-artist-program',
-        'Licensed training catalog',
-        'Bria licensed training catalog'
-      ),
-    ],
-  },
-  {
-    term: 'Consent',
-    definition: 'Permission granted by the relevant rights holder or contributor before data is used for AI training, retrieval, or other downstream purposes.',
-    related: ['Opt-in', 'Opt-out'],
-    externalLinks: [
-      catalogLink('created-by-humans', 'Created by Humans'),
-      catalogLink('fairlytrained', 'Fairly Trained'),
-    ],
   },
   {
     term: 'TDMRep',
@@ -143,7 +136,7 @@ const terms: GlossaryTerm[] = [
   {
     term: 'Licensing Collective',
     definition: 'An organization that manages rights on behalf of multiple creators, negotiating licenses and distributing payments. Examples include ASCAP for music and newer publisher or creator collectives negotiating AI-related uses.',
-    related: ['RSL', 'Compensation'],
+    related: ['RSL', 'Rights Holder'],
     externalLinks: [catalogLink('publishers-rights', "Publishers' Rights Organization")],
   },
   {
@@ -151,6 +144,15 @@ const terms: GlossaryTerm[] = [
     definition: 'A machine-readable licensing format that allows content creators to specify terms for AI use of their work. Designed to be easily parsed by automated systems for compliance checking.',
     related: ['Licensing Collective', 'Preference Signal'],
     externalLinks: [catalogLink('rsl', 'RSL standard')],
+  },
+  {
+    term: 'Privacy-Preserving Computation',
+    definition: 'Ways of training, evaluating, or collaborating on AI systems without freely exposing the underlying raw data. In this catalog, it points to approaches where data holders keep more custody and control while still enabling model development.',
+    related: ['Training Data', 'Data Provenance'],
+    externalLinks: [
+      catalogLink('syftbox', 'SyftBox'),
+      catalogLink('flexolmo', 'FlexOlmo'),
+    ],
   },
   {
     term: 'Tollgate',
@@ -161,7 +163,7 @@ const terms: GlossaryTerm[] = [
   {
     term: 'Technical Control',
     definition: 'Measures that detect, limit, or block unwanted automated access to content. Includes rate limiting, CAPTCHAs, bot detection, and fingerprinting. Unlike preference signals, these are enforced rather than advisory.',
-    related: ['Tollgate', 'Scraping'],
+    related: ['Tollgate', 'Scraping', 'Bot Authentication'],
     externalLinks: [catalogLink('cloudflare-anti-scraping', 'Cloudflare AI Crawl Control')],
   },
   {
@@ -184,20 +186,14 @@ const terms: GlossaryTerm[] = [
   },
   {
     term: 'Pipeline Stage',
-    definition: 'A phase in the AI data lifecycle. Common stages include: Collect/Scrape (gathering data), Train (initial model training), Fine-tune (specialization), Retrieve (RAG lookups), and Generate (output creation).',
+    definition: 'A phase in the AI data lifecycle. Common stages include collection or scraping, training, fine-tuning, retrieval, and user-facing output generation.',
     related: ['Training Data', 'RAG'],
     externalLinks: [link('NIST AI lifecycle tasks', 'https://airc.nist.gov/airmf-resources/airmf/appendices/app-a-descriptions-of-ai-actor-tasks/')],
   },
   {
-    term: 'Generate',
-    definition: 'The stage where a model produces text, images, code, or other outputs for users. Licensing and attribution questions here often differ from those at collection or training time.',
-    related: ['Pipeline Stage', 'RAG'],
-    externalLinks: [link('Google generative AI glossary', 'https://developers.google.com/machine-learning/glossary/generative')],
-  },
-  {
     term: 'RAG (Retrieval-Augmented Generation)',
     definition: 'A technique where AI models retrieve relevant documents at inference time to augment their responses. Raises different licensing questions than training since content is accessed dynamically.',
-    related: ['Pipeline Stage', 'Generate'],
+    related: ['Pipeline Stage'],
     externalLinks: [link('Original RAG paper (DOI)', 'https://doi.org/10.48550/arXiv.2005.11401')],
   },
   {
@@ -212,19 +208,19 @@ const terms: GlossaryTerm[] = [
   {
     term: 'Data Provenance',
     definition: 'The documented history of a piece of data: where it came from, how it was processed, and what permissions apply. Critical for compliance and attribution in AI systems.',
-    related: ['Training Data', 'Attribution'],
+    related: ['Training Data', 'Attribution', 'Registry'],
     externalLinks: [link('W3C PROV overview', 'https://www.w3.org/TR/prov-overview/')],
   },
   {
     term: 'Opt-out',
     definition: 'A mechanism allowing content creators to indicate they do not want their work used for AI training. May be technical (robots.txt) or legal (GDPR rights). Effectiveness depends on crawler compliance.',
-    related: ['Preference Signal', 'Consent'],
+    related: ['Preference Signal', 'Opt-in', 'Registry'],
     externalLinks: [catalogLink('do-not-train-registry', 'Spawning Do Not Train Registry')],
   },
   {
     term: 'Opt-in',
     definition: 'A consent model where explicit permission is required before content can be used. More protective than opt-out but harder to scale. Some licensing collectives operate on opt-in basis.',
-    related: ['Licensing Collective', 'Consent'],
+    related: ['Licensing Collective', 'Opt-out'],
     externalLinks: [catalogLink('created-by-humans', 'Created by Humans')],
   },
   {
@@ -236,8 +232,26 @@ const terms: GlossaryTerm[] = [
   {
     term: 'Fairly Trained',
     definition: 'A certification program that verifies AI models were trained with proper consent and licensing. Provides third-party validation that a model meets ethical training criteria.',
-    related: ['Certification', 'Consent'],
+    related: ['Certification'],
     externalLinks: [catalogLink('fairlytrained', 'Fairly Trained')],
+  },
+  {
+    term: 'Registry',
+    definition: 'A shared list or lookup service that records rights, preferences, or status information about works. In this space, registries can help others discover opt-outs, verify rights claims, or check reuse conditions across many assets.',
+    related: ['Opt-out', 'Data Provenance', 'Rights Holder'],
+    externalLinks: [
+      catalogLink('do-not-train-registry', 'Spawning Do Not Train Registry'),
+      catalogLink('commonsdb', 'CommonsDB'),
+    ],
+  },
+  {
+    term: 'Rights Holder',
+    definition: 'The person or organization that controls the relevant rights in a work or dataset, and can authorize, refuse, or condition reuse. Rights holders may be creators, publishers, labels, archives, or other stewards depending on the context.',
+    related: ['Licensing Collective', 'Data Market Platform', 'Opt-in'],
+    externalLinks: [
+      catalogLink('created-by-humans', 'Created by Humans'),
+      catalogLink('iptc-plus-data-mining-metadata', 'IPTC + PLUS Data Mining Metadata'),
+    ],
   },
   {
     term: 'W3C',
@@ -246,15 +260,18 @@ const terms: GlossaryTerm[] = [
     externalLinks: [link('W3C about page', 'https://www.w3.org/about/')],
   },
   {
-    term: 'Status: WIP',
-    definition: 'Work in Progress. The initiative is still forming, changing quickly, or not ready for dependable use yet.',
-    related: ['Status: Live'],
-    externalLinks: [link('Merriam-Webster: work in progress', 'https://www.merriam-webster.com/dictionary/work%20in%20progress')],
+    term: 'X-Robots-Tag',
+    definition: 'An HTTP response header that lets a server send crawler instructions along with a page or file response. It is useful when a site needs per-URL or per-file rules instead of relying only on a site-wide `robots.txt` file.',
+    related: ['robots.txt', 'Preference Signal', 'Asset-level Signal'],
+    externalLinks: [
+      catalogLink('robots-ai-directives', 'OpenAI bots documentation'),
+      link('MDN X-Robots-Tag', 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Robots-Tag'),
+    ],
   },
   {
     term: 'Status: Live',
     definition: 'The initiative is publicly live or deployable today, even if adoption is still limited or emerging.',
-    related: ['Status: WIP'],
+    related: [],
     externalLinks: [link('Merriam-Webster: go live', 'https://www.merriam-webster.com/dictionary/go%20live')],
   },
 ];

@@ -111,19 +111,6 @@ export async function loadReferences(options: { force?: boolean; basePath?: stri
   return refs;
 }
 
-export async function loadReferencesByKeys(keys: string[], options: { basePath?: string } = {}): Promise<Reference[]> {
-  const allRefs = await loadReferences(options);
-  const result: Reference[] = [];
-
-  for (const key of keys) {
-    const ref = allRefs.get(key);
-    if (ref) {
-      result.push(ref);
-    }
-  }
-
-  return result;
-}
 export function formatCitation(ref: Reference, style: 'apa' | 'short' = 'short'): string {
   if (style === 'short') {
     const firstAuthor = ref.authors[0]?.split(',')[0] || 'Unknown';

@@ -10,7 +10,7 @@ export const APPROACH_KEYS = [
   'new-infrastructures',
   'certification',
 ] as const;
-export type ApproachKey = typeof APPROACH_KEYS[number];
+type ApproachKey = typeof APPROACH_KEYS[number];
 
 export const ACTION_LABELS: Record<string, string> = {
   'attach-preference-signal': 'Preference signal',
