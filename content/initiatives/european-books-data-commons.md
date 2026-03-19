@@ -5,6 +5,7 @@ status: wip
 website: 'https://openfuture.eu/publication/outline-for-a-european-books-data-commons/'
 actionsSupported:
   - new-infrastructures
+primaryApproachType: new-infrastructures
 jurisdictions:
   - EU
 pipelineStages:

@@ -5,6 +5,7 @@ status: live
 website: 'https://localcontexts.org/labels/traditional-knowledge-labels/'
 actionsSupported:
   - attach-preference-signal
+primaryApproachType: attach-preference-signal
 pipelineStages:
   - collect
   - retrieve

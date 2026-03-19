@@ -5,6 +5,7 @@ status: live
 website: 'https://www.sourceaudio.com/why-music-ai-dataset-partnerships-matter'
 actionsSupported:
   - data-market-platform
+primaryApproachType: data-market-platform
 pipelineStages:
   - train
   - fine-tune

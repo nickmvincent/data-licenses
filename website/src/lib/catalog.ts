@@ -1,5 +1,17 @@
 import type { LoadedInitiative } from './content-loader';
 
+export const APPROACH_KEYS = [
+  'attach-preference-signal',
+  'attach-formal-license',
+  'join-licensing-collective',
+  'data-market-platform',
+  'add-tollgate',
+  'technical-blocking',
+  'new-infrastructures',
+  'certification',
+] as const;
+export type ApproachKey = typeof APPROACH_KEYS[number];
+
 export const ACTION_LABELS: Record<string, string> = {
   'attach-preference-signal': 'Preference signal',
   'attach-formal-license': 'Formal license',
@@ -36,23 +48,57 @@ export const STATUS_LABELS: Record<string, string> = {
   wip: 'WIP',
 };
 
-export const SECTION_KEYS = ['new-approaches', 'markets-with-new-approaches', 'markets-only'] as const;
-export type CatalogSectionKey = typeof SECTION_KEYS[number];
-
-export const SECTION_DETAILS: Record<CatalogSectionKey, { title: string; description: string }> = {
-  'new-approaches': {
-    title: 'New approaches',
+export const APPROACH_DETAILS: Record<
+  ApproachKey,
+  { title: string; shortDescription: string; description: string }
+> = {
+  'attach-preference-signal': {
+    title: 'Preference signal',
+    shortDescription: 'Publishes machine-readable AI-use preferences.',
     description:
-      'Signals, licenses, infrastructure, blocking, tollgates, certification, and other non-market approaches.',
+      'Signals that express whether AI systems may crawl, train on, or reuse content, usually through metadata, headers, or other machine-readable notices.',
   },
-  'markets-with-new-approaches': {
-    title: 'Markets with new approaches',
+  'attach-formal-license': {
+    title: 'Formal license',
+    shortDescription: 'Uses explicit license terms for AI reuse.',
     description:
-      'Marketplace entries that also add at least one other approach from the catalog.',
+      'Formal legal terms or license language that grant, restrict, or condition AI-related reuse of content, datasets, or model inputs.',
   },
-  'markets-only': {
-    title: 'Markets only',
-    description: 'Entries whose only catalog approach is a marketplace.',
+  'join-licensing-collective': {
+    title: 'Licensing collective',
+    shortDescription: 'Coordinates licensing across many rights holders.',
+    description:
+      'Shared bargaining, aggregation, or rights-management structures that let many publishers or creators negotiate AI access together.',
+  },
+  'data-market-platform': {
+    title: 'Marketplace',
+    shortDescription: 'Matches data suppliers with AI buyers.',
+    description:
+      'Commercial platforms or brokers that package, list, or sell access to datasets, content libraries, or licensing opportunities for AI use.',
+  },
+  'add-tollgate': {
+    title: 'Tollgate',
+    shortDescription: 'Makes AI access conditional on payment or metering.',
+    description:
+      'Access layers that require payment, metering, or authenticated entry before content can be fetched, queried, or reused for AI workflows.',
+  },
+  'technical-blocking': {
+    title: 'Technical blocking',
+    shortDescription: 'Blocks or constrains automated access.',
+    description:
+      'Technical controls that deny, rate-limit, or otherwise constrain crawling, downloading, or automated collection unless a requester meets specific conditions.',
+  },
+  'new-infrastructures': {
+    title: 'New infrastructure',
+    shortDescription: 'Builds new rails for governed data sharing.',
+    description:
+      'New registries, protocols, hosting patterns, or coordination layers that make governed data access, compliance, or contribution easier to operate.',
+  },
+  certification: {
+    title: 'Certification',
+    shortDescription: 'Verifies or signals compliant sourcing practices.',
+    description:
+      'Third-party review, badges, or verification programs that signal whether a model, company, or dataset follows stated sourcing or licensing requirements.',
   },
 };
 
@@ -94,9 +140,13 @@ export function formatLinkTitle(url: string, label?: string) {
   return `${normalizedLabel}\n${url}`;
 }
 
+export function formatApproachLabel(action: string) {
+  return ACTION_LABELS[action] || action;
+}
+
 export function formatActionSummary(actionsSupported: string[]) {
   if (!Array.isArray(actionsSupported) || actionsSupported.length === 0) return 'Uncategorized';
-  return actionsSupported.map((action) => ACTION_LABELS[action] || action).join(' / ');
+  return actionsSupported.map((action) => formatApproachLabel(action)).join(' / ');
 }
 
 export function formatPipelineSummary(pipelineStages: string[]) {
@@ -106,16 +156,4 @@ export function formatPipelineSummary(pipelineStages: string[]) {
 
 export function formatDataTypeLabel(dataType: string) {
   return DATA_TYPE_LABELS[dataType] || dataType;
-}
-
-export function catalogSectionForItem(
-  item: Pick<LoadedInitiative, 'actionsSupported'>
-): CatalogSectionKey {
-  const actions = Array.isArray(item.actionsSupported) ? item.actionsSupported : [];
-  const hasMarketplace = actions.includes('data-market-platform');
-  const hasOtherApproaches = actions.some((action) => action !== 'data-market-platform');
-
-  if (hasMarketplace && !hasOtherApproaches) return 'markets-only';
-  if (hasMarketplace && hasOtherApproaches) return 'markets-with-new-approaches';
-  return 'new-approaches';
 }

@@ -5,6 +5,7 @@ status: live
 website: 'https://pluscoalition.org/about-ai-and-ml-image-rights-standards/'
 actionsSupported:
   - attach-preference-signal
+primaryApproachType: attach-preference-signal
 pipelineStages:
   - collect
   - train

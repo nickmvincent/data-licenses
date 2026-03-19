@@ -5,6 +5,7 @@ status: live
 website: 'https://helpx.adobe.com/creative-cloud/apps/adobe-content-authenticity/generative-ai-training-preferences.html'
 actionsSupported:
   - attach-preference-signal
+primaryApproachType: attach-preference-signal
 pipelineStages:
   - train
   - generate

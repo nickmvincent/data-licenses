@@ -3,11 +3,11 @@ import Layout from '../layouts/Layout.astro';
 import { formatCitation, loadInitiatives, type LoadedInitiative } from '../lib/content-loader';
 import {
   ACTION_LABELS,
-  SECTION_DETAILS,
-  SECTION_KEYS,
+  APPROACH_DETAILS,
+  APPROACH_KEYS,
   STATUS_LABELS,
-  catalogSectionForItem,
   formatActionSummary,
+  formatApproachLabel,
   formatDataTypeLabel,
   formatDate,
   formatLinkLabel,
@@ -16,34 +16,40 @@ import {
   sortByLatestThenTitle,
 } from '../lib/catalog';
 
-type CatalogSectionKey = (typeof SECTION_KEYS)[number];
+type CatalogApproachKey = (typeof APPROACH_KEYS)[number];
 
 const items: LoadedInitiative[] = (await loadInitiatives()).sort(sortByLatestThenTitle);
 const bySlug = Object.fromEntries(items.map((item) => [item.slug, item]));
 const byId = Object.fromEntries(items.map((item) => [item.id, item]));
 const groupedItems: Array<{
-  key: CatalogSectionKey;
+  key: CatalogApproachKey;
   items: LoadedInitiative[];
   title: string;
   description: string;
-}> = SECTION_KEYS.map((key) => ({
+  shortDescription: string;
+}> = APPROACH_KEYS.map((key) => ({
   key,
-  items: items.filter((item) => catalogSectionForItem(item) === key),
-  ...SECTION_DETAILS[key],
+  items: items.filter((item) => item.primaryApproachType === key),
+  ...APPROACH_DETAILS[key],
 }));
 
-const actions: string[] = Array.from(new Set(items.flatMap((item) => item.actionsSupported || []))).sort(
-  (a, b) => (ACTION_LABELS[a] || a).localeCompare(ACTION_LABELS[b] || b)
+const actions: string[] = APPROACH_KEYS.filter((key) =>
+  items.some((item) => (item.actionsSupported || []).includes(key))
 );
 const dataTypes: string[] = Array.from(new Set(items.flatMap((item) => item.dataTypes || []))).sort(
   (a, b) => formatDataTypeLabel(a).localeCompare(formatDataTypeLabel(b))
 );
+const formatSecondaryApproaches = (item: LoadedInitiative) =>
+  item.actionsSupported
+    .filter((action) => action !== item.primaryApproachType)
+    .map((action) => formatApproachLabel(action))
+    .join(' / ');
 
 const stats = [
   { label: 'Initiatives', value: String(items.length) },
   { label: 'Live now', value: String(items.filter((item) => item.status === 'live').length) },
   { label: 'WIP tracked', value: String(items.filter((item) => item.status === 'wip').length) },
-  { label: 'Approach types', value: String(actions.length) },
+  { label: 'Approach types', value: String(groupedItems.length) },
 ];
 
 const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
@@ -60,7 +66,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         <h1 class="catalog-title">DataLicenses.org</h1>
         <p class="catalog-summary">
           Live and emerging initiatives that shape AI data access, licensing, and enforcement.
-          Use the <a href="/glossary">glossary</a> for vocabulary, the <a href="/methodology">methodology</a> for how entries are verified, or <a href="/contributing">contribute</a> to add a new one.
+          Use the <a href="/glossary">glossary</a> for vocabulary and the <a href="/methodology">method and contribute guide</a> for how entries are reviewed and how to add one.
         </p>
       </div>
     </header>
@@ -68,7 +74,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     <section class="catalog-start box" aria-label="Catalog snapshot">
       <p class="catalog-start-summary">
         A current snapshot of live and emerging initiatives shaping AI data access, licensing, and
-        enforcement.
+        enforcement. Each initiative appears once under a primary approach type, even when it also
+        uses secondary mechanisms.
       </p>
 
       <dl class="catalog-start-stats">
@@ -107,8 +114,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           <div>
             <dt>Approach type</dt>
             <dd>
-              The kind of mechanism an initiative uses, like preference signals, blocking,
-              licensing, marketplaces, tollgates, or certification.
+              The main mechanism an initiative uses, like preference signals, formal licenses,
+              collectives, marketplaces, tollgates, blocking, infrastructure, or certification.
             </dd>
           </div>
         </dl>
@@ -126,7 +133,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           <input
             id="q"
             type="search"
-            placeholder="Search title, summary, website, evidence, or approach"
+            placeholder="Search title, summary, website, evidence, or approach type"
             autocomplete="off"
             spellcheck="false"
           />
@@ -152,7 +159,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           <div class="catalog-panel-head">
             <p class="catalog-panel-intro">
               Search is always on. Open this panel when you want to sort, focus on live vs WIP,
-              or drill into specific approaches and data types.
+              or drill into specific approach types and data types.
             </p>
             <button type="button" id="reset-filters" class="catalog-reset" hidden>Reset all</button>
           </div>
@@ -178,7 +185,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           </div>
 
           <div class="catalog-panel-block">
-            <span class="catalog-panel-label">Specific actions</span>
+            <span class="catalog-panel-label">Approach types</span>
             <div id="actions" class="catalog-action-list">
               {actions.map((action) => (
                 <button type="button" class="catalog-action" data-action={action} aria-pressed="false">
@@ -208,43 +215,269 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       <div id="active-filter-chips" class="active-filter-chips" hidden></div>
     </section>
 
-    <div id="spreadsheet-view" class="catalog-group-stack">
-      {groupedItems.map((group) => (
-        <section id={`spreadsheet-group-${group.key}`} class="catalog-group" data-catalog-section={group.key}>
-          <div class="catalog-group-head">
-            <div>
-              <p class="catalog-group-kicker">Catalog section</p>
-              <h2 class="catalog-group-title">{group.title}</h2>
-              <p class="catalog-group-copy">{group.description}</p>
-            </div>
-          </div>
-          <div class="catalog-table-wrap">
-            <table class="catalog-table">
-              <thead>
-                <tr>
-                  <th>Initiative</th>
-                  <th>Website</th>
-                  <th>Latest update</th>
-                  <th>Approach</th>
-                </tr>
-              </thead>
-              <tbody id={`table-body-${group.key}`}>
+    <div class="catalog-shell">
+      <aside class="catalog-sidebar box" aria-labelledby="catalog-nav-title">
+        <div class="catalog-sidebar-inner">
+          <p class="eyebrow">Approach types</p>
+          <h2 id="catalog-nav-title" class="catalog-sidebar-title">Jump by primary approach</h2>
+          <p class="catalog-sidebar-copy">
+            Each initiative appears once under its primary approach type. Secondary approaches still
+            show up inside each row or card.
+          </p>
+
+          <nav class="catalog-approach-nav" aria-label="Primary approach type sections">
+            {groupedItems.map((group) => (
+              <a
+                class="catalog-approach-link"
+                href={`#spreadsheet-group-${group.key}`}
+                data-approach-nav={group.key}
+                data-approach-jump={group.key}
+              >
+                <span class="catalog-approach-link-topline">
+                  <span class="catalog-approach-link-title">{group.title}</span>
+                  <span class="catalog-approach-link-count" data-approach-count={group.key}>
+                    {group.items.length}
+                  </span>
+                </span>
+                <span class="catalog-approach-link-copy">{group.shortDescription}</span>
+              </a>
+            ))}
+          </nav>
+        </div>
+      </aside>
+
+      <div class="catalog-main">
+        <div id="spreadsheet-view" class="catalog-group-stack">
+          {groupedItems.map((group) => (
+            <section id={`spreadsheet-group-${group.key}`} class="catalog-group" data-catalog-section={group.key}>
+              <div class="catalog-group-head">
+                <div>
+                  <p class="catalog-group-kicker">Primary approach type</p>
+                  <h2 class="catalog-group-title">{group.title}</h2>
+                  <p class="catalog-group-copy">{group.description}</p>
+                </div>
+              </div>
+              <div class="catalog-table-wrap">
+                <table class="catalog-table">
+                  <thead>
+                    <tr>
+                      <th>Initiative</th>
+                      <th>Website</th>
+                      <th>Latest update</th>
+                      <th>Approach type</th>
+                    </tr>
+                  </thead>
+                  <tbody id={`table-body-${group.key}`}>
+                    {group.items.map((item) => {
+                      const latest = item.latestEvidenceLink;
+                      const primaryApproachLabel = formatApproachLabel(item.primaryApproachType);
+                      const secondaryApproaches = formatSecondaryApproaches(item);
+                      const actionSummary = formatActionSummary(item.actionsSupported);
+                      const pipelineSummary = formatPipelineSummary(item.pipelineStages);
+                      const searchableApproach = [primaryApproachLabel, actionSummary, pipelineSummary]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLowerCase();
+                      const evidenceSearchText = (item.evidenceLinks || [])
+                        .map((link) => link.label)
+                        .join(' ')
+                        .toLowerCase();
+                      const hasMetrics = Boolean(item.usersCount || item.dataVolume || item.moneyVolume);
+                      const hasRowDetails =
+                        (item.evidenceLinks || []).length > 1 ||
+                        (Array.isArray(item.dataTypes) && item.dataTypes.length > 0) ||
+                        (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
+                        hasMetrics;
+
+                      return (
+                        <tr
+                          class="catalog-row"
+                          data-item={item.slug}
+                          data-catalog-section={group.key}
+                          data-title={item.title.toLowerCase()}
+                          data-summary={(item.summary || '').toLowerCase()}
+                          data-tags={(item.tags || []).join(' ').toLowerCase()}
+                          data-types={(item.dataTypes || []).join(' ').toLowerCase()}
+                          data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
+                          data-status={item.status}
+                          data-website={item.website.toLowerCase()}
+                          data-approach={searchableApproach}
+                          data-evidence={evidenceSearchText}
+                          data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
+                        >
+                          <td class="catalog-row-main" data-label="Initiative">
+                            <div class="catalog-row-titleline">
+                              <a class="catalog-row-title" href={`/initiatives/${item.slug}`}>{item.title}</a>
+                              <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
+                            </div>
+                            <p class="catalog-row-summary">{item.summary}</p>
+                            {hasRowDetails && (
+                              <details class="catalog-row-details">
+                                <summary class="catalog-row-details-toggle">More context</summary>
+                                <div class="catalog-row-details-content">
+                                  {(item.evidenceLinks || []).length > 0 && (
+                                    <div class="catalog-row-detail">
+                                      <span class="catalog-row-detail-label">Evidence trail</span>
+                                      <ul class="catalog-row-links">
+                                        {(item.evidenceLinks || []).map((link) => (
+                                          <li>
+                                            <a
+                                              class="link-shell"
+                                              href={link.url}
+                                              target="_blank"
+                                              rel="noopener"
+                                              title={formatLinkTitle(link.url, link.label)}
+                                              aria-label={newTabAriaLabel(link.label)}
+                                            >
+                                              <span class="link-label link-label-multi">{link.label}</span>
+                                            </a>
+                                            <span class="catalog-evidence-date">{formatDate(link.date)}</span>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+
+                                  {Array.isArray(item.dataTypes) && item.dataTypes.length > 0 && (
+                                    <div class="catalog-row-detail">
+                                      <span class="catalog-row-detail-label">Data types</span>
+                                      <div class="catalog-row-detail-chips">
+                                        {item.dataTypes.map((dataType) => (
+                                          <span class="chip">{formatDataTypeLabel(dataType)}</span>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {Array.isArray(item.dependsOn) && item.dependsOn.length > 0 && (
+                                    <div class="catalog-row-detail">
+                                      <span class="catalog-row-detail-label">Uses</span>
+                                      <div class="catalog-row-detail-chips">
+                                        {item.dependsOn.map((dependency) => {
+                                          const related = bySlug[dependency] || byId[dependency];
+                                          const label = (related && related.title) || dependency;
+                                          return <span class="chip">{label}</span>;
+                                        })}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {hasMetrics && (
+                                    <div class="catalog-row-detail">
+                                      <span class="catalog-row-detail-label">Signals</span>
+                                      <div class="catalog-row-detail-chips">
+                                        {item.usersCount && (
+                                          <span class="chip metric-chip">
+                                            <span class="chip-label">Users</span>
+                                            {item.usersCount}
+                                          </span>
+                                        )}
+                                        {item.dataVolume && (
+                                          <span class="chip metric-chip">
+                                            <span class="chip-label">Data</span>
+                                            {item.dataVolume}
+                                          </span>
+                                        )}
+                                        {item.moneyVolume && (
+                                          <span class="chip metric-chip">
+                                            <span class="chip-label">Payments</span>
+                                            {item.moneyVolume}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </details>
+                            )}
+                          </td>
+                          <td class="catalog-row-site" data-label="Website">
+                            <a
+                              class="link-shell"
+                              href={item.website}
+                              target="_blank"
+                              rel="noopener"
+                              title={formatLinkTitle(item.website)}
+                              aria-label={newTabAriaLabel(formatLinkLabel(item.website))}
+                            >
+                              <span class="link-label link-label-single">{formatLinkLabel(item.website)}</span>
+                            </a>
+                          </td>
+                          <td class="catalog-row-update" data-label="Latest update">
+                            {latest ? (
+                              <>
+                                <span class="catalog-row-date">{formatDate(latest.date)}</span>
+                                <a
+                                  class="link-shell"
+                                  href={latest.url}
+                                  target="_blank"
+                                  rel="noopener"
+                                  title={formatLinkTitle(latest.url, latest.label)}
+                                  aria-label={newTabAriaLabel(latest.label)}
+                                >
+                                  <span class="link-label link-label-multi">{latest.label}</span>
+                                </a>
+                              </>
+                            ) : (
+                              <span class="muted">No evidence links yet</span>
+                            )}
+                          </td>
+                          <td class="catalog-row-type" data-label="Approach type">
+                            <span class="catalog-row-primary-type">{primaryApproachLabel}</span>
+                            {secondaryApproaches && (
+                              <span class="catalog-row-subtle">Also uses {secondaryApproaches}</span>
+                            )}
+                            {pipelineSummary && <span class="catalog-row-subtle">{pipelineSummary}</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ))}
+        </div>
+
+        <section id="cards-view" class="catalog-group-stack" hidden>
+          {groupedItems.map((group) => (
+            <section id={`cards-group-${group.key}`} class="catalog-group" data-catalog-section={group.key}>
+              <div class="catalog-group-head">
+                <div>
+                  <p class="catalog-group-kicker">Primary approach type</p>
+                  <h2 class="catalog-group-title">{group.title}</h2>
+                  <p class="catalog-group-copy">{group.description}</p>
+                </div>
+              </div>
+              <div id={`cards-grid-${group.key}`} class="catalog-card-grid">
                 {group.items.map((item) => {
                   const latest = item.latestEvidenceLink;
+                  const primaryApproachLabel = formatApproachLabel(item.primaryApproachType);
+                  const secondaryApproaches = formatSecondaryApproaches(item);
                   const actionSummary = formatActionSummary(item.actionsSupported);
                   const pipelineSummary = formatPipelineSummary(item.pipelineStages);
-                  const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
-                  const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
-                  const hasMetrics = Boolean(item.usersCount || item.dataVolume || item.moneyVolume);
-                  const hasRowDetails =
-                    (item.evidenceLinks || []).length > 1 ||
+                  const websiteLabel = formatLinkLabel(item.website);
+                  const searchableApproach = [primaryApproachLabel, actionSummary, pipelineSummary]
+                    .filter(Boolean)
+                    .join(' ')
+                    .toLowerCase();
+                  const evidenceSearchText = (item.evidenceLinks || [])
+                    .map((link) => link.label)
+                    .join(' ')
+                    .toLowerCase();
+                  const hasDetails =
+                    (item.evidenceLinks || []).length > 0 ||
                     (Array.isArray(item.dataTypes) && item.dataTypes.length > 0) ||
                     (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
-                    hasMetrics;
+                    item.usersCount ||
+                    item.dataVolume ||
+                    item.moneyVolume ||
+                    (Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) ||
+                    (Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0);
 
                   return (
-                    <tr
-                      class="catalog-row"
+                    <article
+                      class="catalog-card"
                       data-item={item.slug}
                       data-catalog-section={group.key}
                       data-title={item.title.toLowerCase()}
@@ -258,395 +491,225 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                       data-evidence={evidenceSearchText}
                       data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
                     >
-                      <td class="catalog-row-main" data-label="Initiative">
-                        <div class="catalog-row-titleline">
-                          <a class="catalog-row-title" href={`/initiatives/${item.slug}`}>{item.title}</a>
-                          <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
-                        </div>
-                        <p class="catalog-row-summary">{item.summary}</p>
-                        {hasRowDetails && (
-                          <details class="catalog-row-details">
-                            <summary class="catalog-row-details-toggle">More context</summary>
-                            <div class="catalog-row-details-content">
-                              {(item.evidenceLinks || []).length > 0 && (
-                                <div class="catalog-row-detail">
-                                  <span class="catalog-row-detail-label">Evidence trail</span>
-                                  <ul class="catalog-row-links">
-                                    {(item.evidenceLinks || []).map((link) => (
-                                      <li>
-                                        <a
-                                          class="link-shell"
-                                          href={link.url}
-                                          target="_blank"
-                                          rel="noopener"
-                                          title={formatLinkTitle(link.url, link.label)}
-                                          aria-label={newTabAriaLabel(link.label)}
-                                        >
-                                          <span class="link-label link-label-multi">{link.label}</span>
-                                        </a>
-                                        <span class="catalog-evidence-date">{formatDate(link.date)}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
+                      <div class="catalog-card-header">
+                        <h2 class="catalog-card-title">
+                          <a class="catalog-card-title-link" href={`/initiatives/${item.slug}`}>{item.title}</a>
+                        </h2>
+                        <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
+                      </div>
 
-                              {Array.isArray(item.dataTypes) && item.dataTypes.length > 0 && (
-                                <div class="catalog-row-detail">
-                                  <span class="catalog-row-detail-label">Data types</span>
-                                  <div class="catalog-row-detail-chips">
-                                    {item.dataTypes.map((dataType) => (
-                                      <span class="chip">{formatDataTypeLabel(dataType)}</span>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
+                      <p class="catalog-card-summary">{item.summary}</p>
 
-                              {Array.isArray(item.dependsOn) && item.dependsOn.length > 0 && (
-                                <div class="catalog-row-detail">
-                                  <span class="catalog-row-detail-label">Uses</span>
-                                  <div class="catalog-row-detail-chips">
-                                    {item.dependsOn.map((dependency) => {
-                                      const related = bySlug[dependency] || byId[dependency];
-                                      const label = (related && related.title) || dependency;
-                                      return <span class="chip">{label}</span>;
-                                    })}
-                                  </div>
-                                </div>
-                              )}
-
-                              {hasMetrics && (
-                                <div class="catalog-row-detail">
-                                  <span class="catalog-row-detail-label">Signals</span>
-                                  <div class="catalog-row-detail-chips">
-                                    {item.usersCount && (
-                                      <span class="chip metric-chip">
-                                        <span class="chip-label">Users</span>
-                                        {item.usersCount}
-                                      </span>
-                                    )}
-                                    {item.dataVolume && (
-                                      <span class="chip metric-chip">
-                                        <span class="chip-label">Data</span>
-                                        {item.dataVolume}
-                                      </span>
-                                    )}
-                                    {item.moneyVolume && (
-                                      <span class="chip metric-chip">
-                                        <span class="chip-label">Payments</span>
-                                        {item.moneyVolume}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </details>
-                        )}
-                      </td>
-                      <td class="catalog-row-site" data-label="Website">
-                        <a
-                          class="link-shell"
-                          href={item.website}
-                          target="_blank"
-                          rel="noopener"
-                          title={formatLinkTitle(item.website)}
-                          aria-label={newTabAriaLabel(formatLinkLabel(item.website))}
-                        >
-                          <span class="link-label link-label-single">{formatLinkLabel(item.website)}</span>
-                        </a>
-                      </td>
-                      <td class="catalog-row-update" data-label="Latest update">
-                        {latest ? (
-                          <>
-                            <span class="catalog-row-date">{formatDate(latest.date)}</span>
-                            <a
-                              class="link-shell"
-                              href={latest.url}
-                              target="_blank"
-                              rel="noopener"
-                              title={formatLinkTitle(latest.url, latest.label)}
-                              aria-label={newTabAriaLabel(latest.label)}
-                            >
-                              <span class="link-label link-label-multi">{latest.label}</span>
-                            </a>
-                          </>
-                        ) : (
-                          <span class="muted">No evidence links yet</span>
-                        )}
-                      </td>
-                      <td class="catalog-row-type" data-label="Approach">
-                        <span>{actionSummary}</span>
-                        {pipelineSummary && <span class="catalog-row-subtle">{pipelineSummary}</span>}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      ))}
-    </div>
-
-    <section id="cards-view" class="catalog-group-stack" hidden>
-      {groupedItems.map((group) => (
-        <section id={`cards-group-${group.key}`} class="catalog-group" data-catalog-section={group.key}>
-          <div class="catalog-group-head">
-            <div>
-              <p class="catalog-group-kicker">Catalog section</p>
-              <h2 class="catalog-group-title">{group.title}</h2>
-              <p class="catalog-group-copy">{group.description}</p>
-            </div>
-          </div>
-          <div id={`cards-grid-${group.key}`} class="catalog-card-grid">
-            {group.items.map((item) => {
-              const latest = item.latestEvidenceLink;
-              const actionSummary = formatActionSummary(item.actionsSupported);
-              const pipelineSummary = formatPipelineSummary(item.pipelineStages);
-              const websiteLabel = formatLinkLabel(item.website);
-              const searchableApproach = [actionSummary, pipelineSummary].filter(Boolean).join(' ').toLowerCase();
-              const evidenceSearchText = (item.evidenceLinks || []).map((link) => link.label).join(' ').toLowerCase();
-              const hasDetails =
-                (item.evidenceLinks || []).length > 0 ||
-                (Array.isArray(item.dataTypes) && item.dataTypes.length > 0) ||
-                (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
-                item.usersCount ||
-                item.dataVolume ||
-                item.moneyVolume ||
-                (Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) ||
-                (Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0);
-
-              return (
-                <article
-                  class="catalog-card"
-                  data-item={item.slug}
-                  data-catalog-section={group.key}
-                  data-title={item.title.toLowerCase()}
-                  data-summary={(item.summary || '').toLowerCase()}
-                  data-tags={(item.tags || []).join(' ').toLowerCase()}
-                  data-types={(item.dataTypes || []).join(' ').toLowerCase()}
-                  data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
-                  data-status={item.status}
-                  data-website={item.website.toLowerCase()}
-                  data-approach={searchableApproach}
-                  data-evidence={evidenceSearchText}
-                  data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
-                >
-                  <div class="catalog-card-header">
-                    <h2 class="catalog-card-title">
-                      <a class="catalog-card-title-link" href={`/initiatives/${item.slug}`}>{item.title}</a>
-                    </h2>
-                    <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
-                  </div>
-
-                  <p class="catalog-card-summary">{item.summary}</p>
-
-                  <dl class="catalog-card-meta">
-                    <div>
-                      <dt>Website</dt>
-                      <dd>
-                        <a
-                          class="catalog-card-meta-link catalog-card-external-link"
-                          href={item.website}
-                          target="_blank"
-                          rel="noopener"
-                          title={formatLinkTitle(item.website)}
-                          aria-label={newTabAriaLabel(websiteLabel)}
-                        >
-                          <span class="link-label link-label-single">{websiteLabel}</span>
-                        </a>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Latest update</dt>
-                      <dd>
-                        {latest ? (
-                          <>
+                      <dl class="catalog-card-meta">
+                        <div>
+                          <dt>Website</dt>
+                          <dd>
                             <a
                               class="catalog-card-meta-link catalog-card-external-link"
-                              href={latest.url}
+                              href={item.website}
                               target="_blank"
                               rel="noopener"
-                              title={formatLinkTitle(latest.url, latest.label)}
-                              aria-label={newTabAriaLabel(latest.label)}
+                              title={formatLinkTitle(item.website)}
+                              aria-label={newTabAriaLabel(websiteLabel)}
                             >
-                              <span class="link-label link-label-multi">{latest.label}</span>
+                              <span class="link-label link-label-single">{websiteLabel}</span>
                             </a>
-                            <span class="catalog-card-date">{formatDate(latest.date)}</span>
-                          </>
-                        ) : (
-                          <span class="muted">No evidence links yet</span>
-                        )}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Approach</dt>
-                      <dd>{actionSummary}</dd>
-                    </div>
-                  </dl>
-
-                  {pipelineSummary && <p class="catalog-card-subtle">{pipelineSummary}</p>}
-
-                  <div class="catalog-card-actions">
-                    <a class="btn btn-quiet catalog-card-button" href={`/initiatives/${item.slug}`}>Open profile</a>
-                    <a class="btn btn-quiet catalog-card-button" href={item.website} target="_blank" rel="noopener">Visit website</a>
-                  </div>
-
-                  {hasDetails && (
-                    <details class="card-details">
-                      <summary class="details-toggle">Details</summary>
-                      <div class="details-content">
-                        {(item.evidenceLinks || []).length > 0 && (
-                          <div class="detail-section detail-stack">
-                            <span class="detail-label">Evidence trail</span>
-                            <ul class="catalog-evidence-list">
-                              {(item.evidenceLinks || []).map((link) => (
-                                <li>
-                                  <a
-                                    class="catalog-card-list-link catalog-card-external-link"
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noopener"
-                                    title={formatLinkTitle(link.url, link.label)}
-                                    aria-label={newTabAriaLabel(link.label)}
-                                  >
-                                    <span class="link-label link-label-multi">{link.label}</span>
-                                  </a>
-                                  <span class="catalog-evidence-date">{formatDate(link.date)}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
-                        {Array.isArray(item.dataTypes) && item.dataTypes.length > 0 && (
-                          <div class="detail-section">
-                            <span class="detail-label">Data types</span>
-                            {item.dataTypes.map((dataType) => (
-                              <span class="chip">{formatDataTypeLabel(dataType)}</span>
-                            ))}
-                          </div>
-                        )}
-
-                        {Array.isArray(item.dependsOn) && item.dependsOn.length > 0 && (
-                          <div class="detail-section">
-                            <span class="detail-label">Uses</span>
-                            {item.dependsOn.map((dependency) => {
-                              const related = bySlug[dependency] || byId[dependency];
-                              const label = (related && related.title) || dependency;
-                              return <span class="chip">{label}</span>;
-                            })}
-                          </div>
-                        )}
-
-                        {(item.usersCount || item.dataVolume || item.moneyVolume) && (
-                          <div class="detail-section">
-                            {item.usersCount && (
-                              <span class="chip metric-chip">
-                                <span class="chip-label">Users</span>
-                                {item.usersCount}
-                              </span>
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Latest update</dt>
+                          <dd>
+                            {latest ? (
+                              <>
+                                <a
+                                  class="catalog-card-meta-link catalog-card-external-link"
+                                  href={latest.url}
+                                  target="_blank"
+                                  rel="noopener"
+                                  title={formatLinkTitle(latest.url, latest.label)}
+                                  aria-label={newTabAriaLabel(latest.label)}
+                                >
+                                  <span class="link-label link-label-multi">{latest.label}</span>
+                                </a>
+                                <span class="catalog-card-date">{formatDate(latest.date)}</span>
+                              </>
+                            ) : (
+                              <span class="muted">No evidence links yet</span>
                             )}
-                            {item.dataVolume && (
-                              <span class="chip metric-chip">
-                                <span class="chip-label">Data</span>
-                                {item.dataVolume}
-                              </span>
-                            )}
-                            {item.moneyVolume && (
-                              <span class="chip metric-chip">
-                                <span class="chip-label">Payments</span>
-                                {item.moneyVolume}
-                              </span>
-                            )}
-                          </div>
-                        )}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Primary approach</dt>
+                          <dd>{primaryApproachLabel}</dd>
+                        </div>
+                      </dl>
 
-                        {Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0 && (
-                          <div class="detail-section detail-stack">
-                            <span class="detail-label">Related references</span>
-                            <ul class="references-list">
-                              {item.referencesResolved.map((reference) => (
-                                <li>
-                                  {reference.url ? (
-                                    <a
-                                      class="catalog-card-list-link catalog-card-external-link"
-                                      href={reference.url}
-                                      target="_blank"
-                                      rel="noopener"
-                                      title={formatLinkTitle(reference.url, formatCitation(reference))}
-                                      aria-label={newTabAriaLabel(formatCitation(reference))}
-                                    >
-                                      <span class="link-label link-label-multi">{formatCitation(reference)}</span>
-                                    </a>
-                                  ) : (
-                                    <span>{formatCitation(reference)}</span>
-                                  )}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                      {secondaryApproaches && (
+                        <p class="catalog-card-secondary">Also uses {secondaryApproaches}</p>
+                      )}
+                      {pipelineSummary && <p class="catalog-card-subtle">{pipelineSummary}</p>}
 
-                        {Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0 && (
-                          <div class="detail-section detail-stack">
-                            <span class="detail-label">Examples</span>
-                            <div class="snippets-wrap">
-                              {item.implementationSnippets.map((snippet) => (
-                                <div class="snippet">
-                                  <div class="snippet-head">
-                                    <span class="chip">{snippet.title}</span>
-                                    {snippet.exampleUrl && (
-                                      <a
-                                        class="catalog-card-source-link catalog-card-external-link"
-                                        href={snippet.exampleUrl}
-                                        target="_blank"
-                                        rel="noopener"
-                                        title={formatLinkTitle(snippet.exampleUrl, snippet.exampleLabel || `${snippet.title} example`)}
-                                        aria-label={newTabAriaLabel(snippet.exampleLabel || `${snippet.title} example`)}
-                                      >
-                                        <span class="link-label link-label-single">{snippet.exampleLabel || 'Example'}</span>
-                                      </a>
-                                    )}
-                                    {snippet.sourceUrl && (
-                                      <a
-                                        class="catalog-card-source-link catalog-card-external-link"
-                                        href={snippet.sourceUrl}
-                                        target="_blank"
-                                        rel="noopener"
-                                        title={formatLinkTitle(snippet.sourceUrl, `${snippet.title} source`)}
-                                        aria-label={newTabAriaLabel(`${snippet.title} source`)}
-                                      >
-                                        <span class="link-label link-label-single">Source</span>
-                                      </a>
-                                    )}
-                                    <button type="button" class="copy" data-code={encodeURIComponent(snippet.code || '')}>Copy</button>
-                                  </div>
-                                  {snippet.summary && <p class="snippet-summary">{snippet.summary}</p>}
-                                  <pre class="code"><code>{snippet.code}</code></pre>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                      <div class="catalog-card-actions">
+                        <a class="btn btn-quiet catalog-card-button" href={`/initiatives/${item.slug}`}>Open profile</a>
+                        <a class="btn btn-quiet catalog-card-button" href={item.website} target="_blank" rel="noopener">Visit website</a>
                       </div>
-                    </details>
-                  )}
-                </article>
-              );
-            })}
-          </div>
+
+                      {hasDetails && (
+                        <details class="card-details">
+                          <summary class="details-toggle">Details</summary>
+                          <div class="details-content">
+                            {(item.evidenceLinks || []).length > 0 && (
+                              <div class="detail-section detail-stack">
+                                <span class="detail-label">Evidence trail</span>
+                                <ul class="catalog-evidence-list">
+                                  {(item.evidenceLinks || []).map((link) => (
+                                    <li>
+                                      <a
+                                        class="catalog-card-list-link catalog-card-external-link"
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener"
+                                        title={formatLinkTitle(link.url, link.label)}
+                                        aria-label={newTabAriaLabel(link.label)}
+                                      >
+                                        <span class="link-label link-label-multi">{link.label}</span>
+                                      </a>
+                                      <span class="catalog-evidence-date">{formatDate(link.date)}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {Array.isArray(item.dataTypes) && item.dataTypes.length > 0 && (
+                              <div class="detail-section">
+                                <span class="detail-label">Data types</span>
+                                {item.dataTypes.map((dataType) => (
+                                  <span class="chip">{formatDataTypeLabel(dataType)}</span>
+                                ))}
+                              </div>
+                            )}
+
+                            {Array.isArray(item.dependsOn) && item.dependsOn.length > 0 && (
+                              <div class="detail-section">
+                                <span class="detail-label">Uses</span>
+                                {item.dependsOn.map((dependency) => {
+                                  const related = bySlug[dependency] || byId[dependency];
+                                  const label = (related && related.title) || dependency;
+                                  return <span class="chip">{label}</span>;
+                                })}
+                              </div>
+                            )}
+
+                            {(item.usersCount || item.dataVolume || item.moneyVolume) && (
+                              <div class="detail-section">
+                                {item.usersCount && (
+                                  <span class="chip metric-chip">
+                                    <span class="chip-label">Users</span>
+                                    {item.usersCount}
+                                  </span>
+                                )}
+                                {item.dataVolume && (
+                                  <span class="chip metric-chip">
+                                    <span class="chip-label">Data</span>
+                                    {item.dataVolume}
+                                  </span>
+                                )}
+                                {item.moneyVolume && (
+                                  <span class="chip metric-chip">
+                                    <span class="chip-label">Payments</span>
+                                    {item.moneyVolume}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            {Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0 && (
+                              <div class="detail-section detail-stack">
+                                <span class="detail-label">Related references</span>
+                                <ul class="references-list">
+                                  {item.referencesResolved.map((reference) => (
+                                    <li>
+                                      {reference.url ? (
+                                        <a
+                                          class="catalog-card-list-link catalog-card-external-link"
+                                          href={reference.url}
+                                          target="_blank"
+                                          rel="noopener"
+                                          title={formatLinkTitle(reference.url, formatCitation(reference))}
+                                          aria-label={newTabAriaLabel(formatCitation(reference))}
+                                        >
+                                          <span class="link-label link-label-multi">{formatCitation(reference)}</span>
+                                        </a>
+                                      ) : (
+                                        <span>{formatCitation(reference)}</span>
+                                      )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0 && (
+                              <div class="detail-section detail-stack">
+                                <span class="detail-label">Examples</span>
+                                <div class="snippets-wrap">
+                                  {item.implementationSnippets.map((snippet) => (
+                                    <div class="snippet">
+                                      <div class="snippet-head">
+                                        <span class="chip">{snippet.title}</span>
+                                        {snippet.exampleUrl && (
+                                          <a
+                                            class="catalog-card-source-link catalog-card-external-link"
+                                            href={snippet.exampleUrl}
+                                            target="_blank"
+                                            rel="noopener"
+                                            title={formatLinkTitle(snippet.exampleUrl, snippet.exampleLabel || `${snippet.title} example`)}
+                                            aria-label={newTabAriaLabel(snippet.exampleLabel || `${snippet.title} example`)}
+                                          >
+                                            <span class="link-label link-label-single">{snippet.exampleLabel || 'Example'}</span>
+                                          </a>
+                                        )}
+                                        {snippet.sourceUrl && (
+                                          <a
+                                            class="catalog-card-source-link catalog-card-external-link"
+                                            href={snippet.sourceUrl}
+                                            target="_blank"
+                                            rel="noopener"
+                                            title={formatLinkTitle(snippet.sourceUrl, `${snippet.title} source`)}
+                                            aria-label={newTabAriaLabel(`${snippet.title} source`)}
+                                          >
+                                            <span class="link-label link-label-single">Source</span>
+                                          </a>
+                                        )}
+                                        <button type="button" class="copy" data-code={encodeURIComponent(snippet.code || '')}>Copy</button>
+                                      </div>
+                                      {snippet.summary && <p class="snippet-summary">{snippet.summary}</p>}
+                                      <pre class="code"><code>{snippet.code}</code></pre>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </details>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </section>
-      ))}
-    </section>
+      </div>
+    </div>
 
     <p id="empty" class="catalog-empty muted" hidden>
       No initiatives match this view. <button id="clear" type="button">Clear filters</button>
     </p>
   </main>
 
-  <script>
+  <script is:inline define:vars={{ approachKeys: APPROACH_KEYS }}>
     // @ts-nocheck
     (() => {
       const queryAll = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -665,7 +728,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       const spreadsheetView = queryOne('#spreadsheet-view');
       const cardsView = queryOne('#cards-view');
       const shareButton = queryOne('#share-view');
-      const sectionKeys = ['new-approaches', 'markets-with-new-approaches', 'markets-only'];
+      const sectionKeys = approachKeys;
+      const defaultSectionKey = sectionKeys[0];
       const tableBodies = Object.fromEntries(
         sectionKeys.map((key) => [key, queryOne(`#table-body-${key}`)])
       );
@@ -677,6 +741,12 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       );
       const cardGroups = Object.fromEntries(
         sectionKeys.map((key) => [key, queryOne(`#cards-group-${key}`)])
+      );
+      const approachLinks = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`[data-approach-nav="${key}"]`)])
+      );
+      const approachCounts = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`[data-approach-count="${key}"]`)])
       );
       const emptyState = queryOne('#empty');
       const clearButton = queryOne('#clear');
@@ -706,6 +776,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           spreadsheetGroups[key],
           cardGrids[key],
           cardGroups[key],
+          approachLinks[key],
+          approachCounts[key],
         ]),
         emptyState,
         panelSummary,
@@ -713,7 +785,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
       if (requiredElements.some((element) => !element)) return;
 
-      let currentView = 'spreadsheet';
+      const defaultView = () => (compactCatalogMedia.matches ? 'cards' : 'spreadsheet');
+      let currentView = defaultView();
       let shareResetTimer = 0;
 
       const actionButtons = () => queryAll('.catalog-action', actionsContainer);
@@ -721,7 +794,6 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       const rowNodes = () => queryAll('.catalog-row', spreadsheetView);
       const cardNodes = () => queryAll('.catalog-card', cardsView);
       const cardsById = () => new Map(cardNodes().map((card) => [card.dataset.item || '', card]));
-      const isCompactCatalog = () => compactCatalogMedia.matches;
       const getActionLabel = (action) =>
         actionButtons().find((button) => button.dataset.action === action)?.textContent?.trim() || action;
       const getDataTypeLabel = (dataType) =>
@@ -730,7 +802,6 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         Array.from(sortSelect.options).find((option) => option.value === sortMode)?.text || sortMode;
 
       function normalizeView(view) {
-        if (isCompactCatalog()) return 'spreadsheet';
         return view === 'cards' ? 'cards' : 'spreadsheet';
       }
 
@@ -806,6 +877,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         });
         spreadsheetView.hidden = currentView !== 'spreadsheet';
         cardsView.hidden = currentView !== 'cards';
+        syncApproachNavigation();
       }
 
       function compareItems(a, b, sortMode) {
@@ -843,7 +915,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           });
         }
         selectedActions.forEach((action) => {
-          chips.push({ kind: 'action', value: action, label: `Action: ${getActionLabel(action)}` });
+          chips.push({ kind: 'action', value: action, label: `Approach type: ${getActionLabel(action)}` });
         });
         selectedDataTypes.forEach((dataType) => {
           chips.push({ kind: 'data-type', value: dataType, label: `Data type: ${getDataTypeLabel(dataType)}` });
@@ -903,6 +975,28 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         renderActiveChips(chips);
       }
 
+      function syncApproachNavigation() {
+        sectionKeys.forEach((key) => {
+          const link = approachLinks[key];
+          if (!(link instanceof HTMLAnchorElement)) return;
+          link.href = currentView === 'cards' ? `#cards-group-${key}` : `#spreadsheet-group-${key}`;
+        });
+      }
+
+      function updateApproachNavigation(visibleBySection) {
+        sectionKeys.forEach((key) => {
+          const link = approachLinks[key];
+          const count = approachCounts[key];
+          const visibleCount = visibleBySection[key] || 0;
+
+          if (count) count.textContent = String(visibleCount);
+          if (link) {
+            link.classList.toggle('is-empty', visibleCount === 0);
+            link.setAttribute('aria-disabled', String(visibleCount === 0));
+          }
+        });
+      }
+
       function syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode) {
         const params = new URLSearchParams();
         if (rawQuery) params.set('q', rawQuery);
@@ -910,7 +1004,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         selectedActions.forEach((action) => params.append('actions', action));
         selectedDataTypes.forEach((dataType) => params.append('types', dataType));
         if (sortMode !== 'latest') params.set('sort', sortMode);
-        if (!isCompactCatalog() && currentView !== 'spreadsheet') params.set('view', currentView);
+        if (currentView !== defaultView()) params.set('view', currentView);
 
         const nextUrl = params.toString() ? `?${params.toString()}` : location.pathname;
         history.replaceState(null, '', nextUrl);
@@ -969,7 +1063,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         visibleItems.forEach((item) => {
           const section = sectionKeys.includes(item.row.dataset.catalogSection)
             ? item.row.dataset.catalogSection
-            : 'new-approaches';
+            : defaultSectionKey;
           visibleBySection[section] += 1;
           tableBodies[section].appendChild(item.row);
           if (item.card) cardGrids[section].appendChild(item.card);
@@ -982,6 +1076,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
         countText.textContent = String(visibleItems.length);
         emptyState.hidden = visibleItems.length !== 0;
+        updateApproachNavigation(visibleBySection);
 
         const chips = buildActiveChips(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode);
         updateSummaries(chips, visibleItems.length, rawQuery);
@@ -1024,7 +1119,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
             setPressed(button, preselectedDataTypes.has(button.dataset.dataType || ''));
           });
         }
-        if (!isCompactCatalog() && viewValue === 'cards') setView('cards');
+        if (viewValue && ['cards', 'spreadsheet'].includes(viewValue)) setView(viewValue);
 
         const hasAdvancedFilters =
           (statusValue && statusValue !== 'all') ||
@@ -1048,6 +1143,21 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         button.addEventListener('click', () => {
           setStatusFilter(button.dataset.statusFilter || 'all');
           applyFilters();
+        });
+      });
+
+      Object.values(approachLinks).forEach((link) => {
+        if (!(link instanceof HTMLAnchorElement)) return;
+
+        link.addEventListener('click', (event) => {
+          const key = link.dataset.approachJump || '';
+          const target = queryOne(
+            currentView === 'cards' ? `#cards-group-${key}` : `#spreadsheet-group-${key}`
+          );
+
+          if (!(target instanceof HTMLElement) || target.hidden) {
+            event.preventDefault();
+          }
         });
       });
 
@@ -1113,17 +1223,6 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
       if (clearButton) clearButton.addEventListener('click', clearFilters);
       if (resetButton) resetButton.addEventListener('click', clearFilters);
-
-      const onCompactCatalogChange = () => {
-        setView('spreadsheet');
-        applyFilters();
-      };
-
-      if (typeof compactCatalogMedia.addEventListener === 'function') {
-        compactCatalogMedia.addEventListener('change', onCompactCatalogChange);
-      } else if (typeof compactCatalogMedia.addListener === 'function') {
-        compactCatalogMedia.addListener(onCompactCatalogChange);
-      }
 
       initializeFromUrl();
       setView(currentView);

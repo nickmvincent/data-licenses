@@ -5,6 +5,7 @@ status: live
 website: 'https://www.gcx.co/'
 actionsSupported:
   - data-market-platform
+primaryApproachType: data-market-platform
 pipelineStages:
   - train
   - fine-tune

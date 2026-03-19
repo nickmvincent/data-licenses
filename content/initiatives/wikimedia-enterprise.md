@@ -5,6 +5,7 @@ status: live
 website: 'https://enterprise.wikimedia.com/'
 actionsSupported:
   - new-infrastructures
+primaryApproachType: new-infrastructures
 pipelineStages:
   - retrieve
   - train

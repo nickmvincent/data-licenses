@@ -5,6 +5,7 @@ status: live
 website: 'https://about.ads.microsoft.com/en/blog/post/february-2026/introducing-the-microsoft-publisher-content-marketplace'
 actionsSupported:
   - data-market-platform
+primaryApproachType: data-market-platform
 pipelineStages:
   - retrieve
   - generate

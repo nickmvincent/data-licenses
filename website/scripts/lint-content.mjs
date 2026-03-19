@@ -13,6 +13,7 @@ import {
   looksLikeRootHomepage,
   parseStatus,
   parseVisibility,
+  requirePrimaryApproachType,
   requireInitiativeType,
   requireString,
   requireUrlString,
@@ -98,8 +99,14 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.md'))) {
   collectIssue(issues, context, () => requireUrlString(parsedFm.website, 'website', context));
   collectIssue(issues, context, () => parseVisibility(parsedFm.visibility, context));
   collectIssue(issues, context, () => requireInitiativeType(parsedFm.type, context));
-  collectIssue(issues, context, () =>
+  const actionsSupported = collectIssue(issues, context, () =>
     normalizeStringArray(parsedFm.actionsSupported, 'actionsSupported', context)
+  );
+  if (Array.isArray(actionsSupported) && actionsSupported.length === 0) {
+    issues.push('actionsSupported must contain at least one approach type');
+  }
+  collectIssue(issues, context, () =>
+    requirePrimaryApproachType(parsedFm.primaryApproachType, actionsSupported || [], context)
   );
   collectIssue(issues, context, () =>
     normalizeStringArray(parsedFm.jurisdictions, 'jurisdictions', context)

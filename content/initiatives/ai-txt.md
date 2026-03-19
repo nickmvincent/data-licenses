@@ -5,6 +5,7 @@ status: wip
 website: 'https://site.spawning.ai/spawning-ai-txt'
 actionsSupported:
   - attach-preference-signal
+primaryApproachType: attach-preference-signal
 dataTypes:
   - web-content
 evidenceLinks:

@@ -5,6 +5,7 @@ status: wip
 website: 'https://datatracker.ietf.org/wg/webbotauth/about/'
 actionsSupported:
   - new-infrastructures
+primaryApproachType: new-infrastructures
 pipelineStages:
   - collect
   - retrieve

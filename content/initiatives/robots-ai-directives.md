@@ -8,6 +8,7 @@ status: live
 website: 'https://platform.openai.com/docs/bots'
 actionsSupported:
   - attach-preference-signal
+primaryApproachType: attach-preference-signal
 dataTypes:
   - web-content
 evidenceLinks:

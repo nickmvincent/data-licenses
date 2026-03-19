@@ -11,8 +11,8 @@ Key paths:
 - `src/data/initiative-curation.json` — Editorial tracking for evidence/adoption research backlog
 - `src/lib/content-loader.ts` — Runtime content loader and derived fields
 - `src/pages/index.astro` — Catalog UI
-- `src/pages/methodology.astro` — Public sourcing rules and merge-ready schema examples
-- `src/pages/contributing.astro` — Contributing guide
+- `src/pages/methodology.astro` — Combined methodology and contributing guide
+- `src/pages/contributing.astro` — Compatibility page pointing to the merged guide
 - `src/pages/data/initiatives.json.ts` — Full catalog JSON endpoint
 - `src/pages/data/curation.json.ts` — Curation/backlog JSON endpoint
 - `scripts/lint-content.mjs` — Content linter

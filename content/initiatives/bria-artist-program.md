@@ -5,6 +5,7 @@ status: live
 website: 'https://bria.ai/artist-program'
 actionsSupported:
   - data-market-platform
+primaryApproachType: data-market-platform
 pipelineStages:
   - train
 dataTypes:

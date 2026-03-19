@@ -7,6 +7,7 @@ status: live
 website: 'https://github.com/Responsible-Dataset-Sharing/easy-dataset-share'
 actionsSupported:
   - technical-blocking
+primaryApproachType: technical-blocking
 pipelineStages:
   - collect
 tags:

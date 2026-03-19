@@ -6,6 +6,7 @@ website: 'https://www.dappier.com/marketplace/'
 actionsSupported:
   - data-market-platform
   - add-tollgate
+primaryApproachType: data-market-platform
 pipelineStages:
   - retrieve
   - generate

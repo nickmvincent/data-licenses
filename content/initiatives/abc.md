@@ -5,6 +5,7 @@ status: wip
 website: 'https://openmined.org/attribution-based-control/'
 actionsSupported:
   - new-infrastructures
+primaryApproachType: new-infrastructures
 evidenceLinks:
   - label: OpenMined explains attribution-based control
     url: 'https://openmined.org/blog/unlocking-a-million-times-more-data-for-ai-through-attribution-based-control/'

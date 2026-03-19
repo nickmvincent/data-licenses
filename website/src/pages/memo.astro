@@ -21,16 +21,23 @@ const slugify = (value: string) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
+const headingIdPattern = /\sid="([^"]+)"/;
 
 const seenHeadingIds = new Map<string, number>();
 const headings: Array<{ id: string; level: number; text: string }> = [];
 
-const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level, inner) => {
+const memoHtml = rendered.code.replace(/<h([23])([^>]*)>(.*?)<\/h\1>/g, (_match, level, attrs, inner) => {
   const text = decodeEntities(stripTags(inner)).trim();
-  const base = slugify(text) || `section-${headings.length + 1}`;
+  const existingId = attrs.match(headingIdPattern)?.[1];
+  const base = existingId || slugify(text) || `section-${headings.length + 1}`;
   const seenCount = seenHeadingIds.get(base) || 0;
   seenHeadingIds.set(base, seenCount + 1);
   const id = seenCount === 0 ? base : `${base}-${seenCount + 1}`;
+  const nextAttrs = existingId
+    ? seenCount === 0
+      ? attrs
+      : attrs.replace(headingIdPattern, ` id="${id}"`)
+    : `${attrs} id="${id}"`;
 
   headings.push({
     id,
@@ -38,17 +45,17 @@ const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level,
     text,
   });
 
-  return `<h${level} id="${id}">${inner}</h${level}>`;
+  return `<h${level}${nextAttrs}>${inner}</h${level}>`;
 });
+const memoBodyHtml = memoHtml.replace(/^<h1\b[^>]*>.*?<\/h1>\s*/i, '');
 ---
 
-<Layout title="Memo">
+<Layout title={memoTitle}>
   <main class="wrap memo-page">
     <header class="page-header memo-header">
       <div>
         <p class="eyebrow">Briefing</p>
-        <h1>Memo</h1>
-        <p class="muted">{memoTitle}</p>
+        <h1>{memoTitle}</h1>
       </div>
       <p>
         <a class="btn" href="/">Back to catalog</a>
@@ -59,7 +66,7 @@ const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level,
       <span id="memo-progress-bar"></span>
     </div>
 
-    <div class="memo-shell">
+    <div class:list={['memo-shell', { 'memo-shell-solo': headings.length === 0 }]}>
       {headings.length > 0 && (
         <aside class="memo-toc box section">
           <p class="eyebrow">On this page</p>
@@ -77,7 +84,7 @@ const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level,
         </aside>
       )}
 
-      <article id="memo-article" class="memo box section" set:html={memoHtml}></article>
+      <article id="memo-article" class="memo box section" set:html={memoBodyHtml}></article>
     </div>
   </main>
 
@@ -152,11 +159,6 @@ const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level,
     flex-wrap: wrap;
   }
 
-  .memo-header .muted {
-    margin: 0.55rem 0 0;
-    max-width: 44rem;
-  }
-
   .memo-progress {
     height: 6px;
     border-radius: 999px;
@@ -179,6 +181,10 @@ const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level,
     gap: 18px;
     align-items: start;
     justify-content: center;
+  }
+
+  .memo-shell.memo-shell-solo {
+    grid-template-columns: minmax(0, 52rem);
   }
 
   .memo-toc {
@@ -223,13 +229,36 @@ const memoHtml = rendered.code.replace(/<h([23])>(.*?)<\/h\1>/g, (_match, level,
     padding: 24px 28px;
   }
 
+  .memo :global(h1:first-child) {
+    margin-top: 0;
+  }
+
+  .memo :global(h1) {
+    font-size: clamp(2.1rem, 3.8vw, 3.2rem);
+  }
+
+  .memo :global(h2) {
+    margin-top: 1.9em;
+  }
+
+  .memo :global(p),
+  .memo :global(li),
+  .memo :global(a) {
+    overflow-wrap: anywhere;
+  }
+
+  .memo :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
   .memo :global(h2),
   .memo :global(h3) {
     scroll-margin-top: 100px;
   }
 
   @media (max-width: 960px) {
-    .memo-shell {
+    .memo-shell,
+    .memo-shell.memo-shell-solo {
       grid-template-columns: 1fr;
     }
 

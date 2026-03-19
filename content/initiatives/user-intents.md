@@ -5,6 +5,7 @@ status: wip
 website: 'https://demo.user-intents.org/'
 actionsSupported:
   - attach-preference-signal
+primaryApproachType: attach-preference-signal
 pipelineStages:
   - collect
   - train

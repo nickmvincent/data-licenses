@@ -8,6 +8,7 @@ summary: >-
 website: 'https://datatracker.ietf.org/wg/aipref/about/'
 actionsSupported:
   - attach-preference-signal
+primaryApproachType: attach-preference-signal
 status: wip
 evidenceLinks:
   - label: Vocabulary draft updated

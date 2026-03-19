@@ -5,6 +5,7 @@ status: live
 website: 'https://www.thedpa.ai/'
 actionsSupported:
   - join-licensing-collective
+primaryApproachType: join-licensing-collective
 tags:
   - trade-alliance
   - policy

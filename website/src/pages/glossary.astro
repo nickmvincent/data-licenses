@@ -277,9 +277,13 @@ const grouped = terms.reduce((acc, t) => {
 }, {} as Record<string, typeof terms>);
 const letters = Object.keys(grouped).sort();
 const totalTerms = terms.length;
+const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 ---
 
-<Layout title="Glossary">
+<Layout
+  title="Glossary"
+  description="Definitions and related references for the AI data licensing, access, and enforcement landscape."
+>
   <main class="wrap glossary-page">
     <header class="page-header glossary-header">
       <h1>Glossary</h1>
@@ -326,7 +330,13 @@ const totalTerms = terms.length;
                     <span class="term-meta-label">External:</span>
                     {item.externalLinks.map((externalLink, i) => (
                       <span>
-                        <a href={externalLink.url} target="_blank" rel="noopener" class="related-link">
+                        <a
+                          href={externalLink.url}
+                          target="_blank"
+                          rel="noopener"
+                          class="related-link"
+                          aria-label={newTabAriaLabel(externalLink.label)}
+                        >
                           {externalLink.label}
                         </a>
                         {i < item.externalLinks.length - 1 && ', '}

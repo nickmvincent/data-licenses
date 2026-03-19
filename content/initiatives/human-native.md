@@ -6,6 +6,7 @@ website: 'https://www.humannative.ai/'
 actionsSupported:
   - data-market-platform
   - new-infrastructures
+primaryApproachType: data-market-platform
 pipelineStages:
   - train
 dataTypes:

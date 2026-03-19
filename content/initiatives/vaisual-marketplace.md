@@ -5,6 +5,7 @@ status: live
 website: 'https://vaisual.com/'
 actionsSupported:
   - data-market-platform
+primaryApproachType: data-market-platform
 pipelineStages:
   - train
   - fine-tune

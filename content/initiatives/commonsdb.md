@@ -5,6 +5,7 @@ status: live
 website: 'https://www.commonsdb.org/'
 actionsSupported:
   - new-infrastructures
+primaryApproachType: new-infrastructures
 jurisdictions:
   - EU
 pipelineStages:

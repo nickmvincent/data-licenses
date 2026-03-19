@@ -5,6 +5,7 @@ status: live
 website: 'https://github.com/Spawning-Inc/datadiligence'
 actionsSupported:
   - new-infrastructures
+primaryApproachType: new-infrastructures
 pipelineStages:
   - collect
   - train

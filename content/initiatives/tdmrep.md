@@ -8,6 +8,7 @@ website: 'https://www.w3.org/community/tdmrep/'
 actionsSupported:
   - attach-preference-signal
   - attach-formal-license
+primaryApproachType: attach-preference-signal
 jurisdictions:
   - EU
 dataTypes:

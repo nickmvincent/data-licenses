@@ -11,6 +11,7 @@ actionsSupported:
   - technical-blocking
   - add-tollgate
   - attach-preference-signal
+primaryApproachType: add-tollgate
 dataTypes:
   - web-content
 usersCount: '1M+ customers enabled AI bot blocking'

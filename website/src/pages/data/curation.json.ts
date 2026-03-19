@@ -13,6 +13,7 @@ export async function GET() {
       title: item.title,
       website: item.website,
       status: item.status,
+      primaryApproachType: item.primaryApproachType,
       latestUpdate: item.latestUpdate ?? null,
       evidenceStatus: item.evidenceStatus,
       hasAdoptionMetrics: item.hasAdoptionMetrics,

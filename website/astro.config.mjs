@@ -8,6 +8,7 @@ const repoRoot = resolve(websiteRoot, '..');
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://datalicenses.org',
   vite: {
     resolve: {
       alias: {

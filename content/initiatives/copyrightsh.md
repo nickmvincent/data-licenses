@@ -5,6 +5,7 @@ status: live
 website: 'https://copyright.sh/'
 actionsSupported:
   - attach-formal-license
+primaryApproachType: attach-formal-license
 dataTypes:
   - web-content
 evidenceLinks:

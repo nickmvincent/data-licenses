@@ -5,6 +5,7 @@ status: wip
 website: 'https://noml.info/'
 actionsSupported:
   - attach-preference-signal
+primaryApproachType: attach-preference-signal
 pipelineStages:
   - collect
   - train

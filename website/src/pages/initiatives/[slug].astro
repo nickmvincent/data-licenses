@@ -6,7 +6,7 @@ import {
   ACTION_LABELS,
   PIPELINE_LABELS,
   STATUS_LABELS,
-  formatActionSummary,
+  formatApproachLabel,
   formatDataTypeLabel,
   formatDate,
   formatLinkLabel,
@@ -36,6 +36,10 @@ const byId = Object.fromEntries(allItems.map((candidate) => [candidate.id, candi
 const dependencyItems = (item.dependsOn || [])
   .map((dependency) => bySlug[dependency] || byId[dependency])
   .filter(Boolean);
+const primaryApproachLabel = formatApproachLabel(item.primaryApproachType);
+const secondaryApproachLabels = item.actionsSupported
+  .filter((action) => action !== item.primaryApproachType)
+  .map((action) => formatApproachLabel(action));
 
 const metricLabels = {
   usersCount: 'Users',
@@ -69,7 +73,7 @@ const relatedItems = allItems
 
 const metadataGroups = [
   {
-    label: 'Actions',
+    label: 'Approach types',
     values: item.actionsSupported.map((action) => ACTION_LABELS[action] || action),
   },
   {
@@ -96,9 +100,10 @@ const metadataGroups = [
 
 const latest = item.latestEvidenceLink;
 const websiteLabel = formatLinkLabel(item.website);
+const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 ---
 
-<Layout title={item.title} description={item.summary}>
+<Layout title={item.title} description={item.summary} type="article">
   <main class="wrap initiative-page">
     <nav class="initiative-breadcrumbs" aria-label="Breadcrumb">
       <a href="/">Catalog</a>
@@ -116,7 +121,15 @@ const websiteLabel = formatLinkLabel(item.website);
         <p class="initiative-summary">{item.summary}</p>
 
         <div class="initiative-hero-actions">
-          <a class="btn btn-primary" href={item.website} target="_blank" rel="noopener">Visit website</a>
+          <a
+            class="btn btn-primary"
+            href={item.website}
+            target="_blank"
+            rel="noopener"
+            aria-label={newTabAriaLabel(`${item.title} website`)}
+          >
+            Visit website
+          </a>
           <a class="btn btn-quiet" href="/">Back to catalog</a>
         </div>
       </div>
@@ -131,6 +144,7 @@ const websiteLabel = formatLinkLabel(item.website);
               target="_blank"
               rel="noopener"
               title={formatLinkTitle(item.website)}
+              aria-label={newTabAriaLabel(websiteLabel)}
             >
               <span class="link-label link-label-single">{websiteLabel}</span>
             </a>
@@ -148,6 +162,7 @@ const websiteLabel = formatLinkLabel(item.website);
                   target="_blank"
                   rel="noopener"
                   title={formatLinkTitle(latest.url, latest.label)}
+                  aria-label={newTabAriaLabel(latest.label)}
                 >
                   <span class="link-label link-label-multi">{latest.label}</span>
                 </a>
@@ -158,9 +173,15 @@ const websiteLabel = formatLinkLabel(item.website);
           </dd>
         </div>
         <div>
-          <dt>Approach</dt>
-          <dd>{formatActionSummary(item.actionsSupported)}</dd>
+          <dt>Primary approach</dt>
+          <dd>{primaryApproachLabel}</dd>
         </div>
+        {secondaryApproachLabels.length > 0 && (
+          <div>
+            <dt>Also uses</dt>
+            <dd>{secondaryApproachLabels.join(' / ')}</dd>
+          </div>
+        )}
         {item.pipelineStages.length > 0 && (
           <div>
             <dt>Pipeline</dt>
@@ -199,6 +220,7 @@ const websiteLabel = formatLinkLabel(item.website);
                     target="_blank"
                     rel="noopener"
                     title={formatLinkTitle(link.url, link.label)}
+                    aria-label={newTabAriaLabel(link.label)}
                   >
                     <span class="link-label link-label-multi">{link.label}</span>
                   </a>
@@ -227,6 +249,7 @@ const websiteLabel = formatLinkLabel(item.website);
                             target="_blank"
                             rel="noopener"
                             title={formatLinkTitle(source.url, source.label)}
+                            aria-label={newTabAriaLabel(source.label)}
                           >
                             <span class="link-label link-label-multi">{source.label}</span>
                           </a>
@@ -256,6 +279,7 @@ const websiteLabel = formatLinkLabel(item.website);
                         target="_blank"
                         rel="noopener"
                         title={formatLinkTitle(snippet.exampleUrl, snippet.exampleLabel || `${snippet.title} example`)}
+                        aria-label={newTabAriaLabel(snippet.exampleLabel || `${snippet.title} example`)}
                       >
                         <span class="link-label link-label-single">{snippet.exampleLabel || 'Example'}</span>
                       </a>
@@ -267,6 +291,7 @@ const websiteLabel = formatLinkLabel(item.website);
                         target="_blank"
                         rel="noopener"
                         title={formatLinkTitle(snippet.sourceUrl, `${snippet.title} source`)}
+                        aria-label={newTabAriaLabel(`${snippet.title} source`)}
                       >
                         <span class="link-label link-label-single">Source</span>
                       </a>
@@ -294,6 +319,7 @@ const websiteLabel = formatLinkLabel(item.website);
                       target="_blank"
                       rel="noopener"
                       title={formatLinkTitle(reference.url, formatCitation(reference))}
+                      aria-label={newTabAriaLabel(formatCitation(reference))}
                     >
                       <span class="link-label link-label-multi">{formatCitation(reference)}</span>
                     </a>

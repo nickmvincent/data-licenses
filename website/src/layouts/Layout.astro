@@ -4,26 +4,35 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  type?: 'website' | 'article';
 }
 
 const {
   title = 'DataLicenses.org',
   description = 'A curated catalog of public initiatives shaping AI data access, licensing, technical enforcement, and creator leverage.',
+  image = '/social-card.svg',
+  type = 'website',
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
 const pageTitle = title === 'DataLicenses.org' ? title : `${title} | DataLicenses.org`;
+const site = Astro.site ?? new URL('https://datalicenses.org');
+const canonicalUrl = new URL(currentPath, site).toString();
+const socialImageUrl = new URL(image, site).toString();
+const isGuidePath = currentPath.startsWith('/methodology') || currentPath.startsWith('/contributing');
 const isNavActive = (href: string) =>
   href === '/'
     ? currentPath === '/' || currentPath.startsWith('/initiatives/')
-    : currentPath.startsWith(href);
+    : href === '/methodology'
+      ? isGuidePath
+      : currentPath.startsWith(href);
 
 const navLinks = [
   { href: '/', label: 'Catalog' },
   { href: '/memo', label: 'Memo' },
   { href: '/glossary', label: 'Glossary' },
-  { href: '/methodology', label: 'Methodology' },
-  { href: '/contributing', label: 'Contribute' },
+  { href: '/methodology', label: 'Method & Contribute' },
 ];
 
 const alsoLikeLinks = [
@@ -56,9 +65,26 @@ const alsoLikeLinks = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="canonical" href={canonicalUrl} />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f4efe6" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="application-name" content="DataLicenses.org" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4efe6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111513" />
+    <meta property="og:site_name" content="DataLicenses.org" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:alt" content="DataLicenses.org catalog preview" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageUrl} />
     <title>{pageTitle}</title>
     <script is:inline>
       (() => {
@@ -83,7 +109,23 @@ const alsoLikeLinks = [
           <span class="brand-tag">AI data rights field guide</span>
         </a>
 
-        <div class="navbar-links">
+        <button
+          type="button"
+          id="nav-toggle"
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="site-nav-panel"
+          aria-label="Open navigation menu"
+        >
+          <span class="nav-toggle-label">Menu</span>
+          <span class="nav-toggle-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+
+        <div id="site-nav-panel" class="navbar-links">
           {navLinks.map((link) => (
             <a
               href={link.href}
@@ -98,12 +140,19 @@ const alsoLikeLinks = [
           ))}
 
           <a href="/data/initiatives.json" class="nav-link nav-link-secondary" title="JSON API" aria-label="Open the catalog API">API</a>
-
-          <button type="button" id="theme-toggle" class="theme-toggle" title="Toggle light or dark theme" aria-label="Toggle theme">
-            <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-            <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </button>
         </div>
+
+        <button
+          type="button"
+          id="theme-toggle"
+          class="theme-toggle"
+          title="Switch to dark theme"
+          aria-label="Switch to dark theme"
+          aria-pressed="false"
+        >
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
       </div>
     </nav>
 
@@ -131,9 +180,12 @@ const alsoLikeLinks = [
     <script is:inline>
       (() => {
         const root = document.documentElement;
+        const navbar = document.querySelector('.navbar');
         const toggle = document.getElementById('theme-toggle');
+        const navToggle = document.getElementById('nav-toggle');
         const storageKey = 'theme';
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const desktopNavMedia = window.matchMedia('(min-width: 721px)');
 
         function readStoredTheme() {
           const saved = localStorage.getItem(storageKey);
@@ -145,7 +197,26 @@ const alsoLikeLinks = [
         }
 
         function applyTheme(theme) {
-          root.classList.toggle('dark', theme === 'dark');
+          const isDark = theme === 'dark';
+          root.classList.toggle('dark', isDark);
+
+          if (toggle instanceof HTMLButtonElement) {
+            const nextTheme = isDark ? 'light' : 'dark';
+            toggle.setAttribute('aria-pressed', String(isDark));
+            toggle.setAttribute('aria-label', `Switch to ${nextTheme} theme`);
+            toggle.title = `Switch to ${nextTheme} theme`;
+          }
+        }
+
+        function setNavOpen(isOpen) {
+          if (!(navbar instanceof HTMLElement) || !(navToggle instanceof HTMLButtonElement)) return;
+
+          navbar.classList.toggle('menu-open', isOpen);
+          navToggle.setAttribute('aria-expanded', String(isOpen));
+          navToggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+
+          const label = navToggle.querySelector('.nav-toggle-label');
+          if (label) label.textContent = isOpen ? 'Close' : 'Menu';
         }
 
         applyTheme(readStoredTheme() || currentSystemTheme());
@@ -158,8 +229,29 @@ const alsoLikeLinks = [
           });
         }
 
+        if (navbar instanceof HTMLElement && navToggle instanceof HTMLButtonElement) {
+          setNavOpen(false);
+
+          navToggle.addEventListener('click', () => {
+            setNavOpen(!navbar.classList.contains('menu-open'));
+          });
+
+          navbar.querySelectorAll('.navbar-links a').forEach((link) => {
+            link.addEventListener('click', () => {
+              if (!desktopNavMedia.matches) setNavOpen(false);
+            });
+          });
+
+          document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && navbar.classList.contains('menu-open')) {
+              setNavOpen(false);
+            }
+          });
+        }
+
         const legacyExecCommand = /** @type {{ [key: string]: any }} */ (document)['execCommand']?.bind(document);
         const legacyAddListener = /** @type {{ [key: string]: any }} */ (mediaQuery)['addListener']?.bind(mediaQuery);
+        const legacyDesktopAddListener = /** @type {{ [key: string]: any }} */ (desktopNavMedia)['addListener']?.bind(desktopNavMedia);
 
         async function copyText(value) {
           if (navigator.clipboard?.writeText) {
@@ -216,6 +308,16 @@ const alsoLikeLinks = [
         } else if (typeof legacyAddListener === 'function') {
           legacyAddListener(onSystemThemeChange);
         }
+
+        const onDesktopNavChange = () => {
+          if (desktopNavMedia.matches) setNavOpen(false);
+        };
+
+        if (typeof desktopNavMedia.addEventListener === 'function') {
+          desktopNavMedia.addEventListener('change', onDesktopNavChange);
+        } else if (typeof legacyDesktopAddListener === 'function') {
+          legacyDesktopAddListener(onDesktopNavChange);
+        }
       })();
     </script>
   </body>
@@ -254,8 +356,8 @@ const alsoLikeLinks = [
     margin: 0 auto;
     padding: 0 24px;
     min-height: 68px;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 16px;
   }
@@ -285,8 +387,10 @@ const alsoLikeLinks = [
   .navbar-links {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 6px;
     flex-wrap: wrap;
+    min-width: 0;
   }
 
   .nav-link {
@@ -343,6 +447,56 @@ const alsoLikeLinks = [
   .theme-toggle:hover {
     border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
     color: var(--text);
+  }
+
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 40px;
+    padding: 0 0.95rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 94%, transparent);
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 600;
+    transition:
+      border-color 0.18s ease,
+      background 0.18s ease,
+      color 0.18s ease;
+  }
+
+  .nav-toggle:hover {
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    background: color-mix(in srgb, var(--accent-soft) 45%, var(--card));
+  }
+
+  .nav-toggle-icon {
+    display: inline-grid;
+    gap: 3px;
+  }
+
+  .nav-toggle-icon span {
+    width: 14px;
+    height: 1.5px;
+    border-radius: 999px;
+    background: currentColor;
+    transition:
+      transform 0.18s ease,
+      opacity 0.18s ease;
+  }
+
+  .navbar.menu-open .nav-toggle-icon span:nth-child(1) {
+    transform: translateY(4.5px) rotate(45deg);
+  }
+
+  .navbar.menu-open .nav-toggle-icon span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .navbar.menu-open .nav-toggle-icon span:nth-child(3) {
+    transform: translateY(-4.5px) rotate(-45deg);
   }
 
   .icon-sun {
@@ -442,24 +596,43 @@ const alsoLikeLinks = [
   @media (max-width: 720px) {
     .navbar-inner {
       padding: 12px 16px;
-      align-items: flex-start;
-      flex-direction: column;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 10px;
+    }
+
+    .nav-toggle {
+      display: inline-flex;
+      grid-column: 3;
     }
 
     .navbar-links {
+      display: none;
+      grid-column: 1 / -1;
       width: 100%;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      padding-bottom: 4px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: color-mix(in srgb, var(--card) 94%, transparent);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .navbar.menu-open .navbar-links {
+      display: flex;
     }
 
     .nav-link {
-      min-height: 38px;
-      white-space: nowrap;
+      width: 100%;
+      min-height: 44px;
+      justify-content: flex-start;
+      white-space: normal;
     }
 
     .theme-toggle {
-      flex: 0 0 auto;
+      grid-column: 2;
+      justify-self: end;
     }
   }
 </style>

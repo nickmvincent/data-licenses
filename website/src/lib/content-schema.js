@@ -27,6 +27,7 @@
  * @property {Visibility} visibility
  * @property {'data_license_initiative'} type
  * @property {string[]} actionsSupported
+ * @property {string} primaryApproachType
  * @property {string[]} jurisdictions
  * @property {string[]} signals
  * @property {string[]} pipelineStages
@@ -123,6 +124,19 @@ export function normalizeStringArray(value, field, context) {
   }
 
   return value.map((entry, index) => requireString(entry, `${field}[${index}]`, context));
+}
+
+export function requirePrimaryApproachType(value, actionsSupported, context) {
+  const primaryApproachType = requireString(value, 'primaryApproachType', context);
+  if (!Array.isArray(actionsSupported) || actionsSupported.length === 0) {
+    throw new Error(`${context} has invalid actionsSupported: expected at least one approach type`);
+  }
+  if (!actionsSupported.includes(primaryApproachType)) {
+    throw new Error(
+      `${context} has invalid primaryApproachType: ${primaryApproachType} must also appear in actionsSupported`
+    );
+  }
+  return primaryApproachType;
 }
 
 export function cleanLegacyEvidenceLabel(value) {
@@ -270,6 +284,10 @@ export function normalizeImplementationSnippets(value, context) {
 
 export function normalizeInitiativeFrontmatter(data, context, options = {}) {
   const { allowLegacyEvidenceFallback = true } = options;
+  const actionsSupported = normalizeStringArray(data.actionsSupported, 'actionsSupported', context);
+  if (actionsSupported.length === 0) {
+    throw new Error(`${context} has invalid actionsSupported: expected at least one approach type`);
+  }
 
   return /** @type {NormalizedInitiativeFrontmatter} */ ({
     id: optionalString(data.id),
@@ -279,7 +297,8 @@ export function normalizeInitiativeFrontmatter(data, context, options = {}) {
     status: parseStatus(data.status, context),
     visibility: parseVisibility(data.visibility, context),
     type: requireInitiativeType(data.type, context),
-    actionsSupported: normalizeStringArray(data.actionsSupported, 'actionsSupported', context),
+    actionsSupported,
+    primaryApproachType: requirePrimaryApproachType(data.primaryApproachType, actionsSupported, context),
     jurisdictions: normalizeStringArray(data.jurisdictions, 'jurisdictions', context),
     signals: normalizeStringArray(data.signals, 'signals', context),
     pipelineStages: normalizeStringArray(data.pipelineStages, 'pipelineStages', context),

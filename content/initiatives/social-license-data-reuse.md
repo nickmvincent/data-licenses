@@ -5,6 +5,7 @@ status: wip
 website: 'https://blog.thegovlab.org/reimagining-data-governance-for-ai-operationalizing-social-licensing-for-data-reuse'
 actionsSupported:
   - new-infrastructures
+primaryApproachType: new-infrastructures
 pipelineStages:
   - collect
   - train

@@ -6,6 +6,7 @@ website: 'https://tdmai.org/'
 actionsSupported:
   - attach-preference-signal
   - new-infrastructures
+primaryApproachType: attach-preference-signal
 jurisdictions:
   - EU
 pipelineStages:

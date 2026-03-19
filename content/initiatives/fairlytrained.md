@@ -5,6 +5,7 @@ status: live
 website: 'https://www.fairlytrained.org/'
 actionsSupported:
   - certification
+primaryApproachType: certification
 usersCount: '16+ announced certified entities'
 metricEvidence:
   usersCount:

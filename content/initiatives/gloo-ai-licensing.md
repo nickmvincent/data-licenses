@@ -5,6 +5,7 @@ status: live
 website: 'https://gloo.com/resources/news/gloo-launches-first-ai-licensing-offering-for-faith-ecosystem/'
 actionsSupported:
   - data-market-platform
+primaryApproachType: data-market-platform
 pipelineStages:
   - retrieve
   - generate

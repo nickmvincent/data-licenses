@@ -6,6 +6,7 @@ website: 'https://huggingface.co/docs/hub/datasets-gated'
 actionsSupported:
   - technical-blocking
   - new-infrastructures
+primaryApproachType: technical-blocking
 pipelineStages:
   - collect
   - train

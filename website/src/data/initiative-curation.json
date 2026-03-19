@@ -99,6 +99,10 @@
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Human Native has dated product and acquisition updates, but I could not find a stable public marketplace-size metric."
   },
+  "humpback": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Public marketing materials make the tollgate concept legible, but I could not yet find a stable dated official launch or adoption metric."
+  },
   "iptc-plus-data-mining-metadata": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Standards-layer metadata fields are live, but public deployment is diffuse and hard to count cleanly."

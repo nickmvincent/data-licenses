@@ -5,6 +5,7 @@ status: wip
 website: 'https://github.com/creativecommons/cc-signals'
 actionsSupported:
   - attach-preference-signal
+primaryApproachType: attach-preference-signal
 evidenceLinks:
   - label: Response to feedback
     url: 'https://creativecommons.org/2025/08/27/we-asked-you-answered-how-your-feedback-shapes-cc-signals/'

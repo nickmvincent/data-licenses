@@ -5,6 +5,7 @@ status: wip
 website: 'https://allenai.org/blog/flexolmo'
 actionsSupported:
   - new-infrastructures
+primaryApproachType: new-infrastructures
 pipelineStages:
   - train
 dataTypes:

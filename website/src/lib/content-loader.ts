@@ -43,6 +43,7 @@ export type LoadedInitiative = {
   body: string;
   website: string;
   actionsSupported: string[];
+  primaryApproachType: string;
   jurisdictions: string[];
   signals: string[];
   pipelineStages: string[];
@@ -167,6 +168,7 @@ export async function loadInitiatives(): Promise<LoadedInitiative[]> {
       body,
       website: frontmatter.website,
       actionsSupported: frontmatter.actionsSupported,
+      primaryApproachType: frontmatter.primaryApproachType,
       jurisdictions: frontmatter.jurisdictions,
       signals: frontmatter.signals,
       pipelineStages: frontmatter.pipelineStages,

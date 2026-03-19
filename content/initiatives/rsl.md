@@ -8,6 +8,7 @@ website: 'https://rslstandard.org/'
 actionsSupported:
   - attach-formal-license
   - attach-preference-signal
+primaryApproachType: attach-formal-license
 dataTypes:
   - web-content
 usersCount: '1,500+ organizations'

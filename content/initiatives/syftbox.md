@@ -5,6 +5,7 @@ status: live
 website: 'https://openmined.org/syftbox/'
 actionsSupported:
   - new-infrastructures
+primaryApproachType: new-infrastructures
 pipelineStages:
   - train
   - retrieve

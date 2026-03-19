@@ -6,6 +6,7 @@ website: 'https://withprotege.ai/'
 actionsSupported:
   - data-market-platform
   - new-infrastructures
+primaryApproachType: data-market-platform
 pipelineStages:
   - train
   - fine-tune

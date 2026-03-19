@@ -1,0 +1,15 @@
+{
+  "name": "DataLicenses.org",
+  "short_name": "DataLicenses",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4efe6",
+  "theme_color": "#0b6a61",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ]
+}

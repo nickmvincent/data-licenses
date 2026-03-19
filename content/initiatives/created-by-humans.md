@@ -5,6 +5,7 @@ status: live
 website: 'https://www.createdbyhumans.ai/'
 actionsSupported:
   - data-market-platform
+primaryApproachType: data-market-platform
 pipelineStages:
   - train
   - retrieve

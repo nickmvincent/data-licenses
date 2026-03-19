@@ -6,6 +6,7 @@ website: 'https://haveibeentrained.com/'
 actionsSupported:
   - attach-preference-signal
   - new-infrastructures
+primaryApproachType: attach-preference-signal
 pipelineStages:
   - collect
   - train

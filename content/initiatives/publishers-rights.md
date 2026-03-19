@@ -5,6 +5,7 @@ status: live
 website: 'https://publishersrights.org/'
 actionsSupported:
   - join-licensing-collective
+primaryApproachType: join-licensing-collective
 pipelineStages:
   - train
   - retrieve

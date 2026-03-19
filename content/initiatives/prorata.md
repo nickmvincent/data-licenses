@@ -9,6 +9,7 @@ actionsSupported:
   - join-licensing-collective
   - data-market-platform
   - add-tollgate
+primaryApproachType: join-licensing-collective
 dataTypes:
   - text
 tags:

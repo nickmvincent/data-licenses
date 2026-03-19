@@ -5,6 +5,7 @@ status: wip
 website: 'https://mlcommons.org/2025/03/unlocking-data-collab/'
 actionsSupported:
   - attach-formal-license
+primaryApproachType: attach-formal-license
 pipelineStages:
   - collect
   - train
