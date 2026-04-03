@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "cf:deploy": "npx wrangler pages deploy dist --project-name datalicenses",
-    "lint:content": "node scripts/lint-content.mjs"
+    "lint:content": "node scripts/lint-content.mjs",
+    "export:xlsx": "node scripts/export-catalog-xlsx.mjs"
   },
   "dependencies": {
     "astro": "^5.13.7",

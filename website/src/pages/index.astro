@@ -52,6 +52,12 @@ const stats = [
   { label: 'Approach types', value: String(groupedItems.length) },
 ];
 
+const latestTrackedUpdate = items.reduce<string | null>((latest, item) => {
+  if (!item.latestUpdate) return latest;
+  if (!latest) return item.latestUpdate;
+  return new Date(item.latestUpdate).getTime() > new Date(latest).getTime() ? item.latestUpdate : latest;
+}, null);
+
 const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 ---
 
@@ -61,23 +67,20 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 >
   <main class="wrap">
     <header class="catalog-header">
-      <div>
-        <p class="eyebrow">Community-curated catalog</p>
+      <div class="catalog-header-main">
         <h1 class="catalog-title">DataLicenses.org</h1>
         <p class="catalog-summary">
-          Live and emerging initiatives that shape AI data access, licensing, and enforcement.
-          Use the <a href="/glossary">glossary</a> for vocabulary and the <a href="/methodology">method and contribute guide</a> for how entries are reviewed and how to add one.
+          A working catalog of initiatives shaping AI data access, licensing, and enforcement. See
+          the <a href="/glossary">glossary</a> for terms and the <a href="/methodology">method and
+          contribute guide</a> for how entries are reviewed and how to add one.
         </p>
+        {latestTrackedUpdate && (
+          <p class="catalog-masthead-meta">Updated {formatDate(latestTrackedUpdate)}</p>
+        )}
       </div>
     </header>
 
     <section class="catalog-start box" aria-label="Catalog snapshot">
-      <p class="catalog-start-summary">
-        A current snapshot of live and emerging initiatives shaping AI data access, licensing, and
-        enforcement. Each initiative appears once under a primary approach type, even when it also
-        uses secondary mechanisms.
-      </p>
-
       <dl class="catalog-start-stats">
         {stats.map((stat) => (
           <div>
@@ -310,7 +313,20 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                               <a class="catalog-row-title" href={`/initiatives/${item.slug}`}>{item.title}</a>
                               <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
                             </div>
-                            <p class="catalog-row-summary">{item.summary}</p>
+                            {item.summary && (
+                              <div class="catalog-row-summary-wrap" data-summary-wrap>
+                                <p class="catalog-row-summary" data-summary>{item.summary}</p>
+                                <button
+                                  type="button"
+                                  class="catalog-row-summary-toggle"
+                                  data-summary-toggle
+                                  aria-expanded="false"
+                                  hidden
+                                >
+                                  Show more
+                                </button>
+                              </div>
+                            )}
                             {hasRowDetails && (
                               <details class="catalog-row-details">
                                 <summary class="catalog-row-details-toggle">More context</summary>
@@ -794,6 +810,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       const rowNodes = () => queryAll('.catalog-row', spreadsheetView);
       const cardNodes = () => queryAll('.catalog-card', cardsView);
       const cardsById = () => new Map(cardNodes().map((card) => [card.dataset.item || '', card]));
+      let summaryRefreshFrame = 0;
       const getActionLabel = (action) =>
         actionButtons().find((button) => button.dataset.action === action)?.textContent?.trim() || action;
       const getDataTypeLabel = (dataType) =>
@@ -878,6 +895,51 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         spreadsheetView.hidden = currentView !== 'spreadsheet';
         cardsView.hidden = currentView !== 'cards';
         syncApproachNavigation();
+        scheduleSummaryToggleRefresh();
+      }
+
+      function setSummaryExpanded(summary, toggle, expanded) {
+        summary.classList.toggle('is-clamped', !expanded);
+        summary.classList.toggle('is-expanded', expanded);
+        toggle.setAttribute('aria-expanded', String(expanded));
+        toggle.textContent = expanded ? 'Show less' : 'Show more';
+      }
+
+      function refreshSummaryToggles() {
+        if (currentView !== 'spreadsheet') return;
+
+        queryAll('[data-summary-wrap]', spreadsheetView).forEach((wrap) => {
+          if (!(wrap instanceof HTMLElement) || wrap.closest('[hidden]')) return;
+
+          const summary = queryOne('[data-summary]', wrap);
+          const toggle = queryOne('[data-summary-toggle]', wrap);
+          if (!(summary instanceof HTMLElement) || !(toggle instanceof HTMLButtonElement)) return;
+
+          const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+
+          summary.classList.remove('is-expanded');
+          summary.classList.add('is-clamped');
+
+          const needsToggle = summary.scrollHeight - summary.clientHeight > 4;
+
+          if (!needsToggle) {
+            summary.classList.remove('is-clamped');
+            toggle.hidden = true;
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.textContent = 'Show more';
+            return;
+          }
+
+          toggle.hidden = false;
+          setSummaryExpanded(summary, toggle, isExpanded);
+        });
+      }
+
+      function scheduleSummaryToggleRefresh() {
+        window.cancelAnimationFrame(summaryRefreshFrame);
+        summaryRefreshFrame = window.requestAnimationFrame(() => {
+          refreshSummaryToggles();
+        });
       }
 
       function compareItems(a, b, sortMode) {
@@ -1081,6 +1143,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         const chips = buildActiveChips(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode);
         updateSummaries(chips, visibleItems.length, rawQuery);
         syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode);
+        scheduleSummaryToggleRefresh();
       }
 
       function clearFilters() {
@@ -1161,6 +1224,21 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         });
       });
 
+      spreadsheetView.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const toggle = target.closest('[data-summary-toggle]');
+        if (!(toggle instanceof HTMLButtonElement)) return;
+
+        const wrap = toggle.closest('[data-summary-wrap]');
+        const summary = wrap ? queryOne('[data-summary]', wrap) : null;
+        if (!(summary instanceof HTMLElement)) return;
+
+        const expanded = toggle.getAttribute('aria-expanded') !== 'true';
+        setSummaryExpanded(summary, toggle, expanded);
+      });
+
       actionsContainer.addEventListener('click', (event) => {
         const target = event.target;
         if (!(target instanceof Element)) return;
@@ -1220,6 +1298,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
       searchInput.addEventListener('input', applyFilters);
       sortSelect.addEventListener('change', applyFilters);
+      window.addEventListener('resize', scheduleSummaryToggleRefresh);
+      document.fonts?.ready?.then(scheduleSummaryToggleRefresh).catch(() => {});
 
       if (clearButton) clearButton.addEventListener('click', clearFilters);
       if (resetButton) resetButton.addEventListener('click', clearFilters);

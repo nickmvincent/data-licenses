@@ -112,6 +112,9 @@ Commands:
 - `npm run build`
 - `npm run preview`
 - `npm run check`
+- `npm run export:xlsx`
+
+`npm run export:xlsx` writes `dist/data-licenses-catalog.xlsx`, with worksheet tabs for the main initiative catalog plus supporting evidence, references, implementation snippets, and longer-form site content. Pass a custom output path with `npm run export:xlsx -- ./dist/custom-name.xlsx`.
 
 ## Deploying to Cloudflare Pages
 
