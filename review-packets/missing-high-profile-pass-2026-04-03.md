@@ -1,0 +1,65 @@
+# Missing High-Profile Initiative Pass - 2026-04-03
+
+Method: I mapped the current catalog by `primaryApproachType`, used four subagents to search each category for recent gaps, and then manually verified the strongest candidates with official pages where possible. This pass is about likely missing initiatives, not freshness updates to entries already in `content/initiatives/`.
+
+## Snapshot
+
+- 8 approach categories reviewed.
+- 10 high-confidence missing candidates below.
+- 7 additional candidates or edge cases that likely need editorial judgment before they belong in the catalog.
+- I did not find a clean new `certification` candidate centered on AI training-data sourcing or rights compliance.
+
+## High-Confidence Missing Candidates
+
+### attach-preference-signal
+
+- `trust.txt` with `datatrainingallowed=`: On `2024-04-04`, the `trust.txt` reference document added a machine-readable `datatrainingallowed=` field for AI-related permissions, and on `2025-02-21` RJI described the network as covering about `3,000` participating publishers. This looks like a concrete, recent preference-signal initiative that is not yet represented in the catalog. Sources: [trust.txt spec update](https://journallist.net/reference-document-for-trust-txt-specifications), [RJI browser-extension / network update](https://rjionline.org/news/trust-txt-launches-browser-extension-making-verification-of-trusted-news-sources-easier-for-publishers-and-audiences-alike/).
+
+### attach-formal-license / join-licensing-collective
+
+- `CCC AI licensing suite`: CCC launched AI re-use rights for internal AI use on `2024-07-16`, announced the `AI Systems Training License` on `2025-03-04`, and expanded to `four AI licensing options` on `2026-03-03`. This is one of the clearest large-scale AI licensing programs missing from the catalog. Primary fit is probably `join-licensing-collective`, with a strong secondary fit as `attach-formal-license`. Sources: [2024 launch](https://www.copyright.com/blog/ccc-pioneers-collective-licensing-solution-for-content-usage-in-internal-ai-systems/), [2025 AI Systems Training License](https://www.copyright.com/media-press-releases/ccc-announces-ai-systems-training-license-for-the-external-use-of-copyrighted-works-coming-soon/), [2026 portfolio expansion](https://www.copyright.com/media-press-releases/ccc-launching-new-ai-content-re-use-rights-for-u-s-academic-customers-and-transactional-licensing-capabilities-for-ai/), [AI licensing overview](https://www.copyright.com/solutions-rightsholders-ai/).
+
+### join-licensing-collective
+
+- `CLA Generative AI Training Licence` / `CLA Generative AI Solution`: CLA announced development of its collective AI training licence on `2025-04-23`, positioned it as a scalable remuneration layer for publishers and authors, and coverage in March 2026 indicates it remains an active launch-track initiative. This looks like a strong UK collective-licensing counterpart to CCC. Sources: [CLA announcement](https://cla.co.uk/development-of-cla-generative-ai-licence/), [CLA AI and copyright hub](https://cla.co.uk/ai-and-copyright/), [ALCS AI licences page](https://www.alcs.co.uk/ai-licences/), [Press Gazette, 2026-03-10](https://pressgazette.co.uk/news/new-ai-licensing-scheme-helps-smaller-publishers-strike-deals-with-platforms/).
+
+- `SPUR` (`Standards for Publisher Usage Rights`): On `2026-02-26`, the Guardian announced that the BBC, Financial Times, Guardian, Sky News, and Telegraph Media Group had formed SPUR to create shared standards and responsible licensing frameworks for AI use of journalism. It is a very recent, very visible coalition-level initiative and feels notable enough to track even though it is earlier-stage than CCC or CLA. Sources: [Guardian press release](https://www.theguardian.com/gnm-press-office/2026/feb/26/major-news-brands-including-the-guardian-form-new-coalition-to-promote-responsible-ai-licensing), [Guardian news article](https://www.theguardian.com/media/2026/feb/26/guardian-joins-media-coalition-to-protect-original-journalism-from-unpaid-use-by-ai).
+
+### data-market-platform
+
+- `Stack Overflow Data Licensing`: Stack Overflow’s licensing product won API World’s Best AI API award on `2024-11-06`, expanded through Databricks Marketplace on `2025-06-09`, and by `2025-09-04` was being presented as `Stack Data Licensing` rather than just `OverflowAPI`. This is a conspicuous missing marketplace / licensed-data entry. Sources: [product page](https://stackoverflow.co/data-licensing/), [2024 award announcement](https://stackoverflow.co/company/press/archive/stack-overflow-overflow-api-award/), [Databricks Marketplace announcement](https://stackoverflow.co/company/press/archive/stack-overflow-databricks-marketplace/), [2025 product renaming / award note](https://stackoverflow.co/company/press/archive/stack-overflow-products-api-world-cloudx).
+
+- `DataSeeds.AI`: Zedge launched DataSeeds.AI on `2025-06-05` as a rights-cleared content marketplace for AI training sets, announced a sample dataset on `2025-06-09`, and later reported growing enterprise demand on `2025-10-20`. It is not as culturally prominent as Stack Overflow, but it is a real, recent, public-company marketplace launch squarely in scope. Sources: [launch announcement](https://www.accessnewswire.com/newsroom/en/computers-technology-and-internet/zedge-launches-dataseeds.ai-a-content-marketplace-for-ai-training-1035851), [sample dataset release](https://www.accessnewswire.com/newsroom/en/computers-technology-and-internet/zedges-dataseeds.ai-releases-foundational-dataset-for-computer-vi-1036758), [customer-growth update](https://www.accessnewswire.com/newsroom/en/computers-technology-and-internet/zedge%E2%80%99s-dataseeds.ai-grows-its-enterprise-customer-base-for-right-1089220).
+
+### technical-blocking
+
+- `Fastly AI Bot Management`: Fastly publicly launched AI Bot Management on `2025-04-15`, explicitly letting sites detect, block, intercept, or allow AI crawlers and fetchers, and then published a network-scale AI-bot traffic report on `2025-08-19`. This is a strong missing entry in the same broad family as Cloudflare, but distinct enough to deserve its own record. Sources: [launch announcement](https://community.fastly.com/t/now-available-fastly-ai-bot-management/3985), [product page](https://www.fastly.com/products/fastly-ai-bot-management), [traffic report](https://www.fastly.com/press/press-releases/new-fastly-threat-research-reveals-ai-crawlers-make-up-almost-80-of-ai-bot).
+
+- `Akamai Content Protector`: Akamai launched Content Protector on `2024-02-06` as a scraper-specific product and by `2025-07-15` was explicitly framing AI / LLM bot management as a business-critical use case. This looks like another major infrastructure-vendor entry missing from the blocking side of the catalog. Sources: [launch press release](https://www.akamai.com/newsroom/press-release/akamai-announces-content-protector-to-stop-scraping-attacks), [launch explainer](https://www.akamai.com/blog/security/stop-scrapers-and-scalpers-with-akamai-content-protector), [product page](https://www.akamai.com/products/content-protector), [AI/LLM bot-management post](https://www.akamai.com/blog/security/2025/jul/ai-llm-bot-management-has-become-business-critical-issue).
+
+### new-infrastructures
+
+- `IAB Tech Lab CoMP` (`Content Monetization Protocol`): IAB Tech Lab launched the CoMP working group on `2025-08-12` and released the v1.0 framework for public comment on `2026-03-10`. It is a clean, standards-oriented infrastructure candidate for machine-readable commercial agreements before AI crawling or reuse. Sources: [working-group launch](https://iabtechlab.com/press-releases/iab-tech-lab-forms-ai-content-monetization-protocols-comp-working-group-to-set-ai-era-publisher-monetization-standards/), [v1.0 public-comment release](https://iabtechlab.com/press-releases/iab-tech-lab-announces-comp-framework-to-ensure-llms-have-commercial-agreements-with-publishers-before-content-crawling/).
+
+- `Amlet`: Amlet launched on `2025-10-13` as an AI content registry for publishers and creators, published a TDM-registry explainer on `2025-12-15`, and has visible ecosystem partners such as StreetLib. It feels distinct from CommonsDB and the Spawning registry line because it emphasizes registry + licensing rails for publisher workflows. Sources: [launch post](https://blog.amlet.ai/introducing-amlet-the-global-ai-content-registry-publishers-have-been-waiting-for/), [TDM-registry explainer](https://blog.amlet.ai/why-robots-txt-and-metadata-arent-enough-the-technical-case-for-a-text-and-data-mining-tdm-registry/), [StreetLib partnership](https://blog.streetlib.com/streetlib-and-amlet-pioneering-ai-rights-management-for-authors/), [Publishers Weekly coverage](https://www.publishersweekly.com/pw/by-topic/international/Frankfurt-Book-Fair/article/98859-frankfurt-book-fair-2025-identity-stamps.html).
+
+## Promising But Needs Editorial Judgment
+
+- `Dow Jones Factiva AI marketplace` (`data-market-platform`): Very likely in scope and very high-profile, but the cleanest evidence I found is major press rather than a first-party launch page. Current best leads: [Axios, 2025-02-25](https://www.axios.com/2025/02/25/dow-jones-ai-factiva-publishers) and [WSJ, 2026-02-17](https://www.wsj.com/business/media/marketplaces-are-the-next-frontier-in-publisher-deals-with-ai-companies-11515b00).
+
+- `CAWG Training and Data Mining Assertion` (`attach-preference-signal`): Real standard work with versions approved on `2024-03-18` and `2025-05-16`, but this may be too overlapping with Adobe / Content Credentials unless the catalog wants separate standards-level entries. Sources: [v1.0](https://cawg.io/training-and-data-mining/1.0), [v1.1](https://cawg.io/training-and-data-mining/1.1/).
+
+- `C2PA / Content Credentials` (`new-infrastructures`): A major omission if the catalog wants the standard itself and not just Adobe’s implementation. On `2026-02-09`, C2PA said `6,000+ members and affiliates` had live applications of Content Credentials. The overlap risk is that `Adobe Content Authenticity` already captures a large product implementation surface. Sources: [2026 impact update](https://c2pa.org/the-c2pa-launches-content-credentials-2-3-and-celebrates-5-years-of-impact-across-the-digital-ecosystem/), [spec site](https://spec.c2pa.org/specifications/specifications/2.3/index.html).
+
+- `Penguin Random House AI copyright-page reservation` (`attach-formal-license`): High-profile and clearly AI-related, but it may read more like a publisher policy / rights notice than a reusable public initiative. Sources: [Penguin policy post](https://www.penguin.co.uk/discover/articles/penguins-approach-to-generative-artificial-intelligence), [PRH author-news update](https://authornews.penguinrandomhouse.com/prh-joins-worldwide-coalition-condemning-unlicensed-use-of-creative-works-for-training-generative-ai/), [The Verge coverage](https://www.theverge.com/2024/10/18/24273895/penguin-random-house-books-copyright-ai).
+
+- `EU AI Office GPAI transparency stack` (`new-infrastructures`): Important and recent, but this may be better treated as regulation / compliance infrastructure than a catalog initiative. Sources: [Code of Practice, 2025-07-10](https://digital-strategy.ec.europa.eu/en/news/general-purpose-ai-code-practice-now-available), [training-data summary template, 2025-07-24](https://digital-strategy.ec.europa.eu/en/news/commission-presents-template-general-purpose-ai-model-providers-summarise-data-used-train-their), [signatory taskforce](https://digital-strategy.ec.europa.eu/en/policies/signatory-taskforce-gpai-code-practice).
+
+- `Skyfire` (`add-tollgate`): Interesting and recent, but it is broader AI-agent commerce infrastructure rather than clearly a data-rights or content-licensing initiative. Sources: [official launch](https://skyfire.xyz/skyfire-launches-identity-and-payments-for-autonomous-ai-agents/), [MCP monetization post](https://skyfire.xyz/the-missing-business-layer-of-mcp/).
+
+- `Human Authored` (`certification`): The Authors Guild’s certification is real and has adoption, but it focuses on certifying human-written books rather than training-data sourcing or AI-licensing compliance. Sources: [launch](https://authorsguild.org/news/ag-launches-human-authored-certification-to-preserve-authenticity-in-literature/), [expansion](https://authorsguild.org/news/human-authored-certification-expands-to-all-authors/), [annual report](https://authorsguild.org/app/uploads/2026/03/2025-Authors-Guild-Annual-Report.pdf).
+
+## Suggested Next Step
+
+- If the goal is to add new entries first where the evidence is both recent and straightforward, I would start with `CCC AI licensing suite`, `CLA Generative AI Training Licence`, `Stack Overflow Data Licensing`, `Fastly AI Bot Management`, `Akamai Content Protector`, `IAB Tech Lab CoMP`, `Amlet`, and `trust.txt`.
+- If the goal is to maximize public recognition, I would additionally prioritize `SPUR`, and then decide whether `C2PA` should be cataloged separately from Adobe’s implementation.

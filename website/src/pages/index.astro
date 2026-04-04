@@ -96,10 +96,10 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
   title="Catalog"
   description="A fast, catalog-first view of current initiatives shaping AI data access, licensing, and enforcement, with archived entries available on demand."
 >
-  <main class="wrap">
+  <main class="wrap catalog-page">
     <header class="catalog-header">
       <div class="catalog-header-main">
-        <h1 class="catalog-title">DataLicenses.org</h1>
+        <h1 class="sr-only">DataLicenses.org catalog</h1>
         <p class="catalog-summary">
           A working catalog of initiatives shaping AI data access, licensing, and enforcement. See
           the <a href="/glossary">glossary</a> for terms and the <a href="/methodology">method and
@@ -112,7 +112,17 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       </div>
     </header>
 
-    <section class="catalog-ticker box" aria-label="Catalog ticker">
+    <script is:inline>
+      (() => {
+        try {
+          if (window.localStorage.getItem('datalicenses:catalogTickerDismissed') === '1') {
+            document.documentElement.dataset.catalogTickerDismissed = 'true';
+          }
+        } catch {}
+      })();
+    </script>
+
+    <section id="catalog-ticker" class="catalog-ticker box" aria-label="Catalog ticker" data-catalog-ticker>
       <span class="catalog-ticker-label">Across the catalog</span>
       <div class="catalog-ticker-marquee">
         <div class="catalog-ticker-track">
@@ -130,6 +140,15 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           ))}
         </div>
       </div>
+      <button
+        type="button"
+        id="dismiss-ticker"
+        class="catalog-ticker-dismiss"
+        aria-controls="catalog-ticker"
+        aria-label="Hide catalog ticker"
+      >
+        Hide
+      </button>
     </section>
 
     <section id="catalog-tools" class="catalog-toolbar box">
@@ -155,6 +174,9 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
             <button type="button" class="view-button" data-view="cards" aria-pressed="false">Cards</button>
           </div>
 
+          <button type="button" id="toggle-ticker" class="catalog-reset" aria-controls="catalog-ticker" hidden>
+            Show ticker
+          </button>
           <button type="button" id="share-view" class="catalog-reset catalog-share">Copy this view</button>
         </div>
       </div>
@@ -772,6 +794,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       const queryAll = (selector, root = document) => Array.from(root.querySelectorAll(selector));
       const queryOne = (selector, root = document) => root.querySelector(selector);
       const setPressed = (element, pressed) => element.setAttribute('aria-pressed', String(pressed));
+      const tickerStorageKey = 'datalicenses:catalogTickerDismissed';
 
       const searchInput = queryOne('#q');
       const sortSelect = queryOne('#sort');
@@ -786,6 +809,9 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       const spreadsheetView = queryOne('#spreadsheet-view');
       const cardsView = queryOne('#cards-view');
       const shareButton = queryOne('#share-view');
+      const tickerSection = queryOne('#catalog-ticker');
+      const tickerDismissButton = queryOne('#dismiss-ticker');
+      const tickerToggleButton = queryOne('#toggle-ticker');
       const sectionKeys = approachKeys;
       const defaultSectionKey = sectionKeys[0];
       const tableBodies = Object.fromEntries(
@@ -869,6 +895,30 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
       function normalizeView(view) {
         return view === 'cards' ? 'cards' : 'spreadsheet';
+      }
+
+      function getTickerDismissed() {
+        try {
+          return window.localStorage.getItem(tickerStorageKey) === '1';
+        } catch {
+          return document.documentElement.dataset.catalogTickerDismissed === 'true';
+        }
+      }
+
+      function persistTickerDismissed(value) {
+        try {
+          if (value) {
+            window.localStorage.setItem(tickerStorageKey, '1');
+          } else {
+            window.localStorage.removeItem(tickerStorageKey);
+          }
+        } catch {}
+      }
+
+      function setTickerDismissed(value) {
+        document.documentElement.dataset.catalogTickerDismissed = value ? 'true' : 'false';
+        if (tickerSection instanceof HTMLElement) tickerSection.hidden = value;
+        if (tickerToggleButton instanceof HTMLButtonElement) tickerToggleButton.hidden = !value;
       }
 
       async function copyCurrentView() {
@@ -1383,6 +1433,22 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         });
       }
 
+      if (tickerDismissButton instanceof HTMLButtonElement) {
+        tickerDismissButton.addEventListener('click', () => {
+          persistTickerDismissed(true);
+          setTickerDismissed(true);
+          if (tickerToggleButton instanceof HTMLButtonElement) tickerToggleButton.focus();
+        });
+      }
+
+      if (tickerToggleButton instanceof HTMLButtonElement) {
+        tickerToggleButton.addEventListener('click', () => {
+          persistTickerDismissed(false);
+          setTickerDismissed(false);
+          if (tickerDismissButton instanceof HTMLButtonElement) tickerDismissButton.focus();
+        });
+      }
+
       searchInput.addEventListener('input', applyFilters);
       sortSelect.addEventListener('change', applyFilters);
       window.addEventListener('resize', scheduleSummaryToggleRefresh);
@@ -1392,6 +1458,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       if (resetButton) resetButton.addEventListener('click', clearFilters);
 
       initializeFromUrl();
+      setTickerDismissed(getTickerDismissed());
       setView(currentView);
       applyFilters();
     })();
