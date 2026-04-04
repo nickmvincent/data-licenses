@@ -17,4 +17,10 @@ Each initiative is a Markdown file with frontmatter for merge-ready fields such 
 
 The `shared-references/bibtex-entries/` directory stores any citation records referenced by initiative frontmatter.
 
+Current initiative statuses are:
+
+- `live` for public initiatives that are usable now
+- `wip` for efforts still emerging
+- `archived` for historical or dormant entries that remain accessible but are hidden from the default catalog view
+
 The `memos/` directory stores longer editorial writing that is rendered on the site.

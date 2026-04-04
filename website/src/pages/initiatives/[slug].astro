@@ -119,6 +119,12 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
         </div>
         <p class="initiative-summary">{item.summary}</p>
+        {item.status === 'archived' && (
+          <p class="activity-note initiative-archive-note">
+            This profile remains available for historical context, but it is hidden from the
+            default catalog view because no newer public activity was found during review.
+          </p>
+        )}
 
         <div class="initiative-hero-actions">
           <a

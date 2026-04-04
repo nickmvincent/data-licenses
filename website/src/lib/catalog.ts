@@ -46,6 +46,7 @@ export const DATA_TYPE_LABELS: Record<string, string> = {
 export const STATUS_LABELS: Record<string, string> = {
   live: 'Live',
   wip: 'WIP',
+  archived: 'Archived',
 };
 
 export const APPROACH_DETAILS: Record<
@@ -103,7 +104,10 @@ export const APPROACH_DETAILS: Record<
 };
 
 export function statusRank(status: string) {
-  return status === 'live' ? 0 : 1;
+  if (status === 'live') return 0;
+  if (status === 'wip') return 1;
+  if (status === 'archived') return 2;
+  return 3;
 }
 
 export function sortByLatestThenTitle(a: LoadedInitiative, b: LoadedInitiative) {

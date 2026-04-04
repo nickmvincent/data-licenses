@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-/** @typedef {'live' | 'wip'} InitiativeStatus */
+/** @typedef {'live' | 'wip' | 'archived'} InitiativeStatus */
 /** @typedef {'public' | 'private' | 'draft'} Visibility */
 /** @typedef {'explicit' | 'derived'} MetricEvidenceBasis */
 /** @typedef {'populated' | 'needs-research' | 'hard-to-quantify'} AdoptionResearchStatus */
@@ -50,7 +50,7 @@ const MEMO_TYPE = 'data_license_memo';
 export const ADOPTION_METRIC_FIELDS = ['usersCount', 'dataVolume', 'moneyVolume'];
 export const ADOPTION_RESEARCH_STATUSES = ['populated', 'needs-research', 'hard-to-quantify'];
 
-const VALID_STATUSES = new Set(['live', 'wip']);
+const VALID_STATUSES = new Set(['live', 'wip', 'archived']);
 const VALID_VISIBILITY = new Set(['public', 'private', 'draft']);
 const VALID_METRIC_EVIDENCE_BASIS = new Set(['explicit', 'derived']);
 

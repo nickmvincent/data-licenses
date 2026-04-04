@@ -14,15 +14,15 @@ actionsSupported:
 primaryApproachType: add-tollgate
 dataTypes:
   - web-content
-usersCount: '1M+ customers enabled AI bot blocking'
+usersCount: '3.8M+ domains on managed robots.txt'
 dataVolume: '1B+ 402 responses/day'
 metricEvidence:
   usersCount:
     basis: explicit
     sources:
-      - label: AI Audit and marketplace features launched
-        url: 'https://blog.cloudflare.com/control-content-use-for-ai-training/'
-        date: '2025-07-01'
+      - label: Content Signals Policy launched
+        url: 'https://blog.cloudflare.com/content-signals-policy/'
+        date: '2025-09-24'
   dataVolume:
     basis: explicit
     sources:
@@ -30,9 +30,9 @@ metricEvidence:
         url: 'https://blog.cloudflare.com/ai-crawl-control/'
         date: '2025-09-11'
 evidenceLinks:
-  - label: Content Signals launched
-    url: 'https://blog.cloudflare.com/content-signals/'
-    date: '2025-11-18'
+  - label: Content Signals Policy launched
+    url: 'https://blog.cloudflare.com/content-signals-policy/'
+    date: '2025-09-24'
   - label: AI Crawl Control open beta launched
     url: 'https://blog.cloudflare.com/ai-crawl-control/'
     date: '2025-09-11'

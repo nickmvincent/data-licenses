@@ -15,6 +15,7 @@ tags:
   - music
   - royalties
 dataVolume: '14M+ tracks'
+moneyVolume: 'over $1.35M new annual recurring revenue'
 metricEvidence:
   dataVolume:
     basis: explicit
@@ -23,7 +24,16 @@ metricEvidence:
       - label: SourceAudio outlines AI dataset licensing program scale
         url: 'https://www.sourceaudio.com/why-music-ai-dataset-partnerships-matter'
         date: '2025-06-05'
+  moneyVolume:
+    basis: explicit
+    sources:
+      - label: SourceAudio outlines AI dataset licensing program scale
+        url: 'https://www.sourceaudio.com/why-music-ai-dataset-partnerships-matter'
+        date: '2025-06-05'
 evidenceLinks:
+  - label: Symphonic partnership expands AI dataset licensing marketplace
+    url: 'https://www.sourceaudio.com/v7-blog-post/'
+    date: '2026-03-06'
   - label: SourceAudio outlines AI dataset licensing program scale
     url: 'https://www.sourceaudio.com/why-music-ai-dataset-partnerships-matter'
     date: '2025-06-05'

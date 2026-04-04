@@ -19,19 +19,25 @@ import {
 type CatalogApproachKey = (typeof APPROACH_KEYS)[number];
 
 const items: LoadedInitiative[] = (await loadInitiatives()).sort(sortByLatestThenTitle);
+const defaultCatalogItems = items.filter((item) => item.status !== 'archived');
 const bySlug = Object.fromEntries(items.map((item) => [item.slug, item]));
 const byId = Object.fromEntries(items.map((item) => [item.id, item]));
 const groupedItems: Array<{
   key: CatalogApproachKey;
   items: LoadedInitiative[];
+  activeCount: number;
   title: string;
   description: string;
   shortDescription: string;
-}> = APPROACH_KEYS.map((key) => ({
-  key,
-  items: items.filter((item) => item.primaryApproachType === key),
-  ...APPROACH_DETAILS[key],
-}));
+}> = APPROACH_KEYS.map((key) => {
+  const groupItems = items.filter((item) => item.primaryApproachType === key);
+  return {
+    key,
+    items: groupItems,
+    activeCount: groupItems.filter((item) => item.status !== 'archived').length,
+    ...APPROACH_DETAILS[key],
+  };
+});
 
 const actions: string[] = APPROACH_KEYS.filter((key) =>
   items.some((item) => (item.actionsSupported || []).includes(key))
@@ -39,20 +45,45 @@ const actions: string[] = APPROACH_KEYS.filter((key) =>
 const dataTypes: string[] = Array.from(new Set(items.flatMap((item) => item.dataTypes || []))).sort(
   (a, b) => formatDataTypeLabel(a).localeCompare(formatDataTypeLabel(b))
 );
+const tickerHostIgnore = new Set(['www', 'blog', 'site', 'app', 'docs', 'support', 'help', 'developers']);
+const normalizeTickerToken = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '');
 const formatSecondaryApproaches = (item: LoadedInitiative) =>
   item.actionsSupported
     .filter((action) => action !== item.primaryApproachType)
     .map((action) => formatApproachLabel(action))
     .join(' / ');
+const formatTickerLabel = (item: LoadedInitiative) => {
+  const fullTitle = item.title.trim();
+  const words = fullTitle.split(/\s+/);
 
-const stats = [
-  { label: 'Initiatives', value: String(items.length) },
-  { label: 'Live now', value: String(items.filter((item) => item.status === 'live').length) },
-  { label: 'WIP tracked', value: String(items.filter((item) => item.status === 'wip').length) },
-  { label: 'Approach types', value: String(groupedItems.length) },
-];
+  if (words.length > 2) {
+    try {
+      const hostTokens = new URL(item.website)
+        .hostname.split('.')
+        .map((token) => normalizeTickerToken(token))
+        .filter((token) => token && token.length > 3 && !tickerHostIgnore.has(token));
+      const firstWord = normalizeTickerToken(words[0] || '');
 
-const latestTrackedUpdate = items.reduce<string | null>((latest, item) => {
+      if (hostTokens.some((token) => token === firstWord)) {
+        const shortened = words.slice(1).join(' ').trim();
+        if (shortened.length >= 5) return shortened;
+      }
+    } catch {
+      return fullTitle;
+    }
+  }
+
+  return fullTitle;
+};
+const tickerItems = [...defaultCatalogItems]
+  .map((item) => ({
+    href: `/initiatives/${item.slug}`,
+    label: formatTickerLabel(item),
+    title: item.title,
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+const latestTrackedUpdate = defaultCatalogItems.reduce<Date | null>((latest, item) => {
   if (!item.latestUpdate) return latest;
   if (!latest) return item.latestUpdate;
   return new Date(item.latestUpdate).getTime() > new Date(latest).getTime() ? item.latestUpdate : latest;
@@ -63,7 +94,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
 <Layout
   title="Catalog"
-  description="A fast, catalog-first view of live and in-progress initiatives shaping AI data access, licensing, and enforcement."
+  description="A fast, catalog-first view of current initiatives shaping AI data access, licensing, and enforcement, with archived entries available on demand."
 >
   <main class="wrap">
     <header class="catalog-header">
@@ -72,7 +103,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         <p class="catalog-summary">
           A working catalog of initiatives shaping AI data access, licensing, and enforcement. See
           the <a href="/glossary">glossary</a> for terms and the <a href="/methodology">method and
-          contribute guide</a> for how entries are reviewed and how to add one.
+          contribute guide</a> for how entries are reviewed and how to add one. Archived entries
+          stay accessible for historical context, but are hidden from the default catalog view.
         </p>
         {latestTrackedUpdate && (
           <p class="catalog-masthead-meta">Updated {formatDate(latestTrackedUpdate)}</p>
@@ -80,49 +112,24 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       </div>
     </header>
 
-    <section class="catalog-start box" aria-label="Catalog snapshot">
-      <dl class="catalog-start-stats">
-        {stats.map((stat) => (
-          <div>
-            <dt>{stat.label}</dt>
-            <dd>{stat.value}</dd>
-          </div>
-        ))}
-      </dl>
-
-      <details class="catalog-start-explainer">
-        <summary class="catalog-start-explainer-toggle">What these labels mean</summary>
-        <dl class="catalog-start-definition-list">
-          <div>
-            <dt>Initiative</dt>
-            <dd>
-              One tracked effort in the catalog, such as a standard, product, registry, protocol,
-              marketplace, or organizational program.
-            </dd>
-          </div>
-          <div>
-            <dt>Live</dt>
-            <dd>
-              Publicly available now, with enough concrete evidence that someone could inspect or
-              use it today.
-            </dd>
-          </div>
-          <div>
-            <dt>WIP</dt>
-            <dd>
-              Work in progress that matters to track, but is still emerging, incomplete, or not yet
-              clearly deployable.
-            </dd>
-          </div>
-          <div>
-            <dt>Approach type</dt>
-            <dd>
-              The main mechanism an initiative uses, like preference signals, formal licenses,
-              collectives, marketplaces, tollgates, blocking, infrastructure, or certification.
-            </dd>
-          </div>
-        </dl>
-      </details>
+    <section class="catalog-ticker box" aria-label="Catalog ticker">
+      <span class="catalog-ticker-label">Across the catalog</span>
+      <div class="catalog-ticker-marquee">
+        <div class="catalog-ticker-track">
+          {tickerItems.map((item) => (
+            <a class="catalog-ticker-chip" href={item.href} title={item.title} aria-label={`Open ${item.title}`}>
+              <span class="catalog-ticker-chip-label">{item.label}</span>
+            </a>
+          ))}
+        </div>
+        <div class="catalog-ticker-track" aria-hidden="true">
+          {tickerItems.map((item) => (
+            <a class="catalog-ticker-chip" href={item.href} title={item.title} tabindex="-1">
+              <span class="catalog-ticker-chip-label">{item.label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
     </section>
 
     <section id="catalog-tools" class="catalog-toolbar box">
@@ -162,7 +169,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           <div class="catalog-panel-head">
             <p class="catalog-panel-intro">
               Search is always on. Open this panel when you want to sort, focus on live vs WIP,
-              or drill into specific approach types and data types.
+              or narrow the catalog by approach type and data type.
             </p>
             <button type="button" id="reset-filters" class="catalog-reset" hidden>Reset all</button>
           </div>
@@ -184,6 +191,23 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                 <button type="button" class="status-button" data-status-filter="live" aria-pressed="false">Live</button>
                 <button type="button" class="status-button" data-status-filter="wip" aria-pressed="false">WIP</button>
               </div>
+              <p class="catalog-panel-note">
+                Live means the initiative is public and usable now. WIP tracks efforts worth
+                watching that are still emerging or incomplete.
+              </p>
+            </div>
+
+            <div class="catalog-panel-block">
+              <span class="catalog-panel-label">Catalog scope</span>
+              <div class="catalog-action-list">
+                <button type="button" id="archived-toggle" class="catalog-action" aria-pressed="false">
+                  Include archived
+                </button>
+              </div>
+              <p class="catalog-panel-note">
+                Archived entries stay on the site for historical context, but they are hidden by
+                default because no newer public activity was found during review.
+              </p>
             </div>
           </div>
 
@@ -196,6 +220,10 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                 </button>
               ))}
             </div>
+            <p class="catalog-panel-note">
+              Approach types describe the main mechanism in play, such as licenses, registries,
+              marketplaces, tollgates, blocking, or certification.
+            </p>
           </div>
 
           <div class="catalog-panel-block">
@@ -207,26 +235,27 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                 </button>
               ))}
             </div>
+            <p class="catalog-panel-note">
+              Data types help you focus on the kinds of inputs an initiative covers, like text,
+              images, audio, video, or code.
+            </p>
           </div>
         </div>
       </details>
     </section>
 
     <section id="catalog-results-anchor" class="catalog-results" aria-live="polite">
-      <div class="catalog-results-count"><span id="count">{items.length}</span> initiatives</div>
-      <p id="active-filters" class="catalog-results-summary">Showing all initiatives.</p>
+      <div class="catalog-results-count"><span id="count">{defaultCatalogItems.length}</span> initiatives</div>
+      <p id="active-filters" class="catalog-results-summary">
+        Showing current initiatives. Archived entries are hidden by default.
+      </p>
       <div id="active-filter-chips" class="active-filter-chips" hidden></div>
     </section>
 
     <div class="catalog-shell">
       <aside class="catalog-sidebar box" aria-labelledby="catalog-nav-title">
         <div class="catalog-sidebar-inner">
-          <p class="eyebrow">Approach types</p>
           <h2 id="catalog-nav-title" class="catalog-sidebar-title">Jump by primary approach</h2>
-          <p class="catalog-sidebar-copy">
-            Each initiative appears once under its primary approach type. Secondary approaches still
-            show up inside each row or card.
-          </p>
 
           <nav class="catalog-approach-nav" aria-label="Primary approach type sections">
             {groupedItems.map((group) => (
@@ -239,7 +268,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                 <span class="catalog-approach-link-topline">
                   <span class="catalog-approach-link-title">{group.title}</span>
                   <span class="catalog-approach-link-count" data-approach-count={group.key}>
-                    {group.items.length}
+                    {group.activeCount}
                   </span>
                 </span>
                 <span class="catalog-approach-link-copy">{group.shortDescription}</span>
@@ -252,7 +281,12 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       <div class="catalog-main">
         <div id="spreadsheet-view" class="catalog-group-stack">
           {groupedItems.map((group) => (
-            <section id={`spreadsheet-group-${group.key}`} class="catalog-group" data-catalog-section={group.key}>
+            <section
+              id={`spreadsheet-group-${group.key}`}
+              class="catalog-group"
+              data-catalog-section={group.key}
+              hidden={group.activeCount === 0}
+            >
               <div class="catalog-group-head">
                 <div>
                   <p class="catalog-group-kicker">Primary approach type</p>
@@ -295,6 +329,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                       return (
                         <tr
                           class="catalog-row"
+                          hidden={item.status === 'archived'}
                           data-item={item.slug}
                           data-catalog-section={group.key}
                           data-title={item.title.toLowerCase()}
@@ -457,7 +492,12 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
         <section id="cards-view" class="catalog-group-stack" hidden>
           {groupedItems.map((group) => (
-            <section id={`cards-group-${group.key}`} class="catalog-group" data-catalog-section={group.key}>
+            <section
+              id={`cards-group-${group.key}`}
+              class="catalog-group"
+              data-catalog-section={group.key}
+              hidden={group.activeCount === 0}
+            >
               <div class="catalog-group-head">
                 <div>
                   <p class="catalog-group-kicker">Primary approach type</p>
@@ -494,6 +534,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                   return (
                     <article
                       class="catalog-card"
+                      hidden={item.status === 'archived'}
                       data-item={item.slug}
                       data-catalog-section={group.key}
                       data-title={item.title.toLowerCase()}
@@ -741,6 +782,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       const countText = queryOne('#count');
       const activeFiltersText = queryOne('#active-filters');
       const chipsContainer = queryOne('#active-filter-chips');
+      const archivedToggle = queryOne('#archived-toggle');
       const spreadsheetView = queryOne('#spreadsheet-view');
       const cardsView = queryOne('#cards-view');
       const shareButton = queryOne('#share-view');
@@ -770,7 +812,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       const viewButtons = queryAll('.view-button');
       const statusButtons = queryAll('.status-button');
       const compactCatalogMedia = window.matchMedia('(max-width: 720px)');
-      const statusLabels = { live: 'Live', wip: 'WIP' };
+      const statusLabels = { live: 'Live', wip: 'WIP', archived: 'Archived' };
       const legacyGoalActions = {
         signal: ['attach-preference-signal', 'attach-formal-license'],
         block: ['technical-blocking'],
@@ -785,6 +827,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         countText,
         activeFiltersText,
         chipsContainer,
+        archivedToggle,
         spreadsheetView,
         cardsView,
         ...sectionKeys.flatMap((key) => [
@@ -810,6 +853,12 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       const rowNodes = () => queryAll('.catalog-row', spreadsheetView);
       const cardNodes = () => queryAll('.catalog-card', cardsView);
       const cardsById = () => new Map(cardNodes().map((card) => [card.dataset.item || '', card]));
+      const statusRank = (status) => {
+        if (status === 'live') return 0;
+        if (status === 'wip') return 1;
+        if (status === 'archived') return 2;
+        return 3;
+      };
       let summaryRefreshFrame = 0;
       const getActionLabel = (action) =>
         actionButtons().find((button) => button.dataset.action === action)?.textContent?.trim() || action;
@@ -873,10 +922,18 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         return active?.dataset.statusFilter || 'all';
       }
 
+      function getArchivedIncluded() {
+        return archivedToggle?.getAttribute('aria-pressed') === 'true';
+      }
+
       function setStatusFilter(value) {
         statusButtons.forEach((button) => {
           setPressed(button, button.dataset.statusFilter === value);
         });
+      }
+
+      function setArchivedIncluded(value) {
+        if (archivedToggle) setPressed(archivedToggle, value);
       }
 
       function clearActionButtons() {
@@ -948,8 +1005,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
         if (sortMode === 'alpha') return aTitle.localeCompare(bTitle);
         if (sortMode === 'status') {
-          const aRank = (a.row.dataset.status || '') === 'live' ? 0 : 1;
-          const bRank = (b.row.dataset.status || '') === 'live' ? 0 : 1;
+          const aRank = statusRank(a.row.dataset.status || '');
+          const bRank = statusRank(b.row.dataset.status || '');
           if (aRank !== bRank) return aRank - bRank;
           return aTitle.localeCompare(bTitle);
         }
@@ -958,14 +1015,14 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         const bLatest = Number(b.row.dataset.latest || 0);
         if (aLatest !== bLatest) return bLatest - aLatest;
 
-        const aRank = (a.row.dataset.status || '') === 'live' ? 0 : 1;
-        const bRank = (b.row.dataset.status || '') === 'live' ? 0 : 1;
+        const aRank = statusRank(a.row.dataset.status || '');
+        const bRank = statusRank(b.row.dataset.status || '');
         if (aRank !== bRank) return aRank - bRank;
 
         return aTitle.localeCompare(bTitle);
       }
 
-      function buildActiveChips(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode) {
+      function buildActiveChips(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode, includeArchived) {
         const chips = [];
 
         if (rawQuery) chips.push({ kind: 'search', label: `Search: ${rawQuery}` });
@@ -985,6 +1042,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         if (sortMode !== 'latest') {
           chips.push({ kind: 'sort', value: sortMode, label: `Sort: ${getSortLabel(sortMode)}` });
         }
+        if (includeArchived) chips.push({ kind: 'archived', label: 'Including archived' });
 
         return chips;
       }
@@ -1017,13 +1075,15 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         chipsContainer.hidden = chips.length === 0;
       }
 
-      function updateSummaries(chips, visibleCount, rawQuery) {
+      function updateSummaries(chips, visibleCount, rawQuery, includeArchived) {
         if (chips.length > 0 || rawQuery) {
           activeFiltersText.textContent = `Showing ${visibleCount} ${
             visibleCount === 1 ? 'initiative' : 'initiatives'
           }${rawQuery ? ` for "${rawQuery}"` : ''}.`;
         } else {
-          activeFiltersText.textContent = 'Showing all initiatives.';
+          activeFiltersText.textContent = includeArchived
+            ? 'Showing all current and archived initiatives.'
+            : 'Showing current initiatives. Archived entries are hidden by default.';
         }
 
         panelSummary.textContent = chips.length > 0
@@ -1059,13 +1119,14 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         });
       }
 
-      function syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode) {
+      function syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode, includeArchived) {
         const params = new URLSearchParams();
         if (rawQuery) params.set('q', rawQuery);
         if (statusValue !== 'all') params.set('status', statusValue);
         selectedActions.forEach((action) => params.append('actions', action));
         selectedDataTypes.forEach((dataType) => params.append('types', dataType));
         if (sortMode !== 'latest') params.set('sort', sortMode);
+        if (includeArchived) params.set('archived', '1');
         if (currentView !== defaultView()) params.set('view', currentView);
 
         const nextUrl = params.toString() ? `?${params.toString()}` : location.pathname;
@@ -1079,6 +1140,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         const selectedDataTypes = getSelectedDataTypes();
         const statusValue = getStatusFilter();
         const sortMode = sortSelect.value || 'latest';
+        const includeArchived = getArchivedIncluded();
 
         const cardsLookup = cardsById();
         const items = rowNodes().map((row) => ({
@@ -1103,6 +1165,10 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
           if (matches && statusValue !== 'all') {
             matches = item.row.dataset.status === statusValue;
+          }
+
+          if (matches && !includeArchived) {
+            matches = item.row.dataset.status !== 'archived';
           }
 
           if (matches && selectedActions.length > 0) {
@@ -1140,9 +1206,16 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         emptyState.hidden = visibleItems.length !== 0;
         updateApproachNavigation(visibleBySection);
 
-        const chips = buildActiveChips(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode);
-        updateSummaries(chips, visibleItems.length, rawQuery);
-        syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode);
+        const chips = buildActiveChips(
+          rawQuery,
+          statusValue,
+          selectedActions,
+          selectedDataTypes,
+          sortMode,
+          includeArchived
+        );
+        updateSummaries(chips, visibleItems.length, rawQuery, includeArchived);
+        syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode, includeArchived);
         scheduleSummaryToggleRefresh();
       }
 
@@ -1150,6 +1223,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         searchInput.value = '';
         sortSelect.value = 'latest';
         setStatusFilter('all');
+        setArchivedIncluded(false);
         clearActionButtons();
         clearDataTypeButtons();
         applyFilters();
@@ -1162,6 +1236,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         const goalValue = params.get('goal');
         const sortValue = params.get('sort');
         const viewValue = params.get('view');
+        const archivedValue = params.get('archived');
         const preselectedActions = new Set(params.getAll('actions'));
         const preselectedDataTypes = new Set(params.getAll('types'));
         const legacyActions = legacyGoalActions[goalValue] || [];
@@ -1170,6 +1245,9 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         if (statusValue && ['all', 'live', 'wip'].includes(statusValue)) setStatusFilter(statusValue);
         if (sortValue && Array.from(sortSelect.options).some((option) => option.value === sortValue)) {
           sortSelect.value = sortValue;
+        }
+        if (archivedValue && ['1', 'true', 'yes'].includes(archivedValue)) {
+          setArchivedIncluded(true);
         }
         legacyActions.forEach((action) => preselectedActions.add(action));
         if (preselectedActions.size > 0) {
@@ -1187,6 +1265,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         const hasAdvancedFilters =
           (statusValue && statusValue !== 'all') ||
           (sortValue && sortValue !== 'latest') ||
+          (archivedValue && ['1', 'true', 'yes'].includes(archivedValue)) ||
           preselectedActions.size > 0 ||
           preselectedDataTypes.size > 0;
 
@@ -1208,6 +1287,13 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           applyFilters();
         });
       });
+
+      if (archivedToggle) {
+        archivedToggle.addEventListener('click', () => {
+          setArchivedIncluded(!getArchivedIncluded());
+          applyFilters();
+        });
+      }
 
       Object.values(approachLinks).forEach((link) => {
         if (!(link instanceof HTMLAnchorElement)) return;
@@ -1285,6 +1371,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
             if (dataTypeButton) setPressed(dataTypeButton, false);
           }
           if (kind === 'sort') sortSelect.value = 'latest';
+          if (kind === 'archived') setArchivedIncluded(false);
 
           applyFilters();
         });

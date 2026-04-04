@@ -24,10 +24,13 @@ metricEvidence:
         url: 'https://www.rightsify.com/blog/rightsify-unveils-global-copyright-exchange-gcx-worlds-largest-cleared-music-dataset-for-ai'
         date: '2024-03-21'
 evidenceLinks:
+  - label: Rightsify says Hydra grew out of work on the GCX dataset service
+    url: 'https://www.rightsify.com/post/rightsify-presents-hydra-advanced-ai-music-generation-for-all'
+    date: '2025-05-15'
   - label: GCX launched as rights-cleared music dataset for AI
     url: 'https://www.rightsify.com/blog/rightsify-unveils-global-copyright-exchange-gcx-worlds-largest-cleared-music-dataset-for-ai'
     date: '2024-03-21'
-considerations: Official GCX and DPA member pages now advertise a larger corpus, but because those pages are undated the catalog keeps the older dated launch metric for now.
+considerations: Official GCX and DPA member pages now advertise a larger corpus, but because those pages are undated the catalog keeps the older dated launch metric for now. A 2025 Rightsify update still describes GCX as an active dataset service.
 visibility: public
 type: data_license_initiative
 ---

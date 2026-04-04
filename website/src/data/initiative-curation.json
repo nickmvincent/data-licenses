@@ -111,6 +111,10 @@
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Launch announcement names seven initial publisher partners; broader marketplace adoption remains too early to quantify."
   },
+  "mozilla-data-collective": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "The public homepage now supports a conservative visible dataset-count metric, while public materials still give less clarity on uploader/provider totals."
+  },
   "noml": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Proposal-stage directive with no canonical deployment tracker."

@@ -46,6 +46,12 @@ If AI is involved, the best output is usually a small review packet with sources
 - Concrete implementation details, canonical websites, and dated evidence links.
 - Metadata like status, pipeline stage, data type, jurisdiction, and adoption signals.
 
+### Status meanings
+
+- `live`: public and usable now.
+- `wip`: worth tracking, but still emerging or incomplete.
+- `archived`: kept for historical context, but hidden from the default catalog view because a review did not find newer public activity.
+
 ## Contribute
 
 - Suggest a new initiative or update an existing one with a canonical site and dated sources.
@@ -54,4 +60,4 @@ If AI is involved, the best output is usually a small review packet with sources
 - Open a pull request when the wording and metadata are ready to review.
 - Every suggested `evidenceLinks`, `usersCount`, `dataVolume`, or `moneyVolume` value should include a clickable source and date. If you add a metric, add matching `metricEvidence`.
 
-Developers can add or update a markdown file under `content/initiatives/`. Each entry should have one canonical `website`, a `status` of `live` or `wip`, `visibility: public`, `type: data_license_initiative`, and optional dated `evidenceLinks`.
+Developers can add or update a markdown file under `content/initiatives/`. Each entry should have one canonical `website`, a `status` of `live`, `wip`, or `archived`, `visibility: public`, `type: data_license_initiative`, and optional dated `evidenceLinks`.

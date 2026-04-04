@@ -7,6 +7,9 @@ actionsSupported:
   - attach-preference-signal
 primaryApproachType: attach-preference-signal
 evidenceLinks:
+  - label: Year-end CC Signals progress update
+    url: 'https://creativecommons.org/2025/12/15/cc-signals-what-weve-been-working-on/'
+    date: '2025-12-15'
   - label: Response to feedback
     url: 'https://creativecommons.org/2025/08/27/we-asked-you-answered-how-your-feedback-shapes-cc-signals/'
     date: '2025-08-27'

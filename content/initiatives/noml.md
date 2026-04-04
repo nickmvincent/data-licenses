@@ -1,7 +1,7 @@
 ---
 title: NoML
 summary: Proposal to add a `noml` directive so content can stay searchable but not be used for machine learning.
-status: wip
+status: archived
 website: 'https://noml.info/'
 actionsSupported:
   - attach-preference-signal

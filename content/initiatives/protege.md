@@ -23,6 +23,9 @@ metricEvidence:
         url: 'https://withprotege.ai/articles/news/protege-a16z-30million-fundraise'
         date: '2026-01-07'
 evidenceLinks:
+  - label: HC1 partnership adds large de-identified lab data repository
+    url: 'https://www.withprotege.ai/news/hc1-data-partnership-healthcare'
+    date: '2026-02-12'
   - label: Series A extension cites hundreds of data partners and cross-vertical growth
     url: 'https://withprotege.ai/articles/news/protege-a16z-30million-fundraise'
     date: '2026-01-07'

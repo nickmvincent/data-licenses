@@ -17,15 +17,18 @@ tags:
   - public-domain
   - open-licensed
   - iscc
-dataVolume: '200,000+ declarations'
+dataVolume: '300,000+ declarations'
 metricEvidence:
   dataVolume:
     basis: explicit
     sources:
-      - label: Explorer launched
-        url: 'https://www.commonsdb.org/blog/introducing-commonsdb-explorer/'
-        date: '2025-10-31'
+      - label: Feasibility study part 2 reports 300,000+ declarations
+        url: 'https://www.commonsdb.org/blog/commonsdb-feasibility-study-part-2-from-design-to-deployment/'
+        date: '2026-01-20'
 evidenceLinks:
+  - label: Feasibility study part 2 published
+    url: 'https://www.commonsdb.org/blog/commonsdb-feasibility-study-part-2-from-design-to-deployment/'
+    date: '2026-01-20'
   - label: Explorer launched
     url: 'https://www.commonsdb.org/blog/introducing-commonsdb-explorer/'
     date: '2025-10-31'

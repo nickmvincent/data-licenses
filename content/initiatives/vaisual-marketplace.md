@@ -1,7 +1,7 @@
 ---
 title: vAIsual
 summary: Marketplace for rights-managed visual and biometric datasets tailored to AI training and evaluation.
-status: live
+status: archived
 website: 'https://vaisual.com/'
 actionsSupported:
   - data-market-platform

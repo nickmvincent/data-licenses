@@ -60,7 +60,7 @@ export type LoadedInitiative = {
   type?: string;
   references: string[];
   referencesResolved: Reference[];
-  status: 'live' | 'wip';
+  status: 'live' | 'wip' | 'archived';
   evidenceLinks: EvidenceLink[];
   latestEvidenceLink?: EvidenceLink;
   latestUpdate?: Date;
@@ -234,4 +234,4 @@ export async function loadMethodologyPage() {
   return { slug: 'methodology', frontmatter: data, body };
 }
 
-export { loadReferences, loadReferencesByKeys, formatCitation } from '../../../helpers/shared-references';
+export { loadReferences, formatCitation } from '../../../helpers/shared-references';

@@ -15,6 +15,12 @@ tags:
   - dataset-hosting
   - access-control
 evidenceLinks:
+  - label: Hugging Face docs updated with EU-specific gated-dataset guidance
+    url: 'https://github.com/huggingface/hub-docs/commit/e226a3445ec1d77adb9b9aa1d3d6cb93e753fef1'
+    date: '2025-08-18'
+  - label: Hugging Face docs updated access-request rejection guidance for gated repositories
+    url: 'https://github.com/huggingface/hub-docs/commit/dfd29233d390ceb36d58e21f56e3a60bcf3d9d04'
+    date: '2025-01-17'
   - label: Gated datasets launch explained
     url: 'https://huggingface.co/blog/unlocking-the-source-of-gated-datasets'
     date: '2022-09-30'

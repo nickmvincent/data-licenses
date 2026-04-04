@@ -18,6 +18,12 @@ tags:
   - dsm-directive
   - opt-out
 evidenceLinks:
+  - label: Community group notes outline 2025 alignment work with AI-Pref
+    url: 'https://www.w3.org/community/tdmrep/2025/10/01/notes-september-30th-2025/'
+    date: '2025-10-01'
+  - label: Community group notes discuss standardization path and vocabulary work
+    url: 'https://www.w3.org/community/tdmrep/2025/04/22/notes-april-15th-2025/'
+    date: '2025-04-22'
   - label: Version 3 final report listed
     url: 'https://www.w3.org/community/tdmrep/'
     date: '2024-08-09'
