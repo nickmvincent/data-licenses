@@ -21,15 +21,19 @@ const site = Astro.site ?? new URL('https://datalicenses.org');
 const canonicalUrl = new URL(currentPath, site).toString();
 const socialImageUrl = new URL(image, site).toString();
 const isGuidePath = currentPath.startsWith('/methodology') || currentPath.startsWith('/contributing');
+const isCatalogPath =
+  currentPath === '/catalog' || currentPath.startsWith('/catalog/') || currentPath.startsWith('/initiatives/');
 const isNavActive = (href: string) =>
-  href === '/'
-    ? currentPath === '/' || currentPath.startsWith('/initiatives/')
-    : href === '/methodology'
-      ? isGuidePath
-      : currentPath.startsWith(href);
+  href === '/catalog'
+    ? isCatalogPath
+    : href === '/'
+      ? currentPath === '/'
+      : href === '/methodology'
+        ? isGuidePath
+        : currentPath.startsWith(href);
 
 const navLinks = [
-  { href: '/', label: 'Catalog' },
+  { href: '/catalog', label: 'Catalog' },
   { href: '/memo', label: 'Memo' },
   { href: '/glossary', label: 'Glossary' },
   { href: '/methodology', label: 'Method & Contribute' },

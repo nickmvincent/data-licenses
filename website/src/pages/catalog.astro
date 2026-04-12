@@ -1,0 +1,1353 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { formatCitation, loadInitiatives, type LoadedInitiative } from '../lib/content-loader';
+import {
+  ACTION_LABELS,
+  APPROACH_DETAILS,
+  APPROACH_KEYS,
+  STATUS_LABELS,
+  formatActionSummary,
+  formatApproachLabel,
+  formatDataTypeLabel,
+  formatDate,
+  formatLinkLabel,
+  formatLinkTitle,
+  formatPipelineSummary,
+  sortByLatestThenTitle,
+} from '../lib/catalog';
+
+type CatalogApproachKey = (typeof APPROACH_KEYS)[number];
+
+const items: LoadedInitiative[] = (await loadInitiatives()).sort(sortByLatestThenTitle);
+const defaultCatalogItems = items.filter((item) => item.status !== 'archived');
+const bySlug = Object.fromEntries(items.map((item) => [item.slug, item]));
+const byId = Object.fromEntries(items.map((item) => [item.id, item]));
+const groupedItems: Array<{
+  key: CatalogApproachKey;
+  items: LoadedInitiative[];
+  activeCount: number;
+  title: string;
+  description: string;
+  shortDescription: string;
+}> = APPROACH_KEYS.map((key) => {
+  const groupItems = items.filter((item) => item.primaryApproachType === key);
+  return {
+    key,
+    items: groupItems,
+    activeCount: groupItems.filter((item) => item.status !== 'archived').length,
+    ...APPROACH_DETAILS[key],
+  };
+});
+
+const actions: string[] = APPROACH_KEYS.filter((key) =>
+  items.some((item) => (item.actionsSupported || []).includes(key))
+);
+const dataTypes: string[] = Array.from(new Set(items.flatMap((item) => item.dataTypes || []))).sort(
+  (a, b) => formatDataTypeLabel(a).localeCompare(formatDataTypeLabel(b))
+);
+const formatSecondaryApproaches = (item: LoadedInitiative) =>
+  item.actionsSupported
+    .filter((action) => action !== item.primaryApproachType)
+    .map((action) => formatApproachLabel(action))
+    .join(' / ');
+
+const latestTrackedUpdate = defaultCatalogItems.reduce<Date | null>((latest, item) => {
+  if (!item.latestUpdate) return latest;
+  if (!latest) return item.latestUpdate;
+  return new Date(item.latestUpdate).getTime() > new Date(latest).getTime() ? item.latestUpdate : latest;
+}, null);
+
+const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
+---
+
+<Layout
+  title="Catalog"
+  description="A fast, catalog-first view of current initiatives shaping AI data access, licensing, and enforcement, with archived entries available on demand."
+>
+  <main class="wrap catalog-page">
+    <header class="catalog-header box">
+      <div class="catalog-header-main">
+        <div class="catalog-header-copy">
+          <p class="eyebrow">Working catalog</p>
+          <h1 class="catalog-title">Catalog</h1>
+          <p class="catalog-summary">
+            Browse initiatives shaping AI data access, licensing, and enforcement. Search by name
+            or evidence, filter by status, and use the approach sections below when you want the
+            spreadsheet view.
+          </p>
+        </div>
+
+        <div class="catalog-header-meta">
+          {latestTrackedUpdate && (
+            <p class="catalog-masthead-meta">Updated {formatDate(latestTrackedUpdate)}</p>
+          )}
+          <p class="catalog-header-links">
+            <a href="/">Home</a>
+            <span aria-hidden="true">·</span>
+            <a href="/glossary">Glossary</a>
+            <span aria-hidden="true">·</span>
+            <a href="/methodology">Method &amp; contribute</a>
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <section id="catalog-tools" class="catalog-toolbar box">
+      <div class="catalog-toolbar-top">
+        <div class="catalog-search-shell">
+          <label class="sr-only" for="q">Search initiatives</label>
+          <svg class="catalog-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+          </svg>
+          <input
+            id="q"
+            type="search"
+            placeholder="Search title, summary, website, evidence, or approach type"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <div class="catalog-toolbar-status" aria-label="Status filter">
+          <span class="catalog-toolbar-label">Status</span>
+          <div class="status-switch">
+            <button type="button" class="status-button" data-status-filter="all" aria-pressed="true">All</button>
+            <button type="button" class="status-button" data-status-filter="live" aria-pressed="false">Live</button>
+            <button type="button" class="status-button" data-status-filter="wip" aria-pressed="false">WIP</button>
+          </div>
+        </div>
+
+        <div class="catalog-toolbar-actions">
+          <div class="view-switch" aria-label="Catalog view">
+            <button type="button" class="view-button" data-view="spreadsheet" aria-pressed="true">Spreadsheet</button>
+            <button type="button" class="view-button" data-view="cards" aria-pressed="false">Cards</button>
+          </div>
+
+          <button type="button" id="share-view" class="catalog-reset catalog-share">Copy this view</button>
+        </div>
+      </div>
+
+      <details id="catalog-panel" class="catalog-panel">
+        <summary class="catalog-panel-toggle">
+          <span>More filters</span>
+          <span id="panel-summary" class="catalog-panel-summary">All filters off</span>
+        </summary>
+
+        <div class="catalog-panel-body">
+          <div class="catalog-panel-head">
+            <p class="catalog-panel-intro">
+              Search and status are always visible. Open this panel when you want to sort, include
+              archived entries, or narrow the catalog by approach type and data type.
+            </p>
+            <button type="button" id="reset-filters" class="catalog-reset" hidden>Reset all</button>
+          </div>
+
+          <div class="catalog-panel-grid">
+            <div class="catalog-panel-block">
+              <label class="catalog-panel-label" for="sort">Sort</label>
+              <select id="sort" class="catalog-select">
+                <option value="latest">Latest update</option>
+                <option value="alpha">A to Z</option>
+                <option value="status">Status</option>
+              </select>
+            </div>
+
+            <div class="catalog-panel-block">
+              <span class="catalog-panel-label">Catalog scope</span>
+              <div class="catalog-action-list">
+                <button type="button" id="archived-toggle" class="catalog-action" aria-pressed="false">
+                  Include archived
+                </button>
+              </div>
+              <p class="catalog-panel-note">
+                Archived entries stay on the site for historical context, but they are hidden by
+                default because no newer public activity was found during review.
+              </p>
+            </div>
+          </div>
+
+          <div class="catalog-panel-block">
+            <span class="catalog-panel-label">Approach types</span>
+            <div id="actions" class="catalog-action-list">
+              {actions.map((action) => (
+                <button type="button" class="catalog-action" data-action={action} aria-pressed="false">
+                  {ACTION_LABELS[action] || action}
+                </button>
+              ))}
+            </div>
+            <p class="catalog-panel-note">
+              Approach types describe the main mechanism in play, such as licenses, registries,
+              marketplaces, tollgates, blocking, or certification.
+            </p>
+          </div>
+
+          <div class="catalog-panel-block">
+            <span class="catalog-panel-label">Data types</span>
+            <div id="data-types" class="catalog-action-list">
+              {dataTypes.map((dataType) => (
+                <button type="button" class="catalog-action" data-data-type={dataType} aria-pressed="false">
+                  {formatDataTypeLabel(dataType)}
+                </button>
+              ))}
+            </div>
+            <p class="catalog-panel-note">
+              Data types help you focus on the kinds of inputs an initiative covers, like text,
+              images, audio, video, or code.
+            </p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section id="catalog-results-anchor" class="catalog-results" aria-live="polite">
+      <div class="catalog-results-count"><span id="count">{defaultCatalogItems.length}</span> initiatives</div>
+      <p id="active-filters" class="catalog-results-summary">
+        Showing current initiatives. Archived entries are hidden by default.
+      </p>
+      <div id="active-filter-chips" class="active-filter-chips" hidden></div>
+    </section>
+
+    <section class="catalog-jump" aria-labelledby="catalog-jump-title">
+      <div class="catalog-jump-head">
+        <h2 id="catalog-jump-title" class="catalog-jump-title">Browse by primary approach</h2>
+        <p class="catalog-jump-copy">Use these jump links when you want to scan the spreadsheet section by section.</p>
+      </div>
+
+      <nav class="catalog-approach-nav" aria-label="Primary approach type sections">
+        {groupedItems.map((group) => (
+          <a
+            class="catalog-approach-link"
+            href={`#spreadsheet-group-${group.key}`}
+            data-approach-nav={group.key}
+            data-approach-jump={group.key}
+          >
+            <span class="catalog-approach-link-topline">
+              <span class="catalog-approach-link-title">{group.title}</span>
+              <span class="catalog-approach-link-count" data-approach-count={group.key}>
+                {group.activeCount}
+              </span>
+            </span>
+            <span class="catalog-approach-link-copy">{group.shortDescription}</span>
+          </a>
+        ))}
+      </nav>
+    </section>
+
+    <div class="catalog-main">
+      <div id="spreadsheet-view" class="catalog-group-stack">
+          {groupedItems.map((group) => (
+            <section
+              id={`spreadsheet-group-${group.key}`}
+              class="catalog-group"
+              data-catalog-section={group.key}
+              hidden={group.activeCount === 0}
+            >
+              <div class="catalog-group-head">
+                <div>
+                  <p class="catalog-group-kicker">Primary approach type</p>
+                  <h2 class="catalog-group-title">{group.title}</h2>
+                  <p class="catalog-group-copy">{group.description}</p>
+                </div>
+              </div>
+              <div class="catalog-table-wrap">
+                <table class="catalog-table">
+                  <thead>
+                    <tr>
+                      <th>Initiative</th>
+                      <th>Website</th>
+                      <th>Latest update</th>
+                      <th>Approach type</th>
+                    </tr>
+                  </thead>
+                  <tbody id={`table-body-${group.key}`}>
+                    {group.items.map((item) => {
+                      const latest = item.latestEvidenceLink;
+                      const primaryApproachLabel = formatApproachLabel(item.primaryApproachType);
+                      const secondaryApproaches = formatSecondaryApproaches(item);
+                      const actionSummary = formatActionSummary(item.actionsSupported);
+                      const pipelineSummary = formatPipelineSummary(item.pipelineStages);
+                      const searchableApproach = [primaryApproachLabel, actionSummary, pipelineSummary]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLowerCase();
+                      const evidenceSearchText = (item.evidenceLinks || [])
+                        .map((link) => link.label)
+                        .join(' ')
+                        .toLowerCase();
+                      const hasMetrics = Boolean(item.usersCount || item.dataVolume || item.moneyVolume);
+                      const hasRowDetails =
+                        (item.evidenceLinks || []).length > 1 ||
+                        (Array.isArray(item.dataTypes) && item.dataTypes.length > 0) ||
+                        (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
+                        hasMetrics;
+
+                      return (
+                        <tr
+                          class="catalog-row"
+                          hidden={item.status === 'archived'}
+                          data-item={item.slug}
+                          data-catalog-section={group.key}
+                          data-title={item.title.toLowerCase()}
+                          data-summary={(item.summary || '').toLowerCase()}
+                          data-tags={(item.tags || []).join(' ').toLowerCase()}
+                          data-types={(item.dataTypes || []).join(' ').toLowerCase()}
+                          data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
+                          data-status={item.status}
+                          data-website={item.website.toLowerCase()}
+                          data-approach={searchableApproach}
+                          data-evidence={evidenceSearchText}
+                          data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
+                        >
+                          <td class="catalog-row-main" data-label="Initiative">
+                            <div class="catalog-row-titleline">
+                              <a class="catalog-row-title" href={`/initiatives/${item.slug}`}>{item.title}</a>
+                              <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
+                            </div>
+                            {item.summary && (
+                              <div class="catalog-row-summary-wrap" data-summary-wrap>
+                                <p class="catalog-row-summary" data-summary>{item.summary}</p>
+                                <button
+                                  type="button"
+                                  class="catalog-row-summary-toggle"
+                                  data-summary-toggle
+                                  aria-expanded="false"
+                                  hidden
+                                >
+                                  Show more
+                                </button>
+                              </div>
+                            )}
+                            {hasRowDetails && (
+                              <details class="catalog-row-details">
+                                <summary class="catalog-row-details-toggle">More context</summary>
+                                <div class="catalog-row-details-content">
+                                  {(item.evidenceLinks || []).length > 0 && (
+                                    <div class="catalog-row-detail">
+                                      <span class="catalog-row-detail-label">Evidence trail</span>
+                                      <ul class="catalog-row-links">
+                                        {(item.evidenceLinks || []).map((link) => (
+                                          <li>
+                                            <a
+                                              class="link-shell"
+                                              href={link.url}
+                                              target="_blank"
+                                              rel="noopener"
+                                              title={formatLinkTitle(link.url, link.label)}
+                                              aria-label={newTabAriaLabel(link.label)}
+                                            >
+                                              <span class="link-label link-label-multi">{link.label}</span>
+                                            </a>
+                                            <span class="catalog-evidence-date">{formatDate(link.date)}</span>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+
+                                  {Array.isArray(item.dataTypes) && item.dataTypes.length > 0 && (
+                                    <div class="catalog-row-detail">
+                                      <span class="catalog-row-detail-label">Data types</span>
+                                      <div class="catalog-row-detail-chips">
+                                        {item.dataTypes.map((dataType) => (
+                                          <span class="chip">{formatDataTypeLabel(dataType)}</span>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {Array.isArray(item.dependsOn) && item.dependsOn.length > 0 && (
+                                    <div class="catalog-row-detail">
+                                      <span class="catalog-row-detail-label">Uses</span>
+                                      <div class="catalog-row-detail-chips">
+                                        {item.dependsOn.map((dependency) => {
+                                          const related = bySlug[dependency] || byId[dependency];
+                                          const label = (related && related.title) || dependency;
+                                          return <span class="chip">{label}</span>;
+                                        })}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {hasMetrics && (
+                                    <div class="catalog-row-detail">
+                                      <span class="catalog-row-detail-label">Signals</span>
+                                      <div class="catalog-row-detail-chips">
+                                        {item.usersCount && (
+                                          <span class="chip metric-chip">
+                                            <span class="chip-label">Users</span>
+                                            {item.usersCount}
+                                          </span>
+                                        )}
+                                        {item.dataVolume && (
+                                          <span class="chip metric-chip">
+                                            <span class="chip-label">Data</span>
+                                            {item.dataVolume}
+                                          </span>
+                                        )}
+                                        {item.moneyVolume && (
+                                          <span class="chip metric-chip">
+                                            <span class="chip-label">Payments</span>
+                                            {item.moneyVolume}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </details>
+                            )}
+                          </td>
+                          <td class="catalog-row-site" data-label="Website">
+                            <a
+                              class="link-shell"
+                              href={item.website}
+                              target="_blank"
+                              rel="noopener"
+                              title={formatLinkTitle(item.website)}
+                              aria-label={newTabAriaLabel(formatLinkLabel(item.website))}
+                            >
+                              <span class="link-label link-label-single">{formatLinkLabel(item.website)}</span>
+                            </a>
+                          </td>
+                          <td class="catalog-row-update" data-label="Latest update">
+                            {latest ? (
+                              <>
+                                <span class="catalog-row-date">{formatDate(latest.date)}</span>
+                                <a
+                                  class="link-shell"
+                                  href={latest.url}
+                                  target="_blank"
+                                  rel="noopener"
+                                  title={formatLinkTitle(latest.url, latest.label)}
+                                  aria-label={newTabAriaLabel(latest.label)}
+                                >
+                                  <span class="link-label link-label-multi">{latest.label}</span>
+                                </a>
+                              </>
+                            ) : (
+                              <span class="muted">No evidence links yet</span>
+                            )}
+                          </td>
+                          <td class="catalog-row-type" data-label="Approach type">
+                            <span class="catalog-row-primary-type">{primaryApproachLabel}</span>
+                            {secondaryApproaches && (
+                              <span class="catalog-row-subtle">Also uses {secondaryApproaches}</span>
+                            )}
+                            {pipelineSummary && <span class="catalog-row-subtle">{pipelineSummary}</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ))}
+      </div>
+
+      <section id="cards-view" class="catalog-group-stack" hidden>
+          {groupedItems.map((group) => (
+            <section
+              id={`cards-group-${group.key}`}
+              class="catalog-group"
+              data-catalog-section={group.key}
+              hidden={group.activeCount === 0}
+            >
+              <div class="catalog-group-head">
+                <div>
+                  <p class="catalog-group-kicker">Primary approach type</p>
+                  <h2 class="catalog-group-title">{group.title}</h2>
+                  <p class="catalog-group-copy">{group.description}</p>
+                </div>
+              </div>
+              <div id={`cards-grid-${group.key}`} class="catalog-card-grid">
+                {group.items.map((item) => {
+                  const latest = item.latestEvidenceLink;
+                  const primaryApproachLabel = formatApproachLabel(item.primaryApproachType);
+                  const secondaryApproaches = formatSecondaryApproaches(item);
+                  const actionSummary = formatActionSummary(item.actionsSupported);
+                  const pipelineSummary = formatPipelineSummary(item.pipelineStages);
+                  const websiteLabel = formatLinkLabel(item.website);
+                  const searchableApproach = [primaryApproachLabel, actionSummary, pipelineSummary]
+                    .filter(Boolean)
+                    .join(' ')
+                    .toLowerCase();
+                  const evidenceSearchText = (item.evidenceLinks || [])
+                    .map((link) => link.label)
+                    .join(' ')
+                    .toLowerCase();
+                  const hasDetails =
+                    (item.evidenceLinks || []).length > 0 ||
+                    (Array.isArray(item.dataTypes) && item.dataTypes.length > 0) ||
+                    (Array.isArray(item.dependsOn) && item.dependsOn.length > 0) ||
+                    item.usersCount ||
+                    item.dataVolume ||
+                    item.moneyVolume ||
+                    (Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0) ||
+                    (Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0);
+
+                  return (
+                    <article
+                      class="catalog-card"
+                      hidden={item.status === 'archived'}
+                      data-item={item.slug}
+                      data-catalog-section={group.key}
+                      data-title={item.title.toLowerCase()}
+                      data-summary={(item.summary || '').toLowerCase()}
+                      data-tags={(item.tags || []).join(' ').toLowerCase()}
+                      data-types={(item.dataTypes || []).join(' ').toLowerCase()}
+                      data-actions={(item.actionsSupported || []).join(' ').toLowerCase()}
+                      data-status={item.status}
+                      data-website={item.website.toLowerCase()}
+                      data-approach={searchableApproach}
+                      data-evidence={evidenceSearchText}
+                      data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : ''}
+                    >
+                      <div class="catalog-card-header">
+                        <h2 class="catalog-card-title">
+                          <a class="catalog-card-title-link" href={`/initiatives/${item.slug}`}>{item.title}</a>
+                        </h2>
+                        <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
+                      </div>
+
+                      <p class="catalog-card-summary">{item.summary}</p>
+
+                      <dl class="catalog-card-meta">
+                        <div>
+                          <dt>Website</dt>
+                          <dd>
+                            <a
+                              class="catalog-card-meta-link catalog-card-external-link"
+                              href={item.website}
+                              target="_blank"
+                              rel="noopener"
+                              title={formatLinkTitle(item.website)}
+                              aria-label={newTabAriaLabel(websiteLabel)}
+                            >
+                              <span class="link-label link-label-single">{websiteLabel}</span>
+                            </a>
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Latest update</dt>
+                          <dd>
+                            {latest ? (
+                              <>
+                                <a
+                                  class="catalog-card-meta-link catalog-card-external-link"
+                                  href={latest.url}
+                                  target="_blank"
+                                  rel="noopener"
+                                  title={formatLinkTitle(latest.url, latest.label)}
+                                  aria-label={newTabAriaLabel(latest.label)}
+                                >
+                                  <span class="link-label link-label-multi">{latest.label}</span>
+                                </a>
+                                <span class="catalog-card-date">{formatDate(latest.date)}</span>
+                              </>
+                            ) : (
+                              <span class="muted">No evidence links yet</span>
+                            )}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Primary approach</dt>
+                          <dd>{primaryApproachLabel}</dd>
+                        </div>
+                      </dl>
+
+                      {secondaryApproaches && (
+                        <p class="catalog-card-secondary">Also uses {secondaryApproaches}</p>
+                      )}
+                      {pipelineSummary && <p class="catalog-card-subtle">{pipelineSummary}</p>}
+
+                      <div class="catalog-card-actions">
+                        <a class="btn btn-quiet catalog-card-button" href={`/initiatives/${item.slug}`}>Open profile</a>
+                        <a class="btn btn-quiet catalog-card-button" href={item.website} target="_blank" rel="noopener">Visit website</a>
+                      </div>
+
+                      {hasDetails && (
+                        <details class="card-details">
+                          <summary class="details-toggle">Details</summary>
+                          <div class="details-content">
+                            {(item.evidenceLinks || []).length > 0 && (
+                              <div class="detail-section detail-stack">
+                                <span class="detail-label">Evidence trail</span>
+                                <ul class="catalog-evidence-list">
+                                  {(item.evidenceLinks || []).map((link) => (
+                                    <li>
+                                      <a
+                                        class="catalog-card-list-link catalog-card-external-link"
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener"
+                                        title={formatLinkTitle(link.url, link.label)}
+                                        aria-label={newTabAriaLabel(link.label)}
+                                      >
+                                        <span class="link-label link-label-multi">{link.label}</span>
+                                      </a>
+                                      <span class="catalog-evidence-date">{formatDate(link.date)}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {Array.isArray(item.dataTypes) && item.dataTypes.length > 0 && (
+                              <div class="detail-section">
+                                <span class="detail-label">Data types</span>
+                                {item.dataTypes.map((dataType) => (
+                                  <span class="chip">{formatDataTypeLabel(dataType)}</span>
+                                ))}
+                              </div>
+                            )}
+
+                            {Array.isArray(item.dependsOn) && item.dependsOn.length > 0 && (
+                              <div class="detail-section">
+                                <span class="detail-label">Uses</span>
+                                {item.dependsOn.map((dependency) => {
+                                  const related = bySlug[dependency] || byId[dependency];
+                                  const label = (related && related.title) || dependency;
+                                  return <span class="chip">{label}</span>;
+                                })}
+                              </div>
+                            )}
+
+                            {(item.usersCount || item.dataVolume || item.moneyVolume) && (
+                              <div class="detail-section">
+                                {item.usersCount && (
+                                  <span class="chip metric-chip">
+                                    <span class="chip-label">Users</span>
+                                    {item.usersCount}
+                                  </span>
+                                )}
+                                {item.dataVolume && (
+                                  <span class="chip metric-chip">
+                                    <span class="chip-label">Data</span>
+                                    {item.dataVolume}
+                                  </span>
+                                )}
+                                {item.moneyVolume && (
+                                  <span class="chip metric-chip">
+                                    <span class="chip-label">Payments</span>
+                                    {item.moneyVolume}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            {Array.isArray(item.referencesResolved) && item.referencesResolved.length > 0 && (
+                              <div class="detail-section detail-stack">
+                                <span class="detail-label">Related references</span>
+                                <ul class="references-list">
+                                  {item.referencesResolved.map((reference) => (
+                                    <li>
+                                      {reference.url ? (
+                                        <a
+                                          class="catalog-card-list-link catalog-card-external-link"
+                                          href={reference.url}
+                                          target="_blank"
+                                          rel="noopener"
+                                          title={formatLinkTitle(reference.url, formatCitation(reference))}
+                                          aria-label={newTabAriaLabel(formatCitation(reference))}
+                                        >
+                                          <span class="link-label link-label-multi">{formatCitation(reference)}</span>
+                                        </a>
+                                      ) : (
+                                        <span>{formatCitation(reference)}</span>
+                                      )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {Array.isArray(item.implementationSnippets) && item.implementationSnippets.length > 0 && (
+                              <div class="detail-section detail-stack">
+                                <span class="detail-label">Examples</span>
+                                <div class="snippets-wrap">
+                                  {item.implementationSnippets.map((snippet) => (
+                                    <div class="snippet">
+                                      <div class="snippet-head">
+                                        <span class="chip">{snippet.title}</span>
+                                        {snippet.exampleUrl && (
+                                          <a
+                                            class="catalog-card-source-link catalog-card-external-link"
+                                            href={snippet.exampleUrl}
+                                            target="_blank"
+                                            rel="noopener"
+                                            title={formatLinkTitle(snippet.exampleUrl, snippet.exampleLabel || `${snippet.title} example`)}
+                                            aria-label={newTabAriaLabel(snippet.exampleLabel || `${snippet.title} example`)}
+                                          >
+                                            <span class="link-label link-label-single">{snippet.exampleLabel || 'Example'}</span>
+                                          </a>
+                                        )}
+                                        {snippet.sourceUrl && (
+                                          <a
+                                            class="catalog-card-source-link catalog-card-external-link"
+                                            href={snippet.sourceUrl}
+                                            target="_blank"
+                                            rel="noopener"
+                                            title={formatLinkTitle(snippet.sourceUrl, `${snippet.title} source`)}
+                                            aria-label={newTabAriaLabel(`${snippet.title} source`)}
+                                          >
+                                            <span class="link-label link-label-single">Source</span>
+                                          </a>
+                                        )}
+                                        <button type="button" class="copy" data-code={encodeURIComponent(snippet.code || '')}>Copy</button>
+                                      </div>
+                                      {snippet.summary && <p class="snippet-summary">{snippet.summary}</p>}
+                                      <pre class="code"><code>{snippet.code}</code></pre>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </details>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+      </section>
+    </div>
+
+    <p id="empty" class="catalog-empty muted" hidden>
+      No initiatives match this view. <button id="clear" type="button">Clear filters</button>
+    </p>
+  </main>
+
+  <script is:inline define:vars={{ approachKeys: APPROACH_KEYS }}>
+    // @ts-nocheck
+    (() => {
+      const queryAll = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+      const queryOne = (selector, root = document) => root.querySelector(selector);
+      const setPressed = (element, pressed) => element.setAttribute('aria-pressed', String(pressed));
+      const searchInput = queryOne('#q');
+      const sortSelect = queryOne('#sort');
+      const controlsPanel = queryOne('#catalog-panel');
+      const panelSummary = queryOne('#panel-summary');
+      const actionsContainer = queryOne('#actions');
+      const dataTypesContainer = queryOne('#data-types');
+      const countText = queryOne('#count');
+      const activeFiltersText = queryOne('#active-filters');
+      const chipsContainer = queryOne('#active-filter-chips');
+      const archivedToggle = queryOne('#archived-toggle');
+      const spreadsheetView = queryOne('#spreadsheet-view');
+      const cardsView = queryOne('#cards-view');
+      const shareButton = queryOne('#share-view');
+      const sectionKeys = approachKeys;
+      const defaultSectionKey = sectionKeys[0];
+      const tableBodies = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`#table-body-${key}`)])
+      );
+      const spreadsheetGroups = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`#spreadsheet-group-${key}`)])
+      );
+      const cardGrids = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`#cards-grid-${key}`)])
+      );
+      const cardGroups = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`#cards-group-${key}`)])
+      );
+      const approachLinks = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`[data-approach-nav="${key}"]`)])
+      );
+      const approachCounts = Object.fromEntries(
+        sectionKeys.map((key) => [key, queryOne(`[data-approach-count="${key}"]`)])
+      );
+      const emptyState = queryOne('#empty');
+      const clearButton = queryOne('#clear');
+      const resetButton = queryOne('#reset-filters');
+      const viewButtons = queryAll('.view-button');
+      const statusButtons = queryAll('.status-button');
+      const compactCatalogMedia = window.matchMedia('(max-width: 720px)');
+      const statusLabels = { live: 'Live', wip: 'WIP', archived: 'Archived' };
+      const legacyGoalActions = {
+        signal: ['attach-preference-signal', 'attach-formal-license'],
+        block: ['technical-blocking'],
+        paid: ['add-tollgate', 'data-market-platform', 'join-licensing-collective', 'certification'],
+      };
+
+      const requiredElements = [
+        searchInput,
+        sortSelect,
+        actionsContainer,
+        dataTypesContainer,
+        countText,
+        activeFiltersText,
+        chipsContainer,
+        archivedToggle,
+        spreadsheetView,
+        cardsView,
+        ...sectionKeys.flatMap((key) => [
+          tableBodies[key],
+          spreadsheetGroups[key],
+          cardGrids[key],
+          cardGroups[key],
+          approachLinks[key],
+          approachCounts[key],
+        ]),
+        emptyState,
+        panelSummary,
+      ];
+
+      if (requiredElements.some((element) => !element)) return;
+
+      const defaultView = () => (compactCatalogMedia.matches ? 'cards' : 'spreadsheet');
+      let currentView = defaultView();
+      let shareResetTimer = 0;
+
+      const actionButtons = () => queryAll('.catalog-action', actionsContainer);
+      const dataTypeButtons = () => queryAll('.catalog-action', dataTypesContainer);
+      const rowNodes = () => queryAll('.catalog-row', spreadsheetView);
+      const cardNodes = () => queryAll('.catalog-card', cardsView);
+      const cardsById = () => new Map(cardNodes().map((card) => [card.dataset.item || '', card]));
+      const statusRank = (status) => {
+        if (status === 'live') return 0;
+        if (status === 'wip') return 1;
+        if (status === 'archived') return 2;
+        return 3;
+      };
+      let summaryRefreshFrame = 0;
+      const getActionLabel = (action) =>
+        actionButtons().find((button) => button.dataset.action === action)?.textContent?.trim() || action;
+      const getDataTypeLabel = (dataType) =>
+        dataTypeButtons().find((button) => button.dataset.dataType === dataType)?.textContent?.trim() || dataType;
+      const getSortLabel = (sortMode) =>
+        Array.from(sortSelect.options).find((option) => option.value === sortMode)?.text || sortMode;
+
+      function normalizeView(view) {
+        return view === 'cards' ? 'cards' : 'spreadsheet';
+      }
+
+      async function copyCurrentView() {
+        if (!shareButton) return;
+
+        const setLabel = (text) => {
+          shareButton.textContent = text;
+          window.clearTimeout(shareResetTimer);
+          shareResetTimer = window.setTimeout(() => {
+            shareButton.textContent = 'Copy this view';
+          }, 1400);
+        };
+
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(location.href);
+          } else {
+            const probe = document.createElement('textarea');
+            probe.value = location.href;
+            probe.setAttribute('readonly', '');
+            probe.style.position = 'absolute';
+            probe.style.left = '-9999px';
+            document.body.appendChild(probe);
+            probe.select();
+            document.execCommand('copy');
+            document.body.removeChild(probe);
+          }
+
+          setLabel('Link copied');
+        } catch {
+          setLabel('Copy failed');
+        }
+      }
+
+      function getSelectedActions() {
+        return actionButtons()
+          .filter((button) => button.getAttribute('aria-pressed') === 'true')
+          .map((button) => (button.dataset.action || '').toLowerCase())
+          .filter(Boolean);
+      }
+
+      function getSelectedDataTypes() {
+        return dataTypeButtons()
+          .filter((button) => button.getAttribute('aria-pressed') === 'true')
+          .map((button) => (button.dataset.dataType || '').toLowerCase())
+          .filter(Boolean);
+      }
+
+      function getStatusFilter() {
+        const active = statusButtons.find((button) => button.getAttribute('aria-pressed') === 'true');
+        return active?.dataset.statusFilter || 'all';
+      }
+
+      function getArchivedIncluded() {
+        return archivedToggle?.getAttribute('aria-pressed') === 'true';
+      }
+
+      function setStatusFilter(value) {
+        statusButtons.forEach((button) => {
+          setPressed(button, button.dataset.statusFilter === value);
+        });
+      }
+
+      function setArchivedIncluded(value) {
+        if (archivedToggle) setPressed(archivedToggle, value);
+      }
+
+      function clearActionButtons() {
+        actionButtons().forEach((button) => setPressed(button, false));
+      }
+
+      function clearDataTypeButtons() {
+        dataTypeButtons().forEach((button) => setPressed(button, false));
+      }
+
+      function setView(view) {
+        currentView = normalizeView(view);
+        viewButtons.forEach((button) => {
+          setPressed(button, button.dataset.view === currentView);
+        });
+        spreadsheetView.hidden = currentView !== 'spreadsheet';
+        cardsView.hidden = currentView !== 'cards';
+        syncApproachNavigation();
+        scheduleSummaryToggleRefresh();
+      }
+
+      function setSummaryExpanded(summary, toggle, expanded) {
+        summary.classList.toggle('is-clamped', !expanded);
+        summary.classList.toggle('is-expanded', expanded);
+        toggle.setAttribute('aria-expanded', String(expanded));
+        toggle.textContent = expanded ? 'Show less' : 'Show more';
+      }
+
+      function refreshSummaryToggles() {
+        if (currentView !== 'spreadsheet') return;
+
+        queryAll('[data-summary-wrap]', spreadsheetView).forEach((wrap) => {
+          if (!(wrap instanceof HTMLElement) || wrap.closest('[hidden]')) return;
+
+          const summary = queryOne('[data-summary]', wrap);
+          const toggle = queryOne('[data-summary-toggle]', wrap);
+          if (!(summary instanceof HTMLElement) || !(toggle instanceof HTMLButtonElement)) return;
+
+          const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+
+          summary.classList.remove('is-expanded');
+          summary.classList.add('is-clamped');
+
+          const needsToggle = summary.scrollHeight - summary.clientHeight > 4;
+
+          if (!needsToggle) {
+            summary.classList.remove('is-clamped');
+            toggle.hidden = true;
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.textContent = 'Show more';
+            return;
+          }
+
+          toggle.hidden = false;
+          setSummaryExpanded(summary, toggle, isExpanded);
+        });
+      }
+
+      function scheduleSummaryToggleRefresh() {
+        window.cancelAnimationFrame(summaryRefreshFrame);
+        summaryRefreshFrame = window.requestAnimationFrame(() => {
+          refreshSummaryToggles();
+        });
+      }
+
+      function compareItems(a, b, sortMode) {
+        const aTitle = a.row.dataset.title || '';
+        const bTitle = b.row.dataset.title || '';
+
+        if (sortMode === 'alpha') return aTitle.localeCompare(bTitle);
+        if (sortMode === 'status') {
+          const aRank = statusRank(a.row.dataset.status || '');
+          const bRank = statusRank(b.row.dataset.status || '');
+          if (aRank !== bRank) return aRank - bRank;
+          return aTitle.localeCompare(bTitle);
+        }
+
+        const aLatest = Number(a.row.dataset.latest || 0);
+        const bLatest = Number(b.row.dataset.latest || 0);
+        if (aLatest !== bLatest) return bLatest - aLatest;
+
+        const aRank = statusRank(a.row.dataset.status || '');
+        const bRank = statusRank(b.row.dataset.status || '');
+        if (aRank !== bRank) return aRank - bRank;
+
+        return aTitle.localeCompare(bTitle);
+      }
+
+      function buildActiveChips(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode, includeArchived) {
+        const chips = [];
+
+        if (rawQuery) chips.push({ kind: 'search', label: `Search: ${rawQuery}` });
+        if (statusValue !== 'all') {
+          chips.push({
+            kind: 'status',
+            value: statusValue,
+            label: `Status: ${statusLabels[statusValue] || statusValue}`,
+          });
+        }
+        selectedActions.forEach((action) => {
+          chips.push({ kind: 'action', value: action, label: `Approach type: ${getActionLabel(action)}` });
+        });
+        selectedDataTypes.forEach((dataType) => {
+          chips.push({ kind: 'data-type', value: dataType, label: `Data type: ${getDataTypeLabel(dataType)}` });
+        });
+        if (sortMode !== 'latest') {
+          chips.push({ kind: 'sort', value: sortMode, label: `Sort: ${getSortLabel(sortMode)}` });
+        }
+        if (includeArchived) chips.push({ kind: 'archived', label: 'Including archived' });
+
+        return chips;
+      }
+
+      function renderActiveChips(chips) {
+        if (!chipsContainer) return;
+
+        chipsContainer.replaceChildren();
+
+        chips.forEach((chip) => {
+          const button = document.createElement('button');
+          const label = document.createElement('span');
+          const close = document.createElement('span');
+
+          button.type = 'button';
+          button.className = 'active-filter-chip';
+          button.dataset.removeKind = chip.kind;
+          if (chip.value) button.dataset.removeValue = chip.value;
+          button.setAttribute('aria-label', `Remove ${chip.label}`);
+
+          label.textContent = chip.label;
+          close.className = 'active-filter-chip-close';
+          close.textContent = '×';
+          close.setAttribute('aria-hidden', 'true');
+
+          button.append(label, close);
+          chipsContainer.append(button);
+        });
+
+        chipsContainer.hidden = chips.length === 0;
+      }
+
+      function updateSummaries(chips, visibleCount, rawQuery, includeArchived) {
+        if (chips.length > 0 || rawQuery) {
+          activeFiltersText.textContent = `Showing ${visibleCount} ${
+            visibleCount === 1 ? 'initiative' : 'initiatives'
+          }${rawQuery ? ` for "${rawQuery}"` : ''}.`;
+        } else {
+          activeFiltersText.textContent = includeArchived
+            ? 'Showing all current and archived initiatives.'
+            : 'Showing current initiatives. Archived entries are hidden by default.';
+        }
+
+        panelSummary.textContent = chips.length > 0
+          ? `${chips.length} active ${chips.length === 1 ? 'filter' : 'filters'}`
+          : 'All filters off';
+
+        if (resetButton) {
+          resetButton.hidden = chips.length === 0;
+        }
+
+        renderActiveChips(chips);
+      }
+
+      function syncApproachNavigation() {
+        sectionKeys.forEach((key) => {
+          const link = approachLinks[key];
+          if (!(link instanceof HTMLAnchorElement)) return;
+          link.href = currentView === 'cards' ? `#cards-group-${key}` : `#spreadsheet-group-${key}`;
+        });
+      }
+
+      function updateApproachNavigation(visibleBySection) {
+        sectionKeys.forEach((key) => {
+          const link = approachLinks[key];
+          const count = approachCounts[key];
+          const visibleCount = visibleBySection[key] || 0;
+
+          if (count) count.textContent = String(visibleCount);
+          if (link) {
+            link.classList.toggle('is-empty', visibleCount === 0);
+            link.setAttribute('aria-disabled', String(visibleCount === 0));
+          }
+        });
+      }
+
+      function syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode, includeArchived) {
+        const params = new URLSearchParams();
+        if (rawQuery) params.set('q', rawQuery);
+        if (statusValue !== 'all') params.set('status', statusValue);
+        selectedActions.forEach((action) => params.append('actions', action));
+        selectedDataTypes.forEach((dataType) => params.append('types', dataType));
+        if (sortMode !== 'latest') params.set('sort', sortMode);
+        if (includeArchived) params.set('archived', '1');
+        if (currentView !== defaultView()) params.set('view', currentView);
+
+        const nextUrl = params.toString() ? `?${params.toString()}` : location.pathname;
+        history.replaceState(null, '', nextUrl);
+      }
+
+      function applyFilters() {
+        const rawQuery = (searchInput.value || '').trim();
+        const query = rawQuery.toLowerCase();
+        const selectedActions = getSelectedActions();
+        const selectedDataTypes = getSelectedDataTypes();
+        const statusValue = getStatusFilter();
+        const sortMode = sortSelect.value || 'latest';
+        const includeArchived = getArchivedIncluded();
+
+        const cardsLookup = cardsById();
+        const items = rowNodes().map((row) => ({
+          key: row.dataset.item || '',
+          row,
+          card: cardsLookup.get(row.dataset.item || ''),
+        }));
+
+        const visibleItems = [];
+
+        items.forEach((item) => {
+          let matches = true;
+
+          if (query) {
+            const searchable = `${item.row.dataset.title || ''} ${item.row.dataset.summary || ''} ${
+              item.row.dataset.tags || ''
+            } ${item.row.dataset.types || ''} ${item.row.dataset.website || ''} ${item.row.dataset.approach || ''} ${
+              item.row.dataset.evidence || ''
+            }`;
+            matches = searchable.includes(query);
+          }
+
+          if (matches && statusValue !== 'all') {
+            matches = item.row.dataset.status === statusValue;
+          }
+
+          if (matches && !includeArchived) {
+            matches = item.row.dataset.status !== 'archived';
+          }
+
+          if (matches && selectedActions.length > 0) {
+            const itemActions = (item.row.dataset.actions || '').split(' ').filter(Boolean);
+            matches = selectedActions.some((action) => itemActions.includes(action));
+          }
+
+          if (matches && selectedDataTypes.length > 0) {
+            const itemDataTypes = (item.row.dataset.types || '').split(' ').filter(Boolean);
+            matches = selectedDataTypes.some((dataType) => itemDataTypes.includes(dataType));
+          }
+
+          item.row.hidden = !matches;
+          if (item.card) item.card.hidden = !matches || currentView !== 'cards';
+          if (matches) visibleItems.push(item);
+        });
+
+        visibleItems.sort((a, b) => compareItems(a, b, sortMode));
+        const visibleBySection = Object.fromEntries(sectionKeys.map((key) => [key, 0]));
+        visibleItems.forEach((item) => {
+          const section = sectionKeys.includes(item.row.dataset.catalogSection)
+            ? item.row.dataset.catalogSection
+            : defaultSectionKey;
+          visibleBySection[section] += 1;
+          tableBodies[section].appendChild(item.row);
+          if (item.card) cardGrids[section].appendChild(item.card);
+        });
+
+        sectionKeys.forEach((key) => {
+          spreadsheetGroups[key].hidden = visibleBySection[key] === 0;
+          cardGroups[key].hidden = visibleBySection[key] === 0;
+        });
+
+        countText.textContent = String(visibleItems.length);
+        emptyState.hidden = visibleItems.length !== 0;
+        updateApproachNavigation(visibleBySection);
+
+        const chips = buildActiveChips(
+          rawQuery,
+          statusValue,
+          selectedActions,
+          selectedDataTypes,
+          sortMode,
+          includeArchived
+        );
+        updateSummaries(chips, visibleItems.length, rawQuery, includeArchived);
+        syncUrl(rawQuery, statusValue, selectedActions, selectedDataTypes, sortMode, includeArchived);
+        scheduleSummaryToggleRefresh();
+      }
+
+      function clearFilters() {
+        searchInput.value = '';
+        sortSelect.value = 'latest';
+        setStatusFilter('all');
+        setArchivedIncluded(false);
+        clearActionButtons();
+        clearDataTypeButtons();
+        applyFilters();
+      }
+
+      function initializeFromUrl() {
+        const params = new URLSearchParams(location.search);
+        const queryValue = params.get('q');
+        const statusValue = params.get('status');
+        const goalValue = params.get('goal');
+        const sortValue = params.get('sort');
+        const viewValue = params.get('view');
+        const archivedValue = params.get('archived');
+        const preselectedActions = new Set(params.getAll('actions'));
+        const preselectedDataTypes = new Set(params.getAll('types'));
+        const legacyActions = legacyGoalActions[goalValue] || [];
+
+        if (queryValue) searchInput.value = queryValue;
+        if (statusValue && ['all', 'live', 'wip'].includes(statusValue)) setStatusFilter(statusValue);
+        if (sortValue && Array.from(sortSelect.options).some((option) => option.value === sortValue)) {
+          sortSelect.value = sortValue;
+        }
+        if (archivedValue && ['1', 'true', 'yes'].includes(archivedValue)) {
+          setArchivedIncluded(true);
+        }
+        legacyActions.forEach((action) => preselectedActions.add(action));
+        if (preselectedActions.size > 0) {
+          actionButtons().forEach((button) => {
+            setPressed(button, preselectedActions.has(button.dataset.action || ''));
+          });
+        }
+        if (preselectedDataTypes.size > 0) {
+          dataTypeButtons().forEach((button) => {
+            setPressed(button, preselectedDataTypes.has(button.dataset.dataType || ''));
+          });
+        }
+        if (viewValue && ['cards', 'spreadsheet'].includes(viewValue)) setView(viewValue);
+
+        const hasAdvancedFilters =
+          (statusValue && statusValue !== 'all') ||
+          (sortValue && sortValue !== 'latest') ||
+          (archivedValue && ['1', 'true', 'yes'].includes(archivedValue)) ||
+          preselectedActions.size > 0 ||
+          preselectedDataTypes.size > 0;
+
+        if (controlsPanel && hasAdvancedFilters) {
+          controlsPanel.open = true;
+        }
+      }
+
+      viewButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          setView(button.dataset.view || 'spreadsheet');
+          applyFilters();
+        });
+      });
+
+      statusButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          setStatusFilter(button.dataset.statusFilter || 'all');
+          applyFilters();
+        });
+      });
+
+      if (archivedToggle) {
+        archivedToggle.addEventListener('click', () => {
+          setArchivedIncluded(!getArchivedIncluded());
+          applyFilters();
+        });
+      }
+
+      Object.values(approachLinks).forEach((link) => {
+        if (!(link instanceof HTMLAnchorElement)) return;
+
+        link.addEventListener('click', (event) => {
+          const key = link.dataset.approachJump || '';
+          const target = queryOne(
+            currentView === 'cards' ? `#cards-group-${key}` : `#spreadsheet-group-${key}`
+          );
+
+          if (!(target instanceof HTMLElement) || target.hidden) {
+            event.preventDefault();
+          }
+        });
+      });
+
+      spreadsheetView.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const toggle = target.closest('[data-summary-toggle]');
+        if (!(toggle instanceof HTMLButtonElement)) return;
+
+        const wrap = toggle.closest('[data-summary-wrap]');
+        const summary = wrap ? queryOne('[data-summary]', wrap) : null;
+        if (!(summary instanceof HTMLElement)) return;
+
+        const expanded = toggle.getAttribute('aria-expanded') !== 'true';
+        setSummaryExpanded(summary, toggle, expanded);
+      });
+
+      actionsContainer.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const actionButton = target.closest('.catalog-action');
+        if (!(actionButton instanceof HTMLElement)) return;
+
+        const nextPressed = actionButton.getAttribute('aria-pressed') !== 'true';
+        setPressed(actionButton, nextPressed);
+        applyFilters();
+      });
+
+      dataTypesContainer.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const dataTypeButton = target.closest('.catalog-action');
+        if (!(dataTypeButton instanceof HTMLElement)) return;
+
+        const nextPressed = dataTypeButton.getAttribute('aria-pressed') !== 'true';
+        setPressed(dataTypeButton, nextPressed);
+        applyFilters();
+      });
+
+      if (chipsContainer) {
+        chipsContainer.addEventListener('click', (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+
+          const chipButton = target.closest('.active-filter-chip');
+          if (!(chipButton instanceof HTMLButtonElement)) return;
+
+          const kind = chipButton.dataset.removeKind;
+          const value = chipButton.dataset.removeValue || '';
+
+          if (kind === 'search') searchInput.value = '';
+          if (kind === 'status') setStatusFilter('all');
+          if (kind === 'action') {
+            const actionButton = actionButtons().find((button) => button.dataset.action === value);
+            if (actionButton) setPressed(actionButton, false);
+          }
+          if (kind === 'data-type') {
+            const dataTypeButton = dataTypeButtons().find((button) => button.dataset.dataType === value);
+            if (dataTypeButton) setPressed(dataTypeButton, false);
+          }
+          if (kind === 'sort') sortSelect.value = 'latest';
+          if (kind === 'archived') setArchivedIncluded(false);
+
+          applyFilters();
+        });
+      }
+
+      if (shareButton) {
+        shareButton.addEventListener('click', () => {
+          void copyCurrentView();
+        });
+      }
+
+      searchInput.addEventListener('input', applyFilters);
+      sortSelect.addEventListener('change', applyFilters);
+      window.addEventListener('resize', scheduleSummaryToggleRefresh);
+      document.fonts?.ready?.then(scheduleSummaryToggleRefresh).catch(() => {});
+
+      if (clearButton) clearButton.addEventListener('click', clearFilters);
+      if (resetButton) resetButton.addEventListener('click', clearFilters);
+
+      initializeFromUrl();
+      setView(currentView);
+      applyFilters();
+    })();
+  </script>
+</Layout>
