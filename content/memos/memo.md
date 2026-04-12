@@ -7,6 +7,16 @@ title: AI Preference Signals, Licenses, and Enforcement
 
 This is a brief memo aimed at organizations that may be considering state-of-the-art AI training-data preference signals and licensing, and the enforcement of those signals or license terms, so members and contributors can control how their valuable content is used in AI pipelines.  
 
+> Note (April 12, 2026): This memo still reflects a useful consent-first baseline, but parts of the landscape have moved faster than the draft. For many organizations, the best near-term posture is watchful waiting plus low-friction action: audit AI bot traffic, keep crawler directives current, publish a clear AI-use policy and contact path, preserve contributor opt-in or opt-out choices, and prepare a controlled opt-in licensing path so you can move quickly as standards and markets settle.
+
+Low-friction actions an organization can take now:
+
+- Audit current AI bot and fetcher traffic so you know which systems are already touching your content.
+- Publish and maintain `robots.txt`, bot-specific directives, and other low-cost preference signals where available.
+- Put a clear AI-use policy and rights-contact path in one obvious place so developers and partners know how to ask.
+- Preserve contributor choices, provenance, and licensing metadata instead of flattening everything into one default.
+- Explore one controlled opt-in channel such as a marketplace, collective licence, or registry without committing your whole corpus immediately.
+
 ## Context  
 
 Ambiguity in the legal frameworks that govern AI data practices has created uncertainty regarding what data can be used for AI training. While there is an emerging set of tools for data creators to express preferences about how and when their content should be used in AI pipelines, there is no widely adopted best-practice standard.  

@@ -2,7 +2,7 @@
 title: Microsoft Publisher Content Marketplace
 summary: Paid marketplace routing premium publisher content into Microsoft Copilot, MSN, and Discover experiences.
 status: live
-website: 'https://about.ads.microsoft.com/en/blog/post/february-2026/introducing-the-microsoft-publisher-content-marketplace'
+website: 'https://about.ads.microsoft.com/en/blog/post/february-2026/building-toward-a-sustainable-content-economy-for-the-agentic-web'
 actionsSupported:
   - data-market-platform
 primaryApproachType: data-market-platform
@@ -17,15 +17,15 @@ usersCount: '7 launch publisher partners'
 metricEvidence:
   usersCount:
     basis: explicit
-    notes: Counts the seven named launch publishers in Microsoft's February 6, 2026 announcement; Yahoo DSP is a demand-side partner, not a publisher participant.
+    notes: Counts the seven named launch publishers in Microsoft's February 3, 2026 announcement; Yahoo is described as a demand partner, not a publisher participant.
     sources:
-      - label: Publisher Content Marketplace announced with seven launch publishers
-        url: 'https://about.ads.microsoft.com/en/blog/post/february-2026/introducing-the-microsoft-publisher-content-marketplace'
-        date: '2026-02-06'
+      - label: Building Toward a Sustainable Content Economy for the Agentic Web
+        url: 'https://about.ads.microsoft.com/en/blog/post/february-2026/building-toward-a-sustainable-content-economy-for-the-agentic-web'
+        date: '2026-02-03'
 evidenceLinks:
-  - label: Publisher Content Marketplace announced with seven launch publishers
-    url: 'https://about.ads.microsoft.com/en/blog/post/february-2026/introducing-the-microsoft-publisher-content-marketplace'
-    date: '2026-02-06'
+  - label: Building Toward a Sustainable Content Economy for the Agentic Web
+    url: 'https://about.ads.microsoft.com/en/blog/post/february-2026/building-toward-a-sustainable-content-economy-for-the-agentic-web'
+    date: '2026-02-03'
 considerations: Microsoft Publisher Content Marketplace is a closed distribution marketplace inside Microsoft's own surfaces rather than a reusable web standard or neutral exchange.
 visibility: public
 type: data_license_initiative

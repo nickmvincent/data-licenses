@@ -19,6 +19,14 @@
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Informal proposed signal with diffuse deployment and no canonical public adoption tracker."
   },
+  "akamai-content-protector": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Akamai publishes strong network-level evidence of AI bot pressure, but not a clean public customer count for Content Protector or its AI-specific workflows."
+  },
+  "amlet": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Amlet has a live registry and named partners, but I could not find a stable public deployment count worth recording yet."
+  },
   "bria-artist-program": {
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Official materials now support a partner-count metric for the licensed training catalog."
@@ -26,6 +34,14 @@
   "cc-signals": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Consultation-stage preference-signal effort with no stable public deployment metric yet."
+  },
+  "ccc-ai-licensing-suite": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "CCC publicly documents multiple AI licensing options, but I could not find a clean AI-specific customer or rightsholder count that maps neatly to the suite."
+  },
+  "cla-generative-ai-licence": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "CLA now has a live request surface for AI training licences, but public rollout and adoption metrics remain limited."
   },
   "cloudflare-anti-scraping": {
     "adoptionResearchStatus": "populated",
@@ -55,6 +71,10 @@
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Member count is now recorded as a conservative announced total across official alliance announcements."
   },
+  "dataseeds-ai": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Company-issued releases support a conservative image-corpus metric for the rights-cleared marketplace."
+  },
   "defined-ai-marketplace": {
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Official 2025 review materials now support a conservative marketplace-revenue metric."
@@ -79,6 +99,10 @@
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Certification count is now recorded as a conservative rollup across official announcement posts; the undated certified-models page appears larger."
   },
+  "fastly-ai-bot-management": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Fastly publishes strong AI-bot traffic research and a live product surface, but not a clean public adoption count for the AI-specific control layer."
+  },
   "flexolmo": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Research-oriented commons effort with no stable public adoption unit yet."
@@ -102,6 +126,10 @@
   "humpback": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Public marketing materials make the tollgate concept legible, but I could not yet find a stable dated official launch or adoption metric."
+  },
+  "iab-tech-lab-comp": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "CoMP is still a standards effort rather than a deployed service, so adoption is not yet the right unit."
   },
   "iptc-plus-data-mining-metadata": {
     "adoptionResearchStatus": "hard-to-quantify",
@@ -147,6 +175,14 @@
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Official materials support a conservative track-count metric for the opt-in AI licensing catalog."
   },
+  "stack-data-licensing": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "A dated official press release supports a conservative corpus-size metric, while the current product page appears larger."
+  },
+  "spur": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "The five founding coalition members are clearly named, but the standards and commercial outputs remain early-stage."
+  },
   "spawning-data-diligence": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Developer tooling with no strong public reporting surface beyond indirect signals."
@@ -170,6 +206,10 @@
   "tollbit": {
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Official launch materials now support a conservative premium-publisher count."
+  },
+  "trust-txt": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "RJI reports the JournalList network at about 3,000 participating publishers, giving this lightweight signal a conservative announced adoption figure."
   },
   "user-intents": {
     "adoptionResearchStatus": "hard-to-quantify",

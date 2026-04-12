@@ -7,7 +7,7 @@ actionsSupported:
   - data-market-platform
   - certification
   - new-infrastructures
-primaryApproachType: data-market-platform
+primaryApproachType: new-infrastructures
 pipelineStages:
   - train
 dataTypes:

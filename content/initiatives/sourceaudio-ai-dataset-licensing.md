@@ -2,7 +2,7 @@
 title: SourceAudio AI Dataset Licensing
 summary: Opt-in music dataset licensing program that pays rights holders for AI training use of tracks and catalogs.
 status: live
-website: 'https://www.sourceaudio.com/why-music-ai-dataset-partnerships-matter'
+website: 'https://www.sourceaudio.com/blog/2025/06/05/a-new-chapter-in-music-licensing/'
 actionsSupported:
   - data-market-platform
 primaryApproachType: data-market-platform
@@ -22,20 +22,20 @@ metricEvidence:
     notes: The same official article also describes participation spanning 400,000 artists and 1,000+ label and publishing catalogs.
     sources:
       - label: SourceAudio outlines AI dataset licensing program scale
-        url: 'https://www.sourceaudio.com/why-music-ai-dataset-partnerships-matter'
+        url: 'https://www.sourceaudio.com/blog/2025/06/05/a-new-chapter-in-music-licensing/'
         date: '2025-06-05'
   moneyVolume:
     basis: explicit
     sources:
       - label: SourceAudio outlines AI dataset licensing program scale
-        url: 'https://www.sourceaudio.com/why-music-ai-dataset-partnerships-matter'
+        url: 'https://www.sourceaudio.com/blog/2025/06/05/a-new-chapter-in-music-licensing/'
         date: '2025-06-05'
 evidenceLinks:
   - label: Symphonic partnership expands AI dataset licensing marketplace
     url: 'https://www.sourceaudio.com/v7-blog-post/'
     date: '2026-03-06'
   - label: SourceAudio outlines AI dataset licensing program scale
-    url: 'https://www.sourceaudio.com/why-music-ai-dataset-partnerships-matter'
+    url: 'https://www.sourceaudio.com/blog/2025/06/05/a-new-chapter-in-music-licensing/'
     date: '2025-06-05'
 considerations: Public materials highlight catalog scale and example payouts, but do not yet provide a simple official count of participating labels or developers.
 visibility: public

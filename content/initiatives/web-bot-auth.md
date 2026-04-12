@@ -14,9 +14,9 @@ dataTypes:
 tags:
   - bot-authentication
 evidenceLinks:
-  - label: Use cases draft published
-    url: 'https://datatracker.ietf.org/doc/draft-nottingham-webbotauth-use-cases/'
-    date: '2026-01-18'
+  - label: Use cases draft updated
+    url: 'https://datatracker.ietf.org/doc/draft-nottingham-webbotauth-use-cases/02/'
+    date: '2026-04-01'
   - label: Charter approved
     url: 'https://datatracker.ietf.org/group/webbotauth/history/'
     date: '2025-10-23'
