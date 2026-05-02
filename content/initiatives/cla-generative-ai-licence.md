@@ -2,7 +2,7 @@
 title: CLA Generative AI Training Licence
 summary: UK collective licensing offer for AI model training, fine-tuning, and RAG over published text content.
 status: live
-website: 'https://cla.co.uk/ai-training-licensing-for-businesses/'
+website: 'https://cla.co.uk/ai-and-copyright/'
 actionsSupported:
   - join-licensing-collective
   - attach-formal-license

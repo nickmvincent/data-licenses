@@ -13,10 +13,10 @@ metricEvidence:
     notes: Derived from nine launch certifications, five additional certified entities announced in March 2024, and two more individual-model certifications announced in August 2024.
     sources:
       - label: Certification launched for generative AI companies
-        url: 'https://www.fairlytrained.org/blog/fairly-trained-launches-certification-for-generative-ai-companies'
+        url: 'https://www.fairlytrained.org/blog/fairly-trained-launches-certification-for-generative-ai-models-that-respect-creators-rights'
         date: '2024-01-17'
       - label: Five more companies received certification
-        url: 'https://www.fairlytrained.org/blog/another-five-companies-receive-fairly-trained-certification'
+        url: 'https://www.fairlytrained.org/blog/newly-certified-models-march-24'
         date: '2024-03-20'
       - label: Individual model certification updated
         url: 'https://www.fairlytrained.org/blog/updating-our-individual-model-certification'
@@ -26,10 +26,10 @@ evidenceLinks:
     url: 'https://www.fairlytrained.org/blog/updating-our-individual-model-certification'
     date: '2024-08-01'
   - label: Five more companies received certification
-    url: 'https://www.fairlytrained.org/blog/another-five-companies-receive-fairly-trained-certification'
+    url: 'https://www.fairlytrained.org/blog/newly-certified-models-march-24'
     date: '2024-03-20'
   - label: Certification launched for generative AI companies
-    url: 'https://www.fairlytrained.org/blog/fairly-trained-launches-certification-for-generative-ai-companies'
+    url: 'https://www.fairlytrained.org/blog/fairly-trained-launches-certification-for-generative-ai-models-that-respect-creators-rights'
     date: '2024-01-17'
 considerations: Published announcement counts may understate the current roster; Fairly Trained's current certified-models page appears larger, but it is undated, so this metric stays conservative.
 visibility: public

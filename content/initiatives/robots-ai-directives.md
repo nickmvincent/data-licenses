@@ -5,7 +5,7 @@ summary: >-
   from OpenAI. Additionally, the X-Robots-Tag response header allows servers to
   send crawler directives via HTTP response headers.
 status: live
-website: 'https://platform.openai.com/docs/bots'
+website: 'https://developers.openai.com/api/docs/bots'
 actionsSupported:
   - attach-preference-signal
 primaryApproachType: attach-preference-signal
@@ -13,7 +13,7 @@ dataTypes:
   - web-content
 evidenceLinks:
   - label: OpenAI bots documentation
-    url: 'https://platform.openai.com/docs/bots'
+    url: 'https://developers.openai.com/api/docs/bots'
     date: '2025-09-17'
 visibility: public
 type: data_license_initiative

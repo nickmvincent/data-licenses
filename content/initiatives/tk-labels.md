@@ -14,9 +14,9 @@ tags:
   - indigenous-data-governance
   - cultural-heritage
 evidenceLinks:
-  - label: Guide to using TK Labels and Notices updated
-    url: 'https://localcontexts.org/blog/how-to-use-tk-labels-and-notices/'
-    date: '2025-09-18'
+  - label: Oriana TV case study shows TK Labels in use
+    url: 'https://localcontexts.org/labels-in-use-oriana-tv/'
+    date: '2022-06-17'
 implementationSnippets:
   - title: TK Attribution label
     summary: Local Contexts publishes each label with a short code plus customizable template text.

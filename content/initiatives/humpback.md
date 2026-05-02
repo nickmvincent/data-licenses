@@ -1,8 +1,8 @@
 ---
 title: Humpback
 summary: LLM paywall and analytics layer for publishers that want to control or monetize AI bot access.
-status: wip
-website: 'https://gethumpback.com/'
+status: archived
+website: 'https://web.archive.org/web/*/https://gethumpback.com/'
 actionsSupported:
   - add-tollgate
   - technical-blocking
@@ -14,11 +14,9 @@ tags:
   - bot-management
   - analytics
 considerations: >-
-  The public positioning is clear, and a live Humpback landing page is
-  currently reachable at gethumpback.com, but the earlier hback.xyz domain
-  appears unavailable and dated official launch and adoption evidence is still
-  thin. Keep this in internal review until the canonical domain and public
-  evidence trail are clearer.
+  Direct checks on May 2, 2026 could not resolve gethumpback.com or hback.xyz,
+  so this draft record is kept only as an archival lead until a live canonical
+  domain or stronger public evidence trail appears.
 visibility: draft
 type: data_license_initiative
 ---

@@ -19,12 +19,12 @@ metricEvidence:
   moneyVolume:
     basis: explicit
     sources:
-      - label: 2025 marketplace growth review published
-        url: 'https://defined.ai/press-room/defined-ai-2025-in-review-data-marketplace-growth-exceeds-1200-and-brings-over-1m-annual-revenue-to-several-partners'
+      - label: Defined.ai reports 2025 marketplace growth
+        url: 'https://defined.ai/press-room/defined-ai-reports-sixty-five-percent-revenue-growth'
         date: '2026-01-27'
 evidenceLinks:
-  - label: 2025 marketplace growth review published
-    url: 'https://defined.ai/press-room/defined-ai-2025-in-review-data-marketplace-growth-exceeds-1200-and-brings-over-1m-annual-revenue-to-several-partners'
+  - label: Defined.ai reports 2025 marketplace growth
+    url: 'https://defined.ai/press-room/defined-ai-reports-sixty-five-percent-revenue-growth'
     date: '2026-01-27'
 considerations: Defined.ai is a broad commercial data marketplace rather than a rights standard or publisher-specific initiative.
 visibility: public

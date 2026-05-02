@@ -30,12 +30,9 @@ evidenceLinks:
   - label: Technical standards released
     url: 'https://rslstandard.org/press/rsl-1-specification-2025'
     date: '2025-12-10'
-  - label: Fastly partnership announced
+  - label: RSL Standard and Collective launched
     url: 'https://rslstandard.org/press/rsl-standard'
     date: '2025-09-10'
-  - label: TechCrunch launch coverage
-    url: 'https://techcrunch.com/2024/08/14/really-simple-licensing-standard-wants-to-help-publishers-protect-their-content-from-ai/'
-    date: '2024-08-14'
 implementationSnippets:
   - title: Site-wide RSL file
     summary: The RSL 1.0 spec includes a compact XML example for prohibiting AI use across a site.
@@ -54,9 +51,9 @@ implementationSnippets:
     language: json
     code: |
       {
-        "@context": "https://schema.org",
+        "@context": "https://schema.org/",
         "@type": "Book",
-        "license": "https://gutenberg.org/ebooks-rsl-license.xml"
+        "license": "https://rslstandard.org/rsl"
       }
     sourceUrl: 'https://rslstandard.org/guide/schema-org'
 visibility: public

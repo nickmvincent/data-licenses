@@ -15,9 +15,6 @@ evidenceLinks:
   - label: Cloudflare acquisition and integration announcement
     url: 'https://blog.cloudflare.com/human-native-joins-cloudflare/'
     date: '2026-01-15'
-  - label: Seed funding post describes Human Native's fair AI data marketplace
-    url: 'https://www.humannative.ai/seed-funding-announcement'
-    date: '2024-06-03'
 visibility: public
 type: data_license_initiative
 ---

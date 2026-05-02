@@ -2,7 +2,7 @@
 title: DataSeeds.AI
 summary: Rights-cleared image dataset marketplace that uses Zedge and GuruShots creator networks to supply AI training data.
 status: live
-website: 'https://dataseeds.ai/'
+website: 'https://www.dataseeds.ai/'
 actionsSupported:
   - data-market-platform
 primaryApproachType: data-market-platform

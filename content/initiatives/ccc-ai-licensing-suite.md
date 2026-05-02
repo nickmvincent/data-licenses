@@ -26,7 +26,7 @@ evidenceLinks:
     url: 'https://www.copyright.com/media-press-releases/ccc-announces-ai-systems-training-license-for-the-external-use-of-copyrighted-works-coming-soon/'
     date: '2025-03-04'
   - label: Internal AI reuse rights launched in the Annual Copyright License
-    url: 'https://www.copyright.com/blog/ccc-pioneers-collective-licensing-solution-for-content-usage-in-internal-ai-systems/'
+    url: 'https://www.copyright.com/media-press-releases/ccc-pioneers-collective-licensing-solution-for-content-usage-in-internal-ai-systems/'
     date: '2024-07-16'
 considerations: CCC is a centralized licensing intermediary with portfolio-based rights offers, not a reusable protocol or open standard for the web at large.
 visibility: public

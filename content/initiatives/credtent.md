@@ -2,7 +2,7 @@
 title: Credtent
 summary: Independent creative registry for opting out of AI use, licensing content, and certifying human-created work.
 status: live
-website: 'https://www.credtent.org/'
+website: 'https://credtent.org/'
 actionsSupported:
   - data-market-platform
   - certification
@@ -20,16 +20,13 @@ metricEvidence:
   usersCount:
     basis: explicit
     sources:
-      - label: Ethical AI content licensing marketplace described
-        url: 'https://www.credtent.com/blog/unlocking-new-markets-how-credtent-powers-the-future-of-ethical-ai-content-licensing'
-        date: '2025-04-02'
+      - label: Credtent marketplace and opt-out announcement
+        url: 'https://www.globenewswire.com/news-release/2025/03/31/3052693/0/en/credtent-announces-17-20-million-dollar-valuation-of-studio-ghibli-s-ip-for-ai-training-and-advocates-for-creative-consent.html'
+        date: '2025-03-31'
 evidenceLinks:
-  - label: Ethical AI licensing marketplace described
-    url: 'https://www.credtent.com/blog/unlocking-new-markets-how-credtent-powers-the-future-of-ethical-ai-content-licensing'
-    date: '2025-04-02'
-  - label: Credtent proposal describes the Independent Creative Registry and ethical sourcing badges
-    url: 'https://www.credtent.org/post/credtents-proposal-for-the-us-ai-action-plan-charts-a-new-path-for-ai-and-creative-industries'
-    date: '2025-03-15'
+  - label: Credtent marketplace and opt-out announcement
+    url: 'https://www.globenewswire.com/news-release/2025/03/31/3052693/0/en/credtent-announces-17-20-million-dollar-valuation-of-studio-ghibli-s-ip-for-ai-training-and-advocates-for-creative-consent.html'
+    date: '2025-03-31'
 visibility: public
 type: data_license_initiative
 ---

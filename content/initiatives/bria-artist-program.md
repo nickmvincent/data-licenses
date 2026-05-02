@@ -22,7 +22,7 @@ metricEvidence:
         date: '2025-04-30'
 evidenceLinks:
   - label: Platform release highlights rights-clear models
-    url: 'https://blog.bria.ai/enterprise-grade-control-meets-creativity-new-platform-release'
+    url: 'https://bria.ai/blog/enterprise-grade-control-meets-creativity-new-platform-release'
     date: '2025-09-18'
   - label: Licensed training catalog published
     url: 'https://bria.ai/licensed-training-catalog'

@@ -15,9 +15,9 @@ tags:
   - publishers
   - enforcement
 evidenceLinks:
-  - label: Coalition overview published
-    url: 'https://publishersrights.org/who-we-are/'
-    date: '2025-01-21'
+  - label: Business model page describes enforcement and future AI licensing
+    url: 'https://publishersrights.org/business-model/'
+    date: '2026-05-02'
 considerations: Publishers' Rights is a publisher-specific advocacy and licensing vehicle rather than a general web standard or neutral infrastructure layer.
 visibility: public
 type: data_license_initiative

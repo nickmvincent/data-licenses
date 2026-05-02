@@ -2,7 +2,7 @@
 title: Mozilla Data Collective
 summary: Community-centered dataset platform for sharing AI-relevant data under contributor-controlled licenses, access rules, and governance terms.
 status: live
-website: 'https://datacollective.mozillafoundation.org/'
+website: 'https://mozilladatacollective.com/'
 actionsSupported:
   - new-infrastructures
   - technical-blocking
@@ -26,7 +26,7 @@ metricEvidence:
       publish the current catalog count.
     sources:
       - label: Homepage lists 470+ datasets
-        url: 'https://datacollective.mozillafoundation.org/'
+        url: 'https://mozilladatacollective.com/'
         date: '2026-04-03'
 evidenceLinks:
   - label: Exclusive-hosting FAQ describes dataset protections and management controls

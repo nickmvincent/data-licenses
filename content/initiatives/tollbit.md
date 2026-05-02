@@ -17,17 +17,17 @@ metricEvidence:
     basis: explicit
     sources:
       - label: TollBit Japan launched
-        url: 'https://tollbit.com/blog/tollbit-japan-launches-with-33-leading-media-companies-to-accelerate-ai-content-licensing-across-japan/'
+        url: 'https://tollbit.com/blog/japan-press-release/'
         date: '2025-10-16'
 evidenceLinks:
-  - label: Imperva partnership announced
-    url: 'https://tollbit.com/blog/imperva-and-tollbit-partner-on-first-ai-crawlers-intelligence-and-monetization-platform/'
+  - label: Imperva integration announced
+    url: 'https://tollbit.com/blog/imperva-integration/'
     date: '2025-12-16'
   - label: TollBit Japan launched
-    url: 'https://tollbit.com/blog/tollbit-japan-launches-with-33-leading-media-companies-to-accelerate-ai-content-licensing-across-japan/'
+    url: 'https://tollbit.com/blog/japan-press-release/'
     date: '2025-10-16'
   - label: State of the Bots report
-    url: 'https://tollbit.com/bots/25q2/'
+    url: 'https://tollbit.com/state-of-the-bots/q2-2025/'
     date: '2025-09-08'
 visibility: public
 type: data_license_initiative

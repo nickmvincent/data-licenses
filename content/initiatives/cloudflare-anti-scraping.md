@@ -26,16 +26,16 @@ metricEvidence:
   dataVolume:
     basis: explicit
     sources:
-      - label: AI Crawl Control open beta launched
-        url: 'https://blog.cloudflare.com/ai-crawl-control/'
-        date: '2025-09-11'
+      - label: AI Crawl Control general availability announced
+        url: 'https://blog.cloudflare.com/introducing-ai-crawl-control/'
+        date: '2025-08-28'
 evidenceLinks:
   - label: Content Signals Policy launched
     url: 'https://blog.cloudflare.com/content-signals-policy/'
     date: '2025-09-24'
-  - label: AI Crawl Control open beta launched
-    url: 'https://blog.cloudflare.com/ai-crawl-control/'
-    date: '2025-09-11'
+  - label: AI Crawl Control general availability announced
+    url: 'https://blog.cloudflare.com/introducing-ai-crawl-control/'
+    date: '2025-08-28'
   - label: AI Audit and marketplace features launched
     url: 'https://blog.cloudflare.com/control-content-use-for-ai-training/'
     date: '2025-07-01'

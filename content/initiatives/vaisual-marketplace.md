@@ -18,13 +18,13 @@ metricEvidence:
   dataVolume:
     basis: explicit
     sources:
-      - label: Diversity image database for better AI described
-        url: 'https://vaisual.com/creating-a-diversity-and-inclusion-image-database-for-better-ai/'
-        date: '2024-08-14'
+      - label: Biometric video dataset release describes original Dataset Shop scale
+        url: 'https://vaisual.com/vaisual-releases-the-first-biometric-video-datasets-for-ai-training/'
+        date: '2023-05-01'
 evidenceLinks:
-  - label: Diversity image database for better AI described
-    url: 'https://vaisual.com/creating-a-diversity-and-inclusion-image-database-for-better-ai/'
-    date: '2024-08-14'
+  - label: Biometric video dataset release describes original Dataset Shop scale
+    url: 'https://vaisual.com/vaisual-releases-the-first-biometric-video-datasets-for-ai-training/'
+    date: '2023-05-01'
 considerations: vAIsual is a specialized computer-vision vendor rather than a general licensing standard or cross-domain policy initiative.
 visibility: public
 type: data_license_initiative

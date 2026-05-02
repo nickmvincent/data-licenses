@@ -46,7 +46,7 @@ implementationSnippets:
     language: html
     code: |
       <meta name="tdm-reservation" content="1">
-      <meta name="tdm-policy" content="https://provider.com/policies/policy.json">
+      <meta name="tdm-policy" content="/policies/policy.json">
     sourceUrl: 'https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240202/'
 ---
 

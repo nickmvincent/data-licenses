@@ -17,9 +17,9 @@ tags:
   - robots-meta
   - x-robots-tag
 evidenceLinks:
-  - label: Project featured in scholarly article on search and AI opt-out
-    url: 'https://noml.info/project-featured-in-scholarly-article-on-search-engine-and-ai-opt-out/'
-    date: '2024-05-29'
+  - label: Mojeek publishes NoML proposal and open letter
+    url: 'https://blog.mojeek.com/2023/10/noml-proposal-and-open-letter.html'
+    date: '2023-10-25'
 implementationSnippets:
   - title: HTML meta tag
     summary: NoML proposes this as the simplest page-level signal for HTML documents.

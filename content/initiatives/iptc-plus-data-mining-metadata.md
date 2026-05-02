@@ -2,7 +2,7 @@
 title: IPTC + PLUS Data Mining Metadata
 summary: Embedded image and video metadata fields for expressing whether assets may be used in data-mining and generative-AI training datasets.
 status: live
-website: 'https://pluscoalition.org/about-ai-and-ml-image-rights-standards/'
+website: 'https://ns.useplus.org/LDF/ldf-XMPSpecification#DataMining'
 actionsSupported:
   - attach-preference-signal
 primaryApproachType: attach-preference-signal
@@ -16,9 +16,12 @@ dataTypes:
 tags:
   - metadata
 evidenceLinks:
-  - label: IPTC and PLUS explain metadata stance on GenAI training
-    url: 'https://iptc.org/news/iptc-and-plus-response-to-the-us-copyright-offices-notice-of-inquiry-on-genai-training/'
-    date: '2025-02-20'
+  - label: IPTC and PLUS submit response to US National Science Foundation AI Action Plan
+    url: 'https://iptc.org/news/iptc-and-plus-submit-response-to-us-ai-action-plan/'
+    date: '2025-03-14'
+  - label: IPTC and PLUS finalize Data Mining field in Photo Metadata Standard 2023.1
+    url: 'https://iptc.org/news/exclude-images-from-generative-ai-iptc-photo-metadata-standard-2023-1/'
+    date: '2023-10-12'
 implementationSnippets:
   - title: ExifTool write command
     summary: IPTC shows this command as a concrete way to attach a PLUS Data Mining value to a video file.

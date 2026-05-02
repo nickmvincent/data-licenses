@@ -20,7 +20,7 @@ evidenceLinks:
     url: 'https://www.dappier.com/newsroom/dappier-launches-licensing-program-to-help-brands-and-publishers-monetize-content-in-ai-search/'
     date: '2025-08-18'
   - label: DPA welcomed Dappier as a member
-    url: 'https://www.thedpa.ai/post/dataset-providers-alliance-welcomes-created-by-humans-and-dappier'
+    url: 'https://www.thedpa.ai/post/dpa-welcomes-five-new-members-expanding-representation-in-audio-and-publishing-sectors'
     date: '2024-12-10'
 visibility: public
 type: data_license_initiative

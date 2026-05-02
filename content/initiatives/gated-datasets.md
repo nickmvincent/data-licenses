@@ -21,9 +21,6 @@ evidenceLinks:
   - label: Hugging Face docs updated access-request rejection guidance for gated repositories
     url: 'https://github.com/huggingface/hub-docs/commit/dfd29233d390ceb36d58e21f56e3a60bcf3d9d04'
     date: '2025-01-17'
-  - label: Gated datasets launch explained
-    url: 'https://huggingface.co/blog/unlocking-the-source-of-gated-datasets'
-    date: '2022-09-30'
 implementationSnippets:
   - title: Basic gated dataset card
     language: yaml

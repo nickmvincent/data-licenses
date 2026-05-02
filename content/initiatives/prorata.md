@@ -4,7 +4,7 @@ summary: >-
   A 50/50 revenue-share platform connecting publishers with AI companies,
   with 700+ publishers signed up including major news outlets.
 status: live
-website: 'https://www.prorata.ai/'
+website: 'https://prorata.ai/'
 actionsSupported:
   - join-licensing-collective
   - data-market-platform

@@ -29,7 +29,7 @@ dependsOn:
   - ai-pref
 evidenceLinks:
   - label: Usage vocabulary updated
-    url: 'https://docs.tdmai.org/technical-specification/usage-preferences-vocabulary'
+    url: 'https://docs.tdmai.org/tdmrep-technical-specification/tdmrep-vocabulary'
     date: '2025-11-04'
 considerations: >-
   The protocol is aligned to evolving IETF AI Preferences drafts and may change

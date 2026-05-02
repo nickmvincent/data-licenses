@@ -23,9 +23,9 @@ metricEvidence:
         url: 'https://support.createdbyhumans.ai/hc/en-us/articles/30891024362523-Author-Overview'
         date: '2025-01-18'
 evidenceLinks:
-  - label: Mission article published
-    url: 'https://support.createdbyhumans.ai/hc/en-us/articles/31686396163483-Created-by-Humans-Mission'
-    date: '2025-03-26'
+  - label: About page describes mission and company story
+    url: 'https://www.createdbyhumans.ai/about'
+    date: '2026-05-02'
   - label: Author overview documents AI Rights licensing and opt-out flows
     url: 'https://support.createdbyhumans.ai/hc/en-us/articles/30891024362523-Author-Overview'
     date: '2025-01-18'
