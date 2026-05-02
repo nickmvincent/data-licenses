@@ -238,15 +238,6 @@ code {
   gap: 0.55rem;
 }
 
-.eyebrow {
-  margin: 0;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--warm);
-}
-
 .btn {
   display: inline-flex;
   align-items: center;

@@ -23,4 +23,4 @@ Current initiative statuses are:
 - `wip` for efforts still emerging
 - `archived` for historical or dormant entries that remain accessible but are hidden from the default catalog view
 
-The `memos/` directory stores longer editorial writing that is rendered on the site.
+The `memos/` directory stores longer editorial notes kept in the repo. These are not currently routed on the public site.

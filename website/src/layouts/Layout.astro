@@ -28,13 +28,13 @@ const isNavActive = (href: string) =>
     ? isCatalogPath
     : href === '/'
       ? currentPath === '/'
-      : href === '/methodology'
-        ? isGuidePath
-        : currentPath.startsWith(href);
+    : href === '/methodology'
+      ? isGuidePath
+      : currentPath.startsWith(href);
 
 const navLinks = [
-  { href: '/catalog', label: 'Catalog' },
-  { href: '/memo', label: 'Memo' },
+  { href: '/', label: 'Quick Glance' },
+  { href: '/catalog', label: 'Full Catalog' },
   { href: '/glossary', label: 'Glossary' },
   { href: '/methodology', label: 'Method & Contribute' },
 ];

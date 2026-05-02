@@ -72,11 +72,15 @@ export type LoadedInitiative = {
   metricEvidenceStatus: MetricEvidenceStatus;
   adoptionResearchStatus: AdoptionResearchStatus;
   adoptionResearchNotes?: string;
+  topTenRank?: number;
+  topTenNote?: string;
 };
 
 type InitiativeCuration = Record<string, {
   adoptionResearchStatus?: AdoptionResearchStatus;
   adoptionResearchNotes?: string;
+  topTenRank?: number;
+  topTenNote?: string;
 }>;
 
 const curationBySlug = initiativeCuration as InitiativeCuration;
@@ -197,6 +201,8 @@ export async function loadInitiatives(): Promise<LoadedInitiative[]> {
       metricEvidenceStatus,
       adoptionResearchStatus,
       adoptionResearchNotes: curation.adoptionResearchNotes,
+      topTenRank: typeof curation.topTenRank === 'number' ? curation.topTenRank : undefined,
+      topTenNote: typeof curation.topTenNote === 'string' ? curation.topTenNote : undefined,
     });
   }
 

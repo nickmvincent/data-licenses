@@ -1,7 +1,7 @@
 import { loadInitiatives } from '../lib/content-loader';
 
 const SITE_ORIGIN = 'https://datalicenses.org';
-const STATIC_PATHS = ['/', '/memo', '/glossary', '/methodology'];
+const STATIC_PATHS = ['/', '/glossary', '/methodology'];
 
 const escapeXml = (value: string) =>
   value

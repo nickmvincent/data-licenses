@@ -1,22 +1,35 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { loadInitiatives, type LoadedInitiative } from '../lib/content-loader';
-import { APPROACH_DETAILS, APPROACH_KEYS, formatDate, sortByLatestThenTitle } from '../lib/catalog';
+import {
+  APPROACH_DETAILS,
+  APPROACH_KEYS,
+  STATUS_LABELS,
+  formatDate,
+  sortByLatestThenTitle,
+} from '../lib/catalog';
 
 type CatalogApproachKey = (typeof APPROACH_KEYS)[number];
 
 const items: LoadedInitiative[] = (await loadInitiatives()).sort(sortByLatestThenTitle);
 const currentItems = items.filter((item) => item.status !== 'archived');
+const topTenItems = [...currentItems]
+  .filter((item) => typeof item.topTenRank === 'number')
+  .sort((a, b) => (a.topTenRank ?? 999) - (b.topTenRank ?? 999) || sortByLatestThenTitle(a, b))
+  .slice(0, 10);
+
 const groupedItems: Array<{
   key: CatalogApproachKey;
   title: string;
   description: string;
   count: number;
+  items: LoadedInitiative[];
 }> = APPROACH_KEYS.map((key) => {
   const groupItems = currentItems.filter((item) => item.primaryApproachType === key);
   return {
     key,
     count: groupItems.length,
+    items: groupItems,
     title: APPROACH_DETAILS[key].title,
     description: APPROACH_DETAILS[key].shortDescription,
   };
@@ -27,68 +40,152 @@ const latestTrackedUpdate = currentItems.reduce<Date | null>((latest, item) => {
   if (!latest) return item.latestUpdate;
   return new Date(item.latestUpdate).getTime() > new Date(latest).getTime() ? item.latestUpdate : latest;
 }, null);
+
+const metricLabel = (item: LoadedInitiative) => item.usersCount || item.dataVolume || item.moneyVolume || '';
+const statusLabel = (item: LoadedInitiative) => STATUS_LABELS[item.status] || item.status;
+const approachLabel = (item: LoadedInitiative) => {
+  const key = item.primaryApproachType as CatalogApproachKey;
+  return APPROACH_DETAILS[key]?.title || item.primaryApproachType;
+};
 ---
 
 <Layout
   title="DataLicenses.org"
-  description="A working map of the main approaches to AI data access, licensing, and enforcement."
+  description="A hyper-curated catalog of public initiatives shaping AI data access, licensing, controlled retrieval, and technical enforcement."
 >
-  <main class="wrap home-page">
-    <section class="home-hero box">
-      <div class="home-hero-copy">
-        <p class="eyebrow">AI data access and licensing</p>
-        <h1 class="home-title">Track the main ways people are trying to govern AI access to content.</h1>
-        <p class="home-lede">
-          DataLicenses.org is a working catalog of live and emerging initiatives around AI data
-          licensing, access controls, marketplaces, collective bargaining, and enforcement.
+  <main class="wrap catalog-home">
+    <section class="catalog-hero box">
+      <div class="catalog-hero-copy">
+        <p class="eyebrow">Catalog-first view</p>
+        <h1 class="catalog-hero-title">Quick glance first. Full catalog below.</h1>
+        <p class="catalog-hero-lede">
+          DataLicenses.org tracks live and emerging initiatives shaping AI data access, licensing,
+          controlled retrieval, and enforcement. The goal here is a fast, opinionated scan of what
+          matters now, with the full catalog still one scroll away.
         </p>
       </div>
 
-      <div class="home-actions">
-        <a class="btn btn-primary" href="/catalog">Open full catalog</a>
+      <div class="catalog-hero-actions">
+        <a class="btn btn-primary" href="#top-ten">See the top ten</a>
+        <a class="btn" href="/catalog">Open full catalog</a>
       </div>
 
-      <p class="home-links">
-        <a href="/memo">Memo</a>
-        <span aria-hidden="true">·</span>
-        <a href="/glossary">Glossary</a>
-        <span aria-hidden="true">·</span>
-        <a href="/methodology">Method &amp; contribute</a>
-      </p>
+      <div class="catalog-hero-meta">
+        <span class="catalog-meta-pill">{currentItems.length} current initiatives</span>
+        <span class="catalog-meta-pill">{groupedItems.length} approach types</span>
+        {latestTrackedUpdate && (
+          <span class="catalog-meta-pill">Updated {formatDate(latestTrackedUpdate)}</span>
+        )}
+      </div>
 
-      <p class="home-meta">
-        {currentItems.length} current initiatives across {groupedItems.length} categories
-        {latestTrackedUpdate && ` · Updated ${formatDate(latestTrackedUpdate)}`}
+      <p class="catalog-hero-note">
+        The top ten below mixes public adoption signals, evidence recency, and editorial judgment.
+        Use it as a quick reading list, not a universal score.
       </p>
     </section>
 
-    <section class="home-categories">
-      <div class="home-section-head">
+    <section id="top-ten" class="top-ten-section">
+      <div class="section-head">
         <div>
-          <p class="eyebrow">Start with a category</p>
-          <h2 class="home-section-title">Jump straight into the spreadsheet view</h2>
+          <p class="eyebrow">Quick glance</p>
+          <h2 class="section-title">Top ten right now</h2>
         </div>
-        <p class="home-section-copy">
-          Each card opens the catalog at that section so you can browse related initiatives right
-          away.
+        <p class="section-copy">
+          A deliberately curated slice of the catalog that leans toward live traction, concrete
+          evidence, and strategic importance.
         </p>
       </div>
 
-      <div class="home-category-list">
+      <div class="top-ten-grid">
+        {topTenItems.map((item) => (
+          <article class="top-ten-card box">
+            <div class="top-ten-card-head">
+              <span class="top-ten-rank">#{item.topTenRank}</span>
+              <div class="top-ten-card-pills">
+                <span class="top-ten-pill">{approachLabel(item)}</span>
+                <span class="top-ten-pill top-ten-pill-muted">{statusLabel(item)}</span>
+              </div>
+            </div>
+
+            <h3 class="top-ten-card-title">
+              <a href={`/initiatives/${item.slug}`}>{item.title}</a>
+            </h3>
+            <p class="top-ten-card-summary">{item.summary}</p>
+            {item.topTenNote && <p class="top-ten-card-note">{item.topTenNote}</p>}
+
+            <div class="top-ten-card-metrics">
+              {metricLabel(item) && <span>{metricLabel(item)}</span>}
+              {item.latestUpdate && <span>Updated {formatDate(item.latestUpdate)}</span>}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="catalog-jump box">
+      <div class="section-head section-head-compact">
+        <div>
+          <p class="eyebrow">Browse the rest</p>
+          <h2 class="section-title">Jump by approach</h2>
+        </div>
+        <p class="section-copy">
+          These quick links drop you into the compact all-initiatives view below.
+        </p>
+      </div>
+
+      <div class="catalog-jump-list">
         {groupedItems.map((group) => (
-          <a
-            class="home-category-item"
-            href={`/catalog?view=spreadsheet#spreadsheet-group-${group.key}`}
-          >
-            <span class="home-category-main">
-              <span class="home-category-topline">
-                <span class="home-category-title">{group.title}</span>
-                <span class="home-category-count">{group.count}</span>
-              </span>
-              <span class="home-category-description">{group.description}</span>
-            </span>
-            <span class="home-category-link">Open in catalog</span>
+          <a class="catalog-jump-chip" href={`#group-${group.key}`}>
+            <span class="catalog-jump-label">{group.title}</span>
+            <span class="catalog-jump-count">{group.count}</span>
           </a>
+        ))}
+      </div>
+    </section>
+
+    <section id="all-initiatives" class="all-catalog">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Full list</p>
+          <h2 class="section-title">All current initiatives</h2>
+        </div>
+        <p class="section-copy">
+          Compact, curated, and link-first. For filters or machine-readable access, use the JSON
+          API from the nav.
+        </p>
+      </div>
+
+      <div class="catalog-groups">
+        {groupedItems.map((group) => (
+          <section id={`group-${group.key}`} class="catalog-group box">
+            <div class="catalog-group-head">
+              <div>
+                <p class="eyebrow">{group.count} tracked</p>
+                <h3 class="catalog-group-title">{group.title}</h3>
+              </div>
+              <p class="catalog-group-copy">{group.description}</p>
+            </div>
+
+            <div class="catalog-group-list">
+              {group.items.map((item) => (
+                <article class="catalog-row">
+                  <div class="catalog-row-main">
+                    <div class="catalog-row-topline">
+                      <a href={`/initiatives/${item.slug}`} class="catalog-row-title">{item.title}</a>
+                      {item.topTenRank && <span class="catalog-row-flag">Top ten</span>}
+                    </div>
+                    <p class="catalog-row-summary">{item.summary}</p>
+                  </div>
+
+                  <div class="catalog-row-meta">
+                    <span>{statusLabel(item)}</span>
+                    {metricLabel(item) && <span>{metricLabel(item)}</span>}
+                    {item.latestUpdate && <span>Updated {formatDate(item.latestUpdate)}</span>}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </section>
@@ -96,151 +193,64 @@ const latestTrackedUpdate = currentItems.reduce<Date | null>((latest, item) => {
 </Layout>
 
 <style>
-  .home-page {
+  .catalog-home {
     display: grid;
     gap: 20px;
   }
 
-  .home-hero {
+  .catalog-hero {
     display: grid;
     gap: 16px;
     padding: clamp(24px, 5vw, 38px);
     background:
-      linear-gradient(180deg, color-mix(in srgb, var(--card) 96%, transparent), color-mix(in srgb, var(--accent-soft) 10%, var(--card))),
+      linear-gradient(180deg, color-mix(in srgb, var(--card) 96%, transparent), color-mix(in srgb, var(--accent-soft) 12%, var(--card))),
       var(--card);
   }
 
-  .home-hero-copy {
+  .catalog-hero-copy {
     display: grid;
     gap: 0.8rem;
-    max-width: 50rem;
+    max-width: 56rem;
   }
 
-  .home-title {
-    max-width: 14ch;
-    font-size: clamp(2.35rem, 5vw, 4.15rem);
+  .catalog-hero-title {
+    max-width: 12ch;
+    font-size: clamp(2.05rem, 4.5vw, 3.75rem);
   }
 
-  .home-lede {
+  .catalog-hero-lede,
+  .catalog-hero-note,
+  .section-copy,
+  .catalog-group-copy {
     margin: 0;
-    max-width: 44rem;
-    font-size: 1rem;
-    line-height: 1.62;
     color: color-mix(in srgb, var(--text) 82%, var(--muted));
+    line-height: 1.6;
   }
 
-  .home-actions {
+  .catalog-hero-lede {
+    max-width: 46rem;
+  }
+
+  .catalog-hero-actions,
+  .catalog-hero-meta,
+  .catalog-jump-list,
+  .top-ten-card-pills,
+  .top-ten-card-metrics,
+  .catalog-row-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
   }
 
-  .home-links,
-  .home-meta {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-
-  .home-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.55rem;
-    align-items: center;
-  }
-
-  .home-links a {
-    color: inherit;
-    text-decoration-color: color-mix(in srgb, var(--accent) 28%, transparent);
-  }
-
-  .home-categories {
-    display: grid;
-    gap: 14px;
-  }
-
-  .home-section-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .home-section-title {
-    font-size: clamp(1.55rem, 3vw, 2.2rem);
-  }
-
-  .home-section-copy {
-    max-width: 34rem;
-    margin: 0;
-    color: var(--muted);
-  }
-
-  .home-category-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0;
-    border-top: 1px solid var(--border);
-  }
-
-  .home-category-item {
-    display: flex;
-    align-items: start;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--border);
-    text-decoration: none;
-    color: inherit;
-    transition:
-      color 0.18s ease,
-      border-color 0.18s ease,
-      background 0.18s ease;
-  }
-
-  .home-category-item:nth-child(odd) {
-    padding-right: 20px;
-  }
-
-  .home-category-item:nth-child(even) {
-    padding-left: 20px;
-  }
-
-  .home-category-item:hover,
-  .home-category-item:focus-visible {
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  .home-category-main {
-    display: grid;
-    gap: 0.45rem;
-    min-width: 0;
-  }
-
-  .home-category-topline {
-    display: flex;
-    align-items: start;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .home-category-title {
-    font-family: var(--font-display);
-    font-size: 1.32rem;
-    font-weight: 600;
-    line-height: 1.1;
-    color: var(--text);
-  }
-
-  .home-category-count {
+  .catalog-meta-pill,
+  .top-ten-pill,
+  .catalog-row-flag,
+  .catalog-jump-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 2rem;
     min-height: 2rem;
-    padding: 0 0.48rem;
+    padding: 0 0.7rem;
     border-radius: 999px;
     border: 1px solid var(--border);
     background: color-mix(in srgb, var(--surface-muted) 72%, var(--card));
@@ -249,41 +259,212 @@ const latestTrackedUpdate = currentItems.reduce<Date | null>((latest, item) => {
     font-weight: 700;
   }
 
-  .home-category-description {
+  .top-ten-pill-muted,
+  .catalog-meta-pill {
     color: var(--muted);
-    line-height: 1.5;
   }
 
-  .home-category-link {
-    color: var(--accent);
-    font-size: 0.92rem;
+  .top-ten-section,
+  .all-catalog {
+    display: grid;
+    gap: 14px;
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .section-head-compact {
+    align-items: start;
+  }
+
+  .section-title {
+    font-size: clamp(1.55rem, 3vw, 2.15rem);
+  }
+
+  .section-copy {
+    max-width: 34rem;
+  }
+
+  .top-ten-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .top-ten-card {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+  }
+
+  .top-ten-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .top-ten-rank {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
     font-weight: 700;
-    white-space: nowrap;
+    color: var(--accent);
+  }
+
+  .top-ten-card-title {
+    font-size: 1.25rem;
+    line-height: 1.15;
+  }
+
+  .top-ten-card-title a,
+  .catalog-row-title,
+  .catalog-jump-chip {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .top-ten-card-title a:hover,
+  .top-ten-card-title a:focus-visible,
+  .catalog-row-title:hover,
+  .catalog-row-title:focus-visible,
+  .catalog-jump-chip:hover,
+  .catalog-jump-chip:focus-visible {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  .top-ten-card-summary,
+  .top-ten-card-note,
+  .catalog-row-summary {
+    margin: 0;
+    line-height: 1.58;
+  }
+
+  .top-ten-card-note {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .top-ten-card-metrics,
+  .catalog-row-meta {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .catalog-jump {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .catalog-jump-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--card) 96%, transparent);
+    transition:
+      border-color 0.18s ease,
+      background 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .catalog-jump-chip:hover,
+  .catalog-jump-chip:focus-visible {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--accent) 32%, var(--border));
+    background: color-mix(in srgb, var(--accent-soft) 16%, var(--card));
+  }
+
+  .catalog-jump-label {
+    font-weight: 700;
+  }
+
+  .catalog-groups {
+    display: grid;
+    gap: 14px;
+  }
+
+  .catalog-group {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+  }
+
+  .catalog-group-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .catalog-group-title {
+    font-size: 1.35rem;
+  }
+
+  .catalog-group-copy {
+    max-width: 34rem;
+  }
+
+  .catalog-group-list {
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .catalog-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .catalog-row-main {
+    display: grid;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .catalog-row-topline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .catalog-row-title {
+    font-family: var(--font-display);
+    font-size: 1.08rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  @media (max-width: 840px) {
+    .top-ten-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .catalog-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   @media (max-width: 720px) {
-    .home-title {
-      max-width: 11ch;
-      font-size: clamp(2rem, 10vw, 3.15rem);
-    }
-
-    .home-actions .btn {
+    .catalog-hero-actions .btn {
       width: 100%;
     }
 
-    .home-category-list {
-      grid-template-columns: 1fr;
-    }
-
-    .home-category-item:nth-child(odd),
-    .home-category-item:nth-child(even) {
-      padding-left: 0;
-      padding-right: 0;
-    }
-
-    .home-category-item {
-      display: grid;
-      gap: 0.7rem;
+    .catalog-hero-title {
+      max-width: 14ch;
     }
   }
 </style>
