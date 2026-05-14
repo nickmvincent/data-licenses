@@ -31,4 +31,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-Defined.ai connects AI builders to annotated, compliance-focused datasets across modalities. It is broader and older than many GenAI-specific entrants, but it clearly belongs in the market-platform branch of this catalog.
+Defined.ai connects AI builders to annotated, compliance-focused datasets across modalities. It is broader and older than many generative-AI-specific entrants, with an established marketplace model for training and fine-tuning data.

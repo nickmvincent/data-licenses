@@ -30,6 +30,9 @@ metricEvidence:
         url: 'https://blog.cloudflare.com/introducing-ai-crawl-control/'
         date: '2025-08-28'
 evidenceLinks:
+  - label: Redirects for AI Training launched
+    url: 'https://blog.cloudflare.com/ai-redirects/'
+    date: '2026-04-17'
   - label: Content Signals Policy launched
     url: 'https://blog.cloudflare.com/content-signals-policy/'
     date: '2025-09-24'
@@ -71,4 +74,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-Cloudflare's AI Crawl Control offers multiple tools: AI Audit dashboard shows which bots crawl your site, managed robots.txt simplifies blocking, and a pay-per-crawl marketplace lets publishers monetize AI training access.
+Cloudflare's AI Crawl Control offers multiple tools: AI Audit dashboard shows which bots crawl a site, managed robots.txt simplifies blocking, redirects can steer verified AI training crawlers toward canonical content, and pay-per-crawl lets publishers monetize automated access.

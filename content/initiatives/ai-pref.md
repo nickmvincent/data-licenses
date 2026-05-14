@@ -11,9 +11,9 @@ actionsSupported:
 primaryApproachType: attach-preference-signal
 status: wip
 evidenceLinks:
-  - label: Vocabulary draft updated
+  - label: Vocabulary draft 06 updated
     url: 'https://datatracker.ietf.org/doc/draft-ietf-aipref-vocab/'
-    date: '2025-12-01'
+    date: '2026-04-27'
   - label: Milestone for protocol specifications
     url: 'https://datatracker.ietf.org/wg/aipref/about/'
     date: '2025-08-01'
@@ -44,4 +44,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-The AIPref effort investigates a standardized way to express preferences to AI systems (including crawlers and agents). It is in early discussion and not ready for production use.
+The AIPref effort investigates a standardized way to express preferences to AI systems, including crawlers and agents. The working group is iterating on vocabulary and attachment drafts; no production deployment signal is available yet.

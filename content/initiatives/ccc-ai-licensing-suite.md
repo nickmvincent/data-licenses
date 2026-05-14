@@ -33,6 +33,6 @@ visibility: public
 type: data_license_initiative
 ---
 
-CCC's AI licensing program is one of the clearest large-scale examples of voluntary collective licensing being adapted for generative AI uses. Its public materials now describe a suite spanning internal AI reuse, external AI training, academic uses, and transactional AI rights.
+CCC's AI licensing program adapts voluntary collective licensing for generative AI uses. Its public materials now describe a suite spanning internal AI reuse, external AI training, academic uses, and transactional AI rights.
 
-This belongs in the catalog because it shows a current, operational path for licensing copyrighted text-based works into AI systems without requiring every publisher or developer to negotiate bespoke bilateral deals.
+The suite provides an operational path for licensing copyrighted text-based works into AI systems without requiring every publisher or developer to negotiate bespoke bilateral deals.

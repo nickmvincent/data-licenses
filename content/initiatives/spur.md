@@ -16,15 +16,21 @@ tags:
   - publishers
   - journalism
   - coalition
-usersCount: '5 founding publisher members'
+usersCount: '6 founding publisher members'
 metricEvidence:
   usersCount:
     basis: explicit
     sources:
+      - label: Mediahuis joins SPUR as a founding member
+        url: 'https://www.mediahuis.com/en/news/mediahuis-joins-the-spur-coalition-as-founding-member'
+        date: '2026-05-11'
       - label: Guardian announced the five founding members
         url: 'https://www.theguardian.com/gnm-press-office/2026/feb/26/major-news-brands-including-the-guardian-form-new-coalition-to-promote-responsible-ai-licensing'
         date: '2026-02-26'
 evidenceLinks:
+  - label: Mediahuis joins SPUR as a founding member
+    url: 'https://www.mediahuis.com/en/news/mediahuis-joins-the-spur-coalition-as-founding-member'
+    date: '2026-05-11'
   - label: Guardian announced SPUR coalition launch
     url: 'https://www.theguardian.com/gnm-press-office/2026/feb/26/major-news-brands-including-the-guardian-form-new-coalition-to-promote-responsible-ai-licensing'
     date: '2026-02-26'
@@ -33,6 +39,6 @@ visibility: public
 type: data_license_initiative
 ---
 
-SPUR is a coalition of major news organizations working on the technical and commercial rules that should govern AI use of journalism. Its public materials emphasize shared standards, responsible licensing pathways, and infrastructure that lets publishers retain control while still supporting legitimate AI access.
+SPUR is a coalition of major news organizations working on the technical and commercial rules that should govern AI use of journalism. Its public materials emphasize shared standards, measurement, responsible licensing pathways, and infrastructure that lets publishers retain control while still supporting legitimate AI access.
 
 It is still early-stage, but it is notable because it shows large publishers coordinating around a common framework rather than relying only on one-off bilateral deals or litigation.

@@ -1,6 +1,6 @@
 ---
 title: Fairly Trained
-summary: Certify that models are fairly trained
+summary: Certification program for AI models and companies that meet stated consent and licensing criteria for training data.
 status: live
 website: 'https://www.fairlytrained.org/'
 actionsSupported:
@@ -35,4 +35,4 @@ considerations: Published announcement counts may understate the current roster;
 visibility: public
 type: data_license_initiative
 ---
-Fairly Trained is a certification program for models and model builders that claim to use properly licensed or consented training data. It belongs in this catalog because it turns sourcing norms into a concrete third-party signal that partners, customers, and policymakers can point to, even if certification counts still understate the full set of participating models.
+Fairly Trained is a certification program for models and model builders that claim to use properly licensed or consented training data. The program turns sourcing norms into a concrete third-party signal that partners, customers, and policymakers can evaluate, even if announcement-based certification counts still understate the full set of participating models.

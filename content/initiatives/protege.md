@@ -36,4 +36,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-Protege connects data holders with model builders and handles the licensing, curation, and delivery of proprietary datasets for AI development. Its recent updates position it as one of the clearest examples of a dedicated AI data market platform rather than a simple crawler-control or publisher-paywall tool.
+Protege connects data holders with model builders and handles the licensing, curation, and delivery of proprietary datasets for AI development. Its recent updates position it as a dedicated AI data market platform rather than a crawler-control or publisher-paywall tool.

@@ -16,6 +16,9 @@ dataTypes:
 tags:
   - metadata
 evidenceLinks:
+  - label: IPTC publishes version 2.0 of AI opt-out guidelines
+    url: 'https://iptc.org/news/iptc-publishes-v2-0-of-ai-opt-out-guidlines/'
+    date: '2026-03-30'
   - label: IPTC and PLUS submit response to US National Science Foundation AI Action Plan
     url: 'https://iptc.org/news/iptc-and-plus-submit-response-to-us-ai-action-plan/'
     date: '2025-03-14'
@@ -40,4 +43,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-IPTC and the PLUS Coalition have added machine-readable data-mining permission fields to major image and video metadata standards so rights holders can say whether works may be used in training datasets. This belongs in the catalog because it pushes AI-use controls down to the asset level, which is complementary to site-level approaches like robots.txt or domain-level preference headers.
+IPTC and the PLUS Coalition have added machine-readable data-mining permission fields to major image and video metadata standards so rights holders can say whether works may be used in training datasets. Those fields push AI-use controls down to the asset level, complementing site-level approaches like robots.txt or domain-level preference headers.

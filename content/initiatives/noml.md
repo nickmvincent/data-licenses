@@ -1,6 +1,6 @@
 ---
 title: NoML
-summary: Proposal to add a `noml` directive so content can stay searchable but not be used for machine learning.
+summary: Proposed robots-style directive for keeping content searchable while asking crawlers not to use it for machine learning.
 status: archived
 website: 'https://noml.info/'
 actionsSupported:

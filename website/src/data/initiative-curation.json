@@ -9,7 +9,7 @@
   },
   "ai-pref": {
     "adoptionResearchStatus": "hard-to-quantify",
-    "adoptionResearchNotes": "Standards work in progress; public adoption is not yet well defined."
+    "adoptionResearchNotes": "Standards work in progress; draft maturity is the relevant evidence unit, and no deployment signal is available yet."
   },
   "ai-ready-licenses": {
     "adoptionResearchStatus": "hard-to-quantify",
@@ -33,23 +33,19 @@
   },
   "cc-signals": {
     "adoptionResearchStatus": "hard-to-quantify",
-    "adoptionResearchNotes": "Consultation-stage preference-signal effort with no stable public deployment metric yet."
+    "adoptionResearchNotes": "Creative Commons has shifted the work from preference signaling toward broader infrastructure and governance pilots, but there is still no stable deployment metric."
   },
   "ccc-ai-licensing-suite": {
     "adoptionResearchStatus": "hard-to-quantify",
-    "adoptionResearchNotes": "CCC publicly documents multiple AI licensing options, but I could not find a clean AI-specific customer or rightsholder count that maps neatly to the suite.",
-    "topTenRank": 3,
-    "topTenNote": "The strongest incumbent collective-licensing route, now spanning internal AI reuse, training, academic, and transactional rights."
+    "adoptionResearchNotes": "CCC publicly documents multiple AI licensing options, but I could not find a clean AI-specific customer or rightsholder count that maps neatly to the suite."
   },
   "cla-generative-ai-licence": {
     "adoptionResearchStatus": "hard-to-quantify",
-    "adoptionResearchNotes": "CLA now has a live request surface for AI training licences, but public rollout and adoption metrics remain limited."
+    "adoptionResearchNotes": "The first opt-in stage is live through PLS, CLA, and ALCS, but publisher uptake and AI-buyer usage are not yet public."
   },
   "cloudflare-anti-scraping": {
     "adoptionResearchStatus": "populated",
-    "adoptionResearchNotes": "Official rollout posts now support both customer-adoption and traffic-volume metrics.",
-    "topTenRank": 1,
-    "topTenNote": "The clearest internet-scale controlled-access stack: managed signals, crawler controls, and 402 payment flows in one edge product."
+    "adoptionResearchNotes": "Official rollout posts now support both customer-adoption and traffic-volume metrics."
   },
   "commonsdb": {
     "adoptionResearchStatus": "populated",
@@ -133,9 +129,7 @@
   },
   "iab-tech-lab-comp": {
     "adoptionResearchStatus": "hard-to-quantify",
-    "adoptionResearchNotes": "CoMP is still a standards effort rather than a deployed service, so adoption is not yet the right unit.",
-    "topTenRank": 10,
-    "topTenNote": "Still pre-adoption, but strategically important because it standardizes commercial agreements before crawling or content use."
+    "adoptionResearchNotes": "CoMP is still a standards effort rather than a deployed service, so adoption is not yet the right unit."
   },
   "iptc-plus-data-mining-metadata": {
     "adoptionResearchStatus": "hard-to-quantify",
@@ -143,9 +137,7 @@
   },
   "microsoft-publisher-content-marketplace": {
     "adoptionResearchStatus": "populated",
-    "adoptionResearchNotes": "Launch announcement names seven initial publisher partners; broader marketplace adoption remains too early to quantify.",
-    "topTenRank": 7,
-    "topTenNote": "A major platform turning publisher licensing into productized retrieval and grounding infrastructure inside Copilot-era surfaces."
+    "adoptionResearchNotes": "Launch announcement names seven initial publisher partners; broader marketplace adoption remains too early to quantify."
   },
   "mozilla-data-collective": {
     "adoptionResearchStatus": "populated",
@@ -157,9 +149,7 @@
   },
   "prorata": {
     "adoptionResearchStatus": "populated",
-    "adoptionResearchNotes": "Publisher count is already recorded.",
-    "topTenRank": 8,
-    "topTenNote": "A live publisher revenue-share experiment with 700+ publications and a clear bet on licensed AI search and answers."
+    "adoptionResearchNotes": "Publisher count is already recorded."
   },
   "protege": {
     "adoptionResearchStatus": "populated",
@@ -175,9 +165,7 @@
   },
   "rsl": {
     "adoptionResearchStatus": "populated",
-    "adoptionResearchNotes": "Official standards-release materials now support organization and page-scale metrics.",
-    "topTenRank": 2,
-    "topTenNote": "The most credible machine-readable licensing layer right now, with standards work, collective licensing, and page-scale support signals."
+    "adoptionResearchNotes": "Official standards-release materials now support organization and page-scale metrics."
   },
   "social-license-data-reuse": {
     "adoptionResearchStatus": "hard-to-quantify",
@@ -185,19 +173,15 @@
   },
   "sourceaudio-ai-dataset-licensing": {
     "adoptionResearchStatus": "populated",
-    "adoptionResearchNotes": "Official materials support a conservative track-count metric for the opt-in AI licensing catalog.",
-    "topTenRank": 9,
-    "topTenNote": "One of the rare public cases with both catalog scale and rights-holder revenue signals for a training-data market."
+    "adoptionResearchNotes": "Recent press-release materials support stronger catalog-count, song-count, and closed-contract revenue metrics for the opt-in AI licensing marketplace."
   },
   "stack-data-licensing": {
     "adoptionResearchStatus": "populated",
-    "adoptionResearchNotes": "A dated official press release supports a conservative corpus-size metric, while the current product page appears larger.",
-    "topTenRank": 5,
-    "topTenNote": "A clean commercial path for a high-value developer corpus, with distribution and packaging aimed at training, RAG, and agents."
+    "adoptionResearchNotes": "Current official product materials now support an 83M+ question-and-answer corpus metric, captured during the May 2026 review."
   },
   "spur": {
     "adoptionResearchStatus": "populated",
-    "adoptionResearchNotes": "The five founding coalition members are clearly named, but the standards and commercial outputs remain early-stage."
+    "adoptionResearchNotes": "Mediahuis has joined the original five founding members, but SPUR remains standards and coordination infrastructure rather than a collective licensing body."
   },
   "spawning-data-diligence": {
     "adoptionResearchStatus": "hard-to-quantify",
@@ -221,9 +205,7 @@
   },
   "tollbit": {
     "adoptionResearchStatus": "populated",
-    "adoptionResearchNotes": "Official launch materials now support a conservative premium-publisher count.",
-    "topTenRank": 4,
-    "topTenNote": "The clearest publisher-focused signal that metered AI access and monetized crawler traffic are becoming a product category."
+    "adoptionResearchNotes": "Official materials support a conservative premium-publisher count; newer secondary interviews suggest a larger network, but first-party surfaces use different publisher-site counts."
   },
   "trust-txt": {
     "adoptionResearchStatus": "populated",
@@ -243,8 +225,6 @@
   },
   "wikimedia-enterprise": {
     "adoptionResearchStatus": "populated",
-    "adoptionResearchNotes": "Partner and corpus-volume signals are already recorded.",
-    "topTenRank": 6,
-    "topTenNote": "A high-reputation access channel showing how open licensed knowledge can still move through explicit enterprise AI relationships."
+    "adoptionResearchNotes": "Partner and corpus-volume signals are already recorded."
   }
 }

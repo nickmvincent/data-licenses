@@ -1,30 +1,32 @@
 ---
-title: Method & Contribute
-description: How the catalog is reviewed, what belongs here, and how to contribute.
+title: Methodology
+description: How the catalog is scoped, sourced, reviewed, and updated.
 visibility: public
 ---
 
-DataLicenses.org is a community-curated catalog. The idea is that folks interested in this topic can submit content. Currently there is no formal governance process, as this is at the "very small" stage (practically, the main editor is Nick Vincent with feedback from a small group of interested parties). Down the line, we'll add formal governance process to decide what belongs here, how entries are written, and which caveats stay visible.
+DataLicenses.org is a community-curated catalog of public initiatives shaping AI data access, licensing, controlled retrieval, and enforcement. The catalog is currently maintained by Nick Vincent with feedback from a small group of contributors and subject-matter observers.
 
-The first draft of this site was built with heavy assistance from coding agents for both web design and information retrieval. The main risks of AI usage in this kind of project are (1) incorrect information (thus, we must maintain human review of all initiatives and all pieces of "evidence"), (2) unpleasant "AI slop tone" in any writing that makes readers have a bad experience, and (3) bad web design. At present, there should not be any major security concerns.
+The project is still lightweight, so editorial decisions are made through public issues, pull requests, and direct review rather than a formal governance board. As the catalog grows, the review process should become more explicit about inclusion criteria, writing standards, and how disagreements are resolved.
+
+AI tools may be used to help find sources, compare public materials, draft update packets, and improve code. They do not replace human review. Claims, dates, adoption metrics, and descriptions should be checked against public sources before they are merged.
 
 ## How we collect initiatives
 
-Our goal is to use search tools, presence in relevant spaces (e.g., going to conferences, watching online spaces), and social networks to maintain a catalog of any "data licensing" relevant initiatives. At the end of the day, people decide what belongs in the catalog, how entries are written, and which caveats stay visible. AI can help find sources and draft updates. Important claims should point to public sources that a reviewer can open and check.
+The catalog is maintained through a mix of source review, conference and community monitoring, public announcements, standards work, and contributor submissions. Entries are included when they have a clear relationship to AI data rights or AI-relevant data access.
 
-Right now inititives are stored in markdown files in the GitHub repo. This may change (perhaps moving to ATProto approach to further externalize content).
+Initiatives are stored as markdown records in the GitHub repository. Each record should have a canonical website, a short summary, a status, a primary mechanism, and dated evidence links for meaningful public updates.
 
 ### Workflow
 
 1. You spot a new initiative or a possible update.
 2. Read the current entry first.
 3. Check the strongest public sources first: official sites, docs, changelogs, repos, and filings.
-4. If helpful, use AI to gather links or draft a small update packet as a single markdown file (see current examples here https://github.com/nickmvincent/data-licenses/tree/main/content/initiatives for exact schema)
-5. Review the key claims
-6. If the evidence is weak or unclear, say so or leave it out (that's ok!)
+4. If helpful, use AI to gather links or draft a small update packet as a single markdown file. Existing entries in the repository show the current schema.
+5. Review the key claims.
+6. If evidence is weak, conflicting, or indirect, note the uncertainty or leave the claim out.
 7. A person makes the final merge.
 
-### Good Update
+### Good update
 
 - A short factual summary.
 - At least one public source.
@@ -40,7 +42,7 @@ If AI is involved, the best output is usually a small review packet with sources
 - Keep summaries short, neutral, and specific.
 - If you add a metric, add matching `metricEvidence` too.
 
-### In Scope
+### In scope
 
 - Initiatives that shape AI data flows through preference signals, licenses or terms, collectives, marketplaces, technical controls, certification, or new infrastructure.
 - Concrete implementation details, canonical websites, and dated evidence links.
@@ -49,14 +51,14 @@ If AI is involved, the best output is usually a small review packet with sources
 ### Status meanings
 
 - `live`: public and usable now.
-- `wip`: worth tracking, but still emerging or incomplete.
+- `wip`: under review, emerging, or not yet fully deployed.
 - `archived`: kept for historical context, but hidden from the default catalog view because a review did not find newer public activity.
 
 ## Contribute
 
 - Suggest a new initiative or update an existing one with a canonical site and dated sources.
 - Open an issue for leads, scope questions, or early discussion.
-- If in doubt, for now, just open an issue!
+- Open an issue if you are unsure whether something belongs in scope.
 - Open a pull request when the wording and metadata are ready to review.
 - Every suggested `evidenceLinks`, `usersCount`, `dataVolume`, or `moneyVolume` value should include a clickable source and date. If you add a metric, add matching `metricEvidence`.
 

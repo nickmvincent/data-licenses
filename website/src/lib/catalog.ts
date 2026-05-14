@@ -45,7 +45,7 @@ export const DATA_TYPE_LABELS: Record<string, string> = {
 
 export const STATUS_LABELS: Record<string, string> = {
   live: 'Live',
-  wip: 'WIP',
+  wip: 'In progress',
   archived: 'Archived',
 };
 
@@ -124,7 +124,12 @@ export function sortByLatestThenTitle(a: LoadedInitiative, b: LoadedInitiative) 
 export function formatDate(value: Date | string | undefined) {
   const date = new Date(String(value));
   if (Number.isNaN(date.getTime())) return String(value);
-  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    timeZone: 'UTC',
+  });
 }
 
 export function formatLinkLabel(url: string) {

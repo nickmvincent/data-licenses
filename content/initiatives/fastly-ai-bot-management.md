@@ -14,8 +14,11 @@ dataTypes:
 tags:
   - bot-management
 evidenceLinks:
+  - label: Threat Insights post covers bot traffic and AI-bot access
+    url: 'https://www.fastly.com/blog/nearly-half-the-web-isnt-human-inside-fastlys-threat-insight-report'
+    date: '2026-04-16'
   - label: Threat research on AI bot traffic released
-    url: 'https://investors.fastly.com/news/news-details/2025/New-Fastly-Threat-Research-Reveals-AI-Crawlers-Make-Up-Almost-80-of-AI-Bot-Traffic-Meta-Leads-AI-Crawling-As-ChatGPT-Dominates-Real-Time-Web-Traffic/default.aspx'
+    url: 'https://www.fastly.com/press/press-releases/new-fastly-threat-research-reveals-ai-crawlers-make-up-almost-80-of-ai-bot'
     date: '2025-08-19'
   - label: AI Bot Management launch announced
     url: 'https://community.fastly.com/t/now-available-fastly-ai-bot-management/3985'
@@ -27,4 +30,4 @@ type: data_license_initiative
 
 Fastly AI Bot Management gives site operators dedicated signals for spotting and responding to AI crawlers and AI fetchers. Its materials frame the product as a way to detect, block, intercept, or otherwise manage automated traffic that consumes content without consent or compensation.
 
-This is useful catalog coverage because it shows another major edge provider converging on AI-specific access control as a practical near-term response to unlicensed scraping.
+Fastly's product shows another major edge provider converging on AI-specific access control as a practical near-term response to unlicensed scraping.

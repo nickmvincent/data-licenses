@@ -1,12 +1,19 @@
 ---
-title: Creative Commons Preference Signals
-summary: Proposed signals for communicating reuse preferences to AI and web agents.
+title: Creative Commons Signals
+summary: Creative Commons framework for communicating expectations and building governance infrastructure around AI use of shared knowledge.
 status: wip
-website: 'https://github.com/creativecommons/cc-signals'
+website: 'https://creativecommons.org/cc-signals/'
 actionsSupported:
   - attach-preference-signal
+  - new-infrastructures
 primaryApproachType: attach-preference-signal
 evidenceLinks:
+  - label: Creative Commons outlines signals-to-infrastructure plan
+    url: 'https://creativecommons.org/2026/05/13/from-signals-to-infrastructure-strengthening-the-commons-for-the-ai-era/'
+    date: '2026-05-13'
+  - label: Creative Commons describes shift from signals to agency
+    url: 'https://creativecommons.org/2026/04/23/update-on-cc-signals-what-changed-and-why/'
+    date: '2026-04-23'
   - label: Year-end CC Signals progress update
     url: 'https://creativecommons.org/2025/12/15/cc-signals-what-weve-been-working-on/'
     date: '2025-12-15'
@@ -20,4 +27,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-Creative Commons Preference Signals explores machine-readable ways for creators and platforms to express preferences about AI and automated reuse. The work is still under consultation, so the ideas are important to track but not yet stable enough to treat as a settled standard.
+Creative Commons Signals explores ways for creators, platforms, and knowledge stewards to communicate expectations about AI and automated reuse. Creative Commons now frames the work as broader than preference signaling alone, spanning legal, technical, and governance interventions for the commons in the AI era.

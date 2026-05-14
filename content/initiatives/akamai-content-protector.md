@@ -31,4 +31,4 @@ type: data_license_initiative
 
 Akamai Content Protector is a dedicated anti-scraping product for identifying and responding to persistent automated extraction of valuable web content. In newer Akamai materials, it increasingly sits inside a broader strategy for managing AI crawlers, fetchers, and other LLM-related bot traffic.
 
-It belongs in the catalog because it represents a major infrastructure-vendor approach to preserving leverage before any downstream licensing or revenue-sharing arrangement is negotiated.
+The product represents an infrastructure-vendor approach to preserving leverage before any downstream licensing or revenue-sharing arrangement is negotiated.

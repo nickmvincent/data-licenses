@@ -62,7 +62,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
 <Layout
   title="Catalog"
-  description="A fast, catalog-first view of current initiatives shaping AI data access, licensing, and enforcement, with archived entries available on demand."
+  description="A searchable catalog of current initiatives shaping AI data access, licensing, and enforcement, with archived entries available on demand."
 >
   <main class="wrap catalog-page">
     <header class="catalog-header box">
@@ -72,7 +72,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           <p class="catalog-summary">
             Browse initiatives shaping AI data access, licensing, and enforcement. Search by name
             or evidence, filter by status, and use the approach sections below when you want the
-            spreadsheet view.
+            table view.
           </p>
         </div>
 
@@ -85,7 +85,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
             <span aria-hidden="true">·</span>
             <a href="/glossary">Glossary</a>
             <span aria-hidden="true">·</span>
-            <a href="/methodology">Method &amp; contribute</a>
+            <a href="/methodology">Methodology</a>
           </p>
         </div>
       </div>
@@ -113,13 +113,13 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           <div class="status-switch">
             <button type="button" class="status-button" data-status-filter="all" aria-pressed="true">All</button>
             <button type="button" class="status-button" data-status-filter="live" aria-pressed="false">Live</button>
-            <button type="button" class="status-button" data-status-filter="wip" aria-pressed="false">WIP</button>
+            <button type="button" class="status-button" data-status-filter="wip" aria-pressed="false">In progress</button>
           </div>
         </div>
 
         <div class="catalog-toolbar-actions">
           <div class="view-switch" aria-label="Catalog view">
-            <button type="button" class="view-button" data-view="spreadsheet" aria-pressed="true">Spreadsheet</button>
+            <button type="button" class="view-button" data-view="spreadsheet" aria-pressed="true">Table</button>
             <button type="button" class="view-button" data-view="cards" aria-pressed="false">Cards</button>
           </div>
 
@@ -210,7 +210,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     <section class="catalog-jump" aria-labelledby="catalog-jump-title">
       <div class="catalog-jump-head">
         <h2 id="catalog-jump-title" class="catalog-jump-title">Browse by primary approach</h2>
-        <p class="catalog-jump-copy">Use these jump links when you want to scan the spreadsheet section by section.</p>
+        <p class="catalog-jump-copy">Use these jump links when you want to scan the table section by section.</p>
       </div>
 
       <nav class="catalog-approach-nav" aria-label="Primary approach type sections">
@@ -765,7 +765,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       const viewButtons = queryAll('.view-button');
       const statusButtons = queryAll('.status-button');
       const compactCatalogMedia = window.matchMedia('(max-width: 720px)');
-      const statusLabels = { live: 'Live', wip: 'WIP', archived: 'Archived' };
+      const statusLabels = { live: 'Live', wip: 'In progress', archived: 'Archived' };
       const legacyGoalActions = {
         signal: ['attach-preference-signal', 'attach-formal-license'],
         block: ['technical-blocking'],

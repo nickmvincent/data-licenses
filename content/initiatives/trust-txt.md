@@ -37,4 +37,4 @@ type: data_license_initiative
 
 trust.txt is a machine-readable file used by publishers to declare affiliations and other trust metadata. In April 2024, the specification added a `datatrainingallowed=` variable, extending the framework into AI-related permissions as well.
 
-It belongs in the catalog because it shows an existing publisher coordination system absorbing an AI-use signal rather than starting from scratch with a brand-new standard.
+The AI-use field adds training-permission metadata to an existing publisher coordination system rather than requiring a separate AI-only standard.

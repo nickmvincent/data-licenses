@@ -31,6 +31,6 @@ visibility: public
 type: data_license_initiative
 ---
 
-CoMP is one of the clearest attempts to standardize the commercial side of AI content access rather than just signaling preferences. Its current framing is about making permissions, terms, and marketplace interactions machine-readable before a bot is allowed to crawl or use content.
+CoMP standardizes the commercial side of AI content access rather than only signaling preferences. Its current framing is about making permissions, terms, and marketplace interactions machine-readable before a bot is allowed to crawl or use content.
 
-It belongs in the catalog as forward-looking infrastructure: not yet a settled, widely deployed standard, but one of the strongest current efforts to bridge blocking, licensing, and scalable monetization workflows.
+As forward-looking infrastructure, it is not yet a settled, widely deployed standard, but it bridges blocking, licensing, and scalable monetization workflows.

@@ -60,4 +60,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-RSL proposes a structured way to express licensing terms in machine-readable form so implementers can reliably interpret reuse permissions across the web. It is one of the clearest examples in the catalog of a standards effort that is trying to combine rights expression, implementation guidance, and ecosystem backing from publishers and infrastructure providers.
+RSL proposes a structured way to express licensing terms in machine-readable form so implementers can reliably interpret reuse permissions across the web. The standard combines rights expression, implementation guidance, and ecosystem backing from publishers and infrastructure providers.

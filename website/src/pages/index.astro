@@ -13,9 +13,9 @@ type CatalogApproachKey = (typeof APPROACH_KEYS)[number];
 
 const items: LoadedInitiative[] = (await loadInitiatives()).sort(sortByLatestThenTitle);
 const currentItems = items.filter((item) => item.status !== 'archived');
-const topTenItems = [...currentItems]
-  .filter((item) => typeof item.topTenRank === 'number')
-  .sort((a, b) => (a.topTenRank ?? 999) - (b.topTenRank ?? 999) || sortByLatestThenTitle(a, b))
+const datedItems = currentItems.filter((item) => item.latestUpdate);
+const recentlyActiveItems = [...datedItems]
+  .sort(sortByLatestThenTitle)
   .slice(0, 10);
 
 const groupedItems: Array<{
@@ -41,11 +41,47 @@ const latestTrackedUpdate = currentItems.reduce<Date | null>((latest, item) => {
   return new Date(item.latestUpdate).getTime() > new Date(latest).getTime() ? item.latestUpdate : latest;
 }, null);
 
-const metricLabel = (item: LoadedInitiative) => item.usersCount || item.dataVolume || item.moneyVolume || '';
-const statusLabel = (item: LoadedInitiative) => STATUS_LABELS[item.status] || item.status;
+const rowNumberBySlug = new Map(currentItems.map((item, index) => [item.slug, index + 1]));
+const githubRepoUrl = 'https://github.com/nickmvincent/data-licenses';
+const catalogLinks = [
+  { href: '/catalog', label: 'catalog' },
+  { href: '/data/initiatives.json', label: 'data JSON' },
+  { href: '/data/curation.json', label: 'curation JSON' },
+  { href: '/prompts/find-updates.txt', label: 'review prompt' },
+  { href: '/methodology#contribute', label: 'contribute' },
+  { href: githubRepoUrl, label: 'github', external: true },
+];
+
+const metricLabel = (item: LoadedInitiative) => item.usersCount || item.dataVolume || item.moneyVolume || 'not recorded';
+const statusLabel = (item: LoadedInitiative) => (STATUS_LABELS[item.status] || item.status).toLowerCase();
 const approachLabel = (item: LoadedInitiative) => {
   const key = item.primaryApproachType as CatalogApproachKey;
   return APPROACH_DETAILS[key]?.title || item.primaryApproachType;
+};
+const rowNumber = (item: LoadedInitiative) => String(rowNumberBySlug.get(item.slug) || '').padStart(2, '0');
+const rowCountLabel = (count: number) => `${count} ${count === 1 ? 'row' : 'rows'}`;
+const sourceShortLabel = (item: LoadedInitiative) => {
+  if (!item.latestEvidenceLink) return 'needs source';
+  try {
+    return new URL(item.latestEvidenceLink.url).hostname.replace(/^www\./, '');
+  } catch {
+    return 'source';
+  }
+};
+const sourceDateLabel = (item: LoadedInitiative) =>
+  item.latestUpdate ? formatDate(item.latestUpdate) : 'No dated source';
+const updateIssueUrl = (item: LoadedInitiative) => {
+  const title = `Update catalog row: ${item.title}`;
+  const body = [
+    `Row: ${item.title}`,
+    `Slug: ${item.slug}`,
+    '',
+    'Suggested change:',
+    '',
+    'Source URL:',
+    'Source date:',
+  ].join('\n');
+  return `${githubRepoUrl}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
 };
 ---
 
@@ -54,136 +90,214 @@ const approachLabel = (item: LoadedInitiative) => {
   description="A hyper-curated catalog of public initiatives shaping AI data access, licensing, controlled retrieval, and technical enforcement."
 >
   <main class="wrap catalog-home">
-    <section class="catalog-hero box">
-      <div class="catalog-hero-copy">
-        <p class="eyebrow">Catalog-first view</p>
-        <h1 class="catalog-hero-title">Quick glance first. Full catalog below.</h1>
-        <p class="catalog-hero-lede">
-          DataLicenses.org tracks live and emerging initiatives shaping AI data access, licensing,
-          controlled retrieval, and enforcement. The goal here is a fast, opinionated scan of what
-          matters now, with the full catalog still one scroll away.
+    <section class="workbook-cover" aria-labelledby="workbook-title">
+      <div class="cover-copy">
+        <h1 id="workbook-title" class="cover-title">DataLicenses.org</h1>
+        <p class="cover-lede">
+          A community-curated catalog of public initiatives shaping AI data access,
+          licensing, controlled retrieval, and enforcement.
+        </p>
+        <p class="cover-note">
+          Rows emphasize public sources, dated evidence, and clear paths for updates.
         </p>
       </div>
 
-      <div class="catalog-hero-actions">
-        <a class="btn btn-primary" href="#top-ten">See the top ten</a>
-        <a class="btn" href="/catalog">Open full catalog</a>
-      </div>
-
-      <div class="catalog-hero-meta">
-        <span class="catalog-meta-pill">{currentItems.length} current initiatives</span>
-        <span class="catalog-meta-pill">{groupedItems.length} approach types</span>
-        {latestTrackedUpdate && (
-          <span class="catalog-meta-pill">Updated {formatDate(latestTrackedUpdate)}</span>
-        )}
-      </div>
-
-      <p class="catalog-hero-note">
-        The top ten below mixes public adoption signals, evidence recency, and editorial judgment.
-        Use it as a quick reading list, not a universal score.
-      </p>
-    </section>
-
-    <section id="top-ten" class="top-ten-section">
-      <div class="section-head">
+      <dl class="cover-stats" aria-label="Catalog snapshot">
         <div>
-          <p class="eyebrow">Quick glance</p>
-          <h2 class="section-title">Top ten right now</h2>
+          <dt>entries</dt>
+          <dd>{currentItems.length}</dd>
         </div>
-        <p class="section-copy">
-          A deliberately curated slice of the catalog that leans toward live traction, concrete
-          evidence, and strategic importance.
-        </p>
-      </div>
-
-      <div class="top-ten-grid">
-        {topTenItems.map((item) => (
-          <article class="top-ten-card box">
-            <div class="top-ten-card-head">
-              <span class="top-ten-rank">#{item.topTenRank}</span>
-              <div class="top-ten-card-pills">
-                <span class="top-ten-pill">{approachLabel(item)}</span>
-                <span class="top-ten-pill top-ten-pill-muted">{statusLabel(item)}</span>
-              </div>
-            </div>
-
-            <h3 class="top-ten-card-title">
-              <a href={`/initiatives/${item.slug}`}>{item.title}</a>
-            </h3>
-            <p class="top-ten-card-summary">{item.summary}</p>
-            {item.topTenNote && <p class="top-ten-card-note">{item.topTenNote}</p>}
-
-            <div class="top-ten-card-metrics">
-              {metricLabel(item) && <span>{metricLabel(item)}</span>}
-              {item.latestUpdate && <span>Updated {formatDate(item.latestUpdate)}</span>}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="catalog-jump box">
-      <div class="section-head section-head-compact">
         <div>
-          <p class="eyebrow">Browse the rest</p>
-          <h2 class="section-title">Jump by approach</h2>
+          <dt>categories</dt>
+          <dd>{groupedItems.length}</dd>
         </div>
-        <p class="section-copy">
-          These quick links drop you into the compact all-initiatives view below.
-        </p>
-      </div>
+        <div>
+          <dt>dated sources</dt>
+          <dd>{datedItems.length}</dd>
+        </div>
+        <div>
+          <dt>latest evidence</dt>
+          <dd>{latestTrackedUpdate ? formatDate(latestTrackedUpdate) : 'No dated source'}</dd>
+        </div>
+      </dl>
 
-      <div class="catalog-jump-list">
-        {groupedItems.map((group) => (
-          <a class="catalog-jump-chip" href={`#group-${group.key}`}>
-            <span class="catalog-jump-label">{group.title}</span>
-            <span class="catalog-jump-count">{group.count}</span>
+      <nav class="workbook-links" aria-label="Catalog links">
+        {catalogLinks.map((link) => (
+          <a href={link.href} target={link.external ? '_blank' : undefined} rel={link.external ? 'noopener' : undefined}>
+            {link.label}
           </a>
         ))}
+      </nav>
+    </section>
+
+    <section id="recently-active" class="sheet-section recent-sheet" aria-labelledby="recently-active-title">
+      <header class="sheet-header">
+        <div>
+          <h2 id="recently-active-title" class="sheet-title">Recently active</h2>
+          <p class="sheet-copy">
+            Entries with the newest dated public evidence.
+          </p>
+        </div>
+        <p class="sheet-note">
+          Recent activity is based on dated sources, not an overall score.
+        </p>
+      </header>
+
+      <div class="sheet-frame recent-frame">
+        <table class="ledger-table recent-table">
+          <caption>Recently active initiatives</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="col-rank">row</th>
+              <th scope="col">initiative</th>
+              <th scope="col" class="col-medium">mechanism</th>
+              <th scope="col" class="col-medium">adoption signal</th>
+              <th scope="col" class="col-source">latest evidence</th>
+              <th scope="col" class="col-action">update</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recentlyActiveItems.map((item, index) => (
+              <tr>
+                <td class="cell-rank">{String(index + 1).padStart(2, '0')}</td>
+                <th scope="row" class="cell-main">
+                  <a class="row-title" href={`/initiatives/${item.slug}`}>{item.title}</a>
+                  <span>{item.summary}</span>
+                </th>
+                <td>
+                  <span>{approachLabel(item)}</span>
+                  <span class="cell-muted">{statusLabel(item)}</span>
+                </td>
+                <td>{metricLabel(item)}</td>
+                <td class="cell-source">
+                  {item.latestEvidenceLink ? (
+                    <>
+                      <a
+                        href={item.latestEvidenceLink.url}
+                        target="_blank"
+                        rel="noopener"
+                        title={item.latestEvidenceLink.label}
+                      >
+                        {sourceShortLabel(item)}
+                      </a>
+                      <span>{sourceDateLabel(item)}</span>
+                    </>
+                  ) : (
+                    <span>{sourceShortLabel(item)}</span>
+                  )}
+                </td>
+                <td class="cell-actions">
+                  <a href={`/initiatives/${item.slug}`}>profile</a>
+                  <a href={updateIssueUrl(item)} target="_blank" rel="noopener">update</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </section>
 
-    <section id="all-initiatives" class="all-catalog">
-      <div class="section-head">
+    <nav class="sheet-tabs" aria-label="Catalog sections">
+      <a href="#recently-active">
+        <span>recent</span>
+        <b>{recentlyActiveItems.length}</b>
+      </a>
+      <a href="#all-initiatives">
+        <span>all entries</span>
+        <b>{currentItems.length}</b>
+      </a>
+      {groupedItems.map((group) => (
+        <a href={`#group-${group.key}`}>
+          <span>{group.title}</span>
+          <b>{group.count}</b>
+        </a>
+      ))}
+    </nav>
+
+    <section id="all-initiatives" class="sheet-section all-catalog" aria-labelledby="all-initiatives-title">
+      <header class="sheet-header">
         <div>
-          <p class="eyebrow">Full list</p>
-          <h2 class="section-title">All current initiatives</h2>
+          <h2 id="all-initiatives-title" class="sheet-title">All current entries</h2>
+          <p class="sheet-copy">
+            Grouped by primary mechanism. Each entry links to a profile, latest evidence, and a
+            pre-filled update issue.
+          </p>
         </div>
-        <p class="section-copy">
-          Compact, curated, and link-first. For filters or machine-readable access, use the JSON
-          API from the nav.
+        <p class="sheet-note">
+          Metric cells show recorded values only when backed by public evidence.
         </p>
+      </header>
+
+      <div class="approach-index" aria-label="Approach index">
+        {groupedItems.map((group) => (
+          <a href={`#group-${group.key}`}>
+            <span>{group.title}</span>
+            <span>{group.description}</span>
+          </a>
+        ))}
       </div>
 
       <div class="catalog-groups">
         {groupedItems.map((group) => (
-          <section id={`group-${group.key}`} class="catalog-group box">
-            <div class="catalog-group-head">
+          <section id={`group-${group.key}`} class="group-sheet" aria-labelledby={`group-title-${group.key}`}>
+            <header class="group-sheet-header">
               <div>
-                <p class="eyebrow">{group.count} tracked</p>
-                <h3 class="catalog-group-title">{group.title}</h3>
+                <h3 id={`group-title-${group.key}`} class="group-title">
+                  {group.title} <span>{rowCountLabel(group.count)}</span>
+                </h3>
+                <p>{group.description}</p>
               </div>
-              <p class="catalog-group-copy">{group.description}</p>
-            </div>
+              <a href="#all-initiatives">back to entries</a>
+            </header>
 
-            <div class="catalog-group-list">
-              {group.items.map((item) => (
-                <article class="catalog-row">
-                  <div class="catalog-row-main">
-                    <div class="catalog-row-topline">
-                      <a href={`/initiatives/${item.slug}`} class="catalog-row-title">{item.title}</a>
-                      {item.topTenRank && <span class="catalog-row-flag">Top ten</span>}
-                    </div>
-                    <p class="catalog-row-summary">{item.summary}</p>
-                  </div>
-
-                  <div class="catalog-row-meta">
-                    <span>{statusLabel(item)}</span>
-                    {metricLabel(item) && <span>{metricLabel(item)}</span>}
-                    {item.latestUpdate && <span>Updated {formatDate(item.latestUpdate)}</span>}
-                  </div>
-                </article>
-              ))}
+            <div class="sheet-frame">
+              <table class="ledger-table all-table">
+                <caption>{group.title} initiatives</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="col-rank">row</th>
+                    <th scope="col">initiative</th>
+                    <th scope="col" class="col-small">status</th>
+                    <th scope="col" class="col-medium">adoption signal</th>
+                    <th scope="col" class="col-source">latest evidence</th>
+                    <th scope="col" class="col-action">update</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {group.items.map((item) => (
+                    <tr>
+                      <td class="cell-rank">{rowNumber(item)}</td>
+                      <th scope="row" class="cell-main">
+                        <a class="row-title" href={`/initiatives/${item.slug}`}>{item.title}</a>
+                        <span>{item.summary}</span>
+                      </th>
+                      <td>{statusLabel(item)}</td>
+                      <td>{metricLabel(item)}</td>
+                      <td class="cell-source">
+                        {item.latestEvidenceLink ? (
+                          <>
+                            <a
+                              href={item.latestEvidenceLink.url}
+                              target="_blank"
+                              rel="noopener"
+                              title={item.latestEvidenceLink.label}
+                            >
+                              {sourceShortLabel(item)}
+                            </a>
+                            <span>{sourceDateLabel(item)}</span>
+                          </>
+                        ) : (
+                          <span>{sourceShortLabel(item)}</span>
+                        )}
+                      </td>
+                      <td class="cell-actions">
+                        <a href={`/initiatives/${item.slug}`}>profile</a>
+                        <a href={updateIssueUrl(item)} target="_blank" rel="noopener">update</a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </section>
         ))}
@@ -193,278 +307,391 @@ const approachLabel = (item: LoadedInitiative) => {
 </Layout>
 
 <style>
+  :global(body) {
+    background: var(--bg);
+  }
+
   .catalog-home {
     display: grid;
-    gap: 20px;
+    gap: clamp(24px, 3vw, 38px);
+    max-width: 1240px;
+    padding-top: 24px;
   }
 
-  .catalog-hero {
-    display: grid;
-    gap: 16px;
-    padding: clamp(24px, 5vw, 38px);
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--card) 96%, transparent), color-mix(in srgb, var(--accent-soft) 12%, var(--card))),
-      var(--card);
+  .catalog-home :is(h1, h2, h3) {
+    letter-spacing: 0;
   }
 
-  .catalog-hero-copy {
-    display: grid;
-    gap: 0.8rem;
-    max-width: 56rem;
-  }
-
-  .catalog-hero-title {
-    max-width: 12ch;
-    font-size: clamp(2.05rem, 4.5vw, 3.75rem);
-  }
-
-  .catalog-hero-lede,
-  .catalog-hero-note,
-  .section-copy,
-  .catalog-group-copy {
-    margin: 0;
-    color: color-mix(in srgb, var(--text) 82%, var(--muted));
-    line-height: 1.6;
-  }
-
-  .catalog-hero-lede {
-    max-width: 46rem;
-  }
-
-  .catalog-hero-actions,
-  .catalog-hero-meta,
-  .catalog-jump-list,
-  .top-ten-card-pills,
-  .top-ten-card-metrics,
-  .catalog-row-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .catalog-meta-pill,
-  .top-ten-pill,
-  .catalog-row-flag,
-  .catalog-jump-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 2rem;
-    padding: 0 0.7rem;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--surface-muted) 72%, var(--card));
-    color: var(--text);
-    font-size: 0.82rem;
-    font-weight: 700;
-  }
-
-  .top-ten-pill-muted,
-  .catalog-meta-pill {
-    color: var(--muted);
-  }
-
-  .top-ten-section,
-  .all-catalog {
+  .workbook-cover,
+  .sheet-section,
+  .group-sheet {
     display: grid;
     gap: 14px;
+    min-width: 0;
   }
 
-  .section-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 16px;
-    flex-wrap: wrap;
+  .workbook-cover {
+    grid-template-columns: minmax(0, 1fr) minmax(13rem, 17rem);
+    gap: 18px 24px;
+    padding: 8px 0 20px;
+    border-top: 1px solid var(--border-strong);
+    border-bottom: 1px solid var(--border-strong);
   }
 
-  .section-head-compact {
-    align-items: start;
-  }
-
-  .section-title {
-    font-size: clamp(1.55rem, 3vw, 2.15rem);
-  }
-
-  .section-copy {
-    max-width: 34rem;
-  }
-
-  .top-ten-grid {
+  .cover-copy {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
+    gap: 0.55rem;
+    align-content: start;
+    max-width: 48rem;
   }
 
-  .top-ten-card {
-    display: grid;
-    gap: 12px;
-    padding: 18px;
+  .cover-title {
+    font-size: clamp(1.9rem, 3.3vw, 3rem);
+    line-height: 1;
   }
 
-  .top-ten-card-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    gap: 12px;
-  }
-
-  .top-ten-rank {
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--accent);
-  }
-
-  .top-ten-card-title {
-    font-size: 1.25rem;
-    line-height: 1.15;
-  }
-
-  .top-ten-card-title a,
-  .catalog-row-title,
-  .catalog-jump-chip {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .top-ten-card-title a:hover,
-  .top-ten-card-title a:focus-visible,
-  .catalog-row-title:hover,
-  .catalog-row-title:focus-visible,
-  .catalog-jump-chip:hover,
-  .catalog-jump-chip:focus-visible {
-    color: var(--accent);
-    text-decoration: underline;
-  }
-
-  .top-ten-card-summary,
-  .top-ten-card-note,
-  .catalog-row-summary {
+  .cover-lede,
+  .cover-note,
+  .sheet-copy,
+  .sheet-note,
+  .group-title + p {
     margin: 0;
-    line-height: 1.58;
+    color: color-mix(in srgb, var(--text) 76%, var(--muted));
+    line-height: 1.5;
   }
 
-  .top-ten-card-note {
-    color: var(--text);
-    font-weight: 500;
+  .cover-lede {
+    max-width: 42rem;
+    font-size: clamp(1rem, 1.4vw, 1.18rem);
   }
 
-  .top-ten-card-metrics,
-  .catalog-row-meta {
+  .cover-note,
+  .sheet-note {
     color: var(--muted);
     font-size: 0.9rem;
   }
 
-  .catalog-jump {
+  .cover-stats {
     display: grid;
-    gap: 14px;
-    padding: 18px;
+    align-content: start;
+    margin: 0;
+    border-top: 1px solid var(--border);
   }
 
-  .catalog-jump-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0.7rem 0.9rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--card) 96%, transparent);
-    transition:
-      border-color 0.18s ease,
-      background 0.18s ease,
-      transform 0.18s ease;
+  .cover-stats div {
+    display: grid;
+    gap: 0.12rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--border);
   }
 
-  .catalog-jump-chip:hover,
-  .catalog-jump-chip:focus-visible {
-    transform: translateY(-1px);
-    border-color: color-mix(in srgb, var(--accent) 32%, var(--border));
-    background: color-mix(in srgb, var(--accent-soft) 16%, var(--card));
+  .cover-stats dt,
+  .cover-stats dd {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.25;
   }
 
-  .catalog-jump-label {
+  .cover-stats dt {
+    color: var(--muted);
+  }
+
+  .cover-stats dd {
+    color: var(--text);
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .workbook-links {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1.1rem;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+
+  .workbook-links a,
+  .sheet-tabs a,
+  .approach-index a,
+  .row-title,
+  .cell-actions a,
+  .group-sheet-header a,
+  .cell-source a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.16em;
+  }
+
+  .workbook-links a,
+  .cell-actions a,
+  .group-sheet-header a {
+    color: var(--accent);
     font-weight: 700;
   }
 
-  .catalog-groups {
+  .sheet-header,
+  .group-sheet-header {
     display: grid;
-    gap: 14px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px 28px;
+    align-items: start;
   }
 
-  .catalog-group {
+  .sheet-header > div,
+  .group-sheet-header > div {
     display: grid;
-    gap: 12px;
-    padding: 18px;
+    gap: 0.35rem;
   }
 
-  .catalog-group-head {
+  .sheet-title,
+  .group-title {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .sheet-copy,
+  .group-title + p {
+    max-width: 42rem;
+    font-size: 0.92rem;
+  }
+
+  .sheet-note {
+    max-width: 24rem;
+  }
+
+  .sheet-tabs {
     display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 16px;
     flex-wrap: wrap;
-  }
-
-  .catalog-group-title {
-    font-size: 1.35rem;
-  }
-
-  .catalog-group-copy {
-    max-width: 34rem;
-  }
-
-  .catalog-group-list {
-    display: grid;
     gap: 0;
     border-top: 1px solid var(--border);
   }
 
-  .catalog-row {
-    display: grid;
+  .sheet-tabs a {
+    display: inline-grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 14px;
-    padding: 14px 0;
+    gap: 0.65rem;
+    min-width: 9rem;
+    padding: 0.55rem 0.8rem 0.5rem 0;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    color: color-mix(in srgb, var(--text) 84%, var(--muted));
+    font-size: 0.82rem;
+  }
+
+  .sheet-tabs b {
+    color: var(--muted);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .approach-index {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .approach-index a {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.65rem 0;
     border-bottom: 1px solid var(--border);
   }
 
-  .catalog-row-main {
+  .approach-index a span:first-child {
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .approach-index a span:last-child {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .catalog-groups {
     display: grid;
-    gap: 0.45rem;
+    gap: 26px;
+  }
+
+  .group-sheet {
+    scroll-margin-top: 86px;
+  }
+
+  .group-title span {
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .group-sheet-header a {
+    justify-self: end;
+    font-size: 0.82rem;
+  }
+
+  .sheet-frame {
     min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    border-top: 1px solid var(--border);
+    scrollbar-width: thin;
   }
 
-  .catalog-row-topline {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
+  .ledger-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    table-layout: fixed;
   }
 
-  .catalog-row-title {
-    font-family: var(--font-display);
-    font-size: 1.08rem;
+  .recent-table {
+    min-width: 980px;
+  }
+
+  .ledger-table caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .ledger-table th,
+  .ledger-table td {
+    padding: 0.62rem 0.75rem 0.62rem 0;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.86rem;
+    line-height: 1.38;
+  }
+
+  .ledger-table thead th {
+    color: var(--muted);
+    font-family: var(--font-code);
+    font-size: 0.72rem;
     font-weight: 600;
-    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: lowercase;
+  }
+
+  .ledger-table tbody tr:hover {
+    background: color-mix(in srgb, var(--surface-muted) 38%, transparent);
+  }
+
+  .col-rank {
+    width: 3.6rem;
+  }
+
+  .col-small {
+    width: 6.5rem;
+  }
+
+  .col-medium {
+    width: 11rem;
+  }
+
+  .col-source {
+    width: 14rem;
+  }
+
+  .col-action {
+    width: 7rem;
+  }
+
+  .cell-rank {
+    color: var(--muted);
+    font-family: var(--font-code);
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cell-main > *,
+  .cell-source > *,
+  .cell-actions > * {
+    display: block;
+  }
+
+  .cell-main > * + *,
+  .cell-source > * + *,
+  .cell-actions > * + * {
+    margin-top: 0.25rem;
+  }
+
+  .row-title {
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .row-title:hover,
+  .row-title:focus-visible,
+  .cell-source a:hover,
+  .cell-source a:focus-visible,
+  .approach-index a:hover,
+  .approach-index a:focus-visible,
+  .sheet-tabs a:hover,
+  .sheet-tabs a:focus-visible {
+    color: var(--accent);
+  }
+
+  .cell-main span,
+  .cell-main em,
+  .cell-muted,
+  .cell-source span {
+    color: var(--muted);
+    font-style: normal;
+    font-size: 0.8rem;
+  }
+
+  .cell-main em {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .cell-actions a {
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 1200px) {
+    .sheet-header,
+    .group-sheet-header {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .group-sheet-header a {
+      justify-self: start;
+    }
+
+    .sheet-note {
+      max-width: 40rem;
+    }
   }
 
   @media (max-width: 840px) {
-    .top-ten-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .catalog-row {
+    .workbook-cover,
+    .approach-index {
       grid-template-columns: minmax(0, 1fr);
     }
   }
 
-  @media (max-width: 720px) {
-    .catalog-hero-actions .btn {
-      width: 100%;
+  @media (max-width: 640px) {
+    .catalog-home {
+      padding-top: 16px;
     }
 
-    .catalog-hero-title {
-      max-width: 14ch;
+    .cover-title {
+      font-size: clamp(1.75rem, 8vw, 2.2rem);
+    }
+
+    .sheet-tabs a {
+      min-width: 50%;
     }
   }
 </style>

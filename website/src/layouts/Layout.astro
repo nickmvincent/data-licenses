@@ -33,10 +33,10 @@ const isNavActive = (href: string) =>
       : currentPath.startsWith(href);
 
 const navLinks = [
-  { href: '/', label: 'Quick Glance' },
-  { href: '/catalog', label: 'Full Catalog' },
+  { href: '/', label: 'Home' },
+  { href: '/catalog', label: 'Catalog' },
   { href: '/glossary', label: 'Glossary' },
-  { href: '/methodology', label: 'Method & Contribute' },
+  { href: '/methodology', label: 'Methodology' },
 ];
 
 const alsoLikeLinks = [
@@ -53,7 +53,7 @@ const alsoLikeLinks = [
   {
     href: 'https://exploringai.org/',
     label: 'ExploringAI.org',
-    desc: 'Research notes and napkin math about AI data flows.',
+    desc: 'Research notes and quantitative sketches about AI data flows.',
   },
   {
     href: 'https://datalevers.org',
@@ -167,7 +167,7 @@ const alsoLikeLinks = [
       <div class="also-like-inner">
         <div class="also-like-heading">
           <p class="also-like-kicker">Adjacent work</p>
-          <p class="also-like-label">Trackers and research projects worth keeping open in the next tab.</p>
+          <p class="also-like-label">Trackers and research projects related to AI data rights.</p>
         </div>
         <div class="also-like-links">
           {alsoLikeLinks.map((link) => (

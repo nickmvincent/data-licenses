@@ -1,6 +1,6 @@
 ---
 title: Hugging Face Gated Datasets
-summary: Hub feature that requires users to request access and share identity details before downloading a dataset.
+summary: Hugging Face Hub access-control feature that requires users to request approval before downloading a dataset.
 status: live
 website: 'https://huggingface.co/docs/hub/datasets-gated'
 actionsSupported:
@@ -42,4 +42,4 @@ type: data_license_initiative
 
 Hugging Face Gated Datasets let dataset publishers require access requests before files can be downloaded. Publishers can ask for contact details or additional form fields, and they can approve requests automatically or manually.
 
-This is useful catalog coverage because it is increasingly common infrastructure for conditional dataset sharing, even though it is closer to platform access control than to interoperable web signaling.
+Gated repository infrastructure is increasingly common for conditional dataset sharing, even though it is closer to platform access control than to interoperable web signaling.

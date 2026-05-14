@@ -31,4 +31,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-Microsoft Publisher Content Marketplace connects premium articles from launch partners into Copilot, MSN, and Microsoft Discover, with Microsoft matching user demand to licensed publisher supply. It belongs in the catalog because it turns publisher licensing into a concrete retrieval-time market rather than a pure bot-blocking or standards effort.
+Microsoft Publisher Content Marketplace connects premium articles from launch partners into Copilot, MSN, and Microsoft Discover, with Microsoft matching user demand to licensed publisher supply. It turns publisher licensing into a retrieval-time market rather than a pure bot-blocking or standards effort.

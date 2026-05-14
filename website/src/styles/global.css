@@ -6,6 +6,12 @@ body {
   min-height: 100%;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :root {
   --font-ui: "Avenir Next", "Segoe UI", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "URW Palladio L", Georgia, serif;
@@ -990,12 +996,6 @@ input[type='search'] {
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--muted);
-}
-
-.badge.WIP {
-  color: color-mix(in srgb, var(--text) 55%, var(--badge-wip-hue));
-  background: color-mix(in srgb, var(--badge-wip-hue) 16%, var(--card));
-  border-color: color-mix(in srgb, var(--badge-wip-hue) 32%, var(--border));
 }
 
 .badge.usable-but-new {

@@ -17,16 +17,19 @@ dataTypes:
 tags:
   - developer-data
   - attributed
-dataVolume: '58M+ human-generated questions and answers'
+dataVolume: '83M+ human-verified questions and answers'
 metricEvidence:
   dataVolume:
     basis: explicit
-    notes: The live product page now claims 83M+ questions and answers, but the conservative dated public metric I found is 58M+ from the November 2024 award announcement.
+    notes: Current live product page captured on May 14, 2026.
     sources:
-      - label: OverflowAPI award announcement cites 58M+ questions and answers
-        url: 'https://stackoverflow.co/company/press/archive/stack-overflow-overflow-api-award/'
-        date: '2024-11-06'
+      - label: Current product page cites 83M+ questions and answers
+        url: 'https://stackoverflow.co/data-licensing/'
+        date: '2026-05-14'
 evidenceLinks:
+  - label: Current product page cites 83M+ questions and answers
+    url: 'https://stackoverflow.co/data-licensing/'
+    date: '2026-05-14'
   - label: Product renamed from OverflowAPI to Stack Data Licensing
     url: 'https://stackoverflow.co/company/press/archive/stack-overflow-products-api-world-cloudx'
     date: '2025-09-04'

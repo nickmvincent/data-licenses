@@ -32,4 +32,4 @@ type: data_license_initiative
 
 Spawning's Do Not Train Registry is an opt-out system for creators who do not want their works included in future AI training datasets. In practice it has been closely associated with the Have I Been Trained workflow for discovering indexed works and recording training preferences.
 
-The core idea is useful for this catalog because it turns an individual opt-out into a reusable registry signal, but the current public implementation appears to be in a transitional state.
+The registry turns individual opt-outs into reusable signals, while the current public implementation appears to be in a transitional state.

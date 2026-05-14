@@ -7,12 +7,11 @@ const guide = await loadMethodologyPage();
 const markdown = await getMarkdownProcessor();
 const rendered = await markdown.render(guide.body);
 
-const title =
-  typeof guide.frontmatter?.title === 'string' ? guide.frontmatter.title : 'Method & Contribute';
+const title = typeof guide.frontmatter?.title === 'string' ? guide.frontmatter.title : 'Methodology';
 const description =
   typeof guide.frontmatter?.description === 'string'
     ? guide.frontmatter.description
-    : 'How the catalog is reviewed, what belongs here, and how to contribute.';
+    : 'How the catalog is scoped, sourced, reviewed, and updated.';
 const stripTags = (value: string) => value.replace(/<[^>]+>/g, '');
 const decodeEntities = (value: string) =>
   value

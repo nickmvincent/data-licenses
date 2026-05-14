@@ -37,4 +37,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-ProRata offers a 50/50 revenue-share model between publishers and AI companies, pairing licensed content ingestion with attribution and monetization infrastructure. Its Gist products make it a useful catalog entry not just as a marketplace, but as an attempt to build publisher-controlled AI search and on-site AI experiences around licensed content.
+ProRata offers a 50/50 revenue-share model between publishers and AI companies, pairing licensed content ingestion with attribution and monetization infrastructure. Its Gist products extend that model into publisher-controlled AI search and on-site AI experiences around licensed content.

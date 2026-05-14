@@ -32,4 +32,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-Bria combines a contributor program, licensed training catalog, and enterprise model stack to offer generative AI built on commercial rights. It is worth tracking because it turns dataset licensing and artist compensation into a concrete go-to-market layer rather than treating them as back-office compliance only.
+Bria combines a contributor program, licensed training catalog, and enterprise model stack to offer generative AI built on commercial rights. Its model turns dataset licensing and artist compensation into a product layer rather than treating them only as back-office compliance.

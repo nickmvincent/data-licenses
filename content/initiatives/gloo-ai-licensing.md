@@ -2,7 +2,7 @@
 title: Gloo AI Licensing
 summary: Licensed-content marketplace for the faith ecosystem, seeded with a pooled guarantee for AI assistants and search experiences.
 status: live
-website: 'https://gloo.com/ai/enterprise/licensing'
+website: 'https://docs.gloo.com/product-guides/licensing'
 actionsSupported:
   - data-market-platform
 primaryApproachType: data-market-platform
@@ -29,4 +29,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-Gloo AI Licensing packages licensed publisher and ministry content for faith-oriented AI assistants, search, and recommendation products. It is narrower than general web marketplaces, but it is still worth tracking because it makes a concrete, publicly priced bid to turn AI content access into an organized licensing channel.
+Gloo AI Licensing packages licensed publisher and ministry content for faith-oriented AI assistants, search, and recommendation products. The offer is narrower than general web marketplaces, but it makes AI content access a priced licensing channel for a defined publisher and community ecosystem.
