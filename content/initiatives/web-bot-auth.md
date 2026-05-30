@@ -14,6 +14,12 @@ dataTypes:
 tags:
   - bot-authentication
 evidenceLinks:
+  - label: Cloudflare documents Web Bot Auth verification support
+    url: 'https://developers.cloudflare.com/bots/reference/bot-verification/web-bot-auth/'
+    date: '2026-05-05'
+  - label: Google documents experimental Web Bot Auth support
+    url: 'https://developers.google.com/crawling/docs/crawlers-fetchers/web-bot-auth'
+    date: '2026-05-04'
   - label: Use cases draft updated
     url: 'https://datatracker.ietf.org/doc/draft-nottingham-webbotauth-use-cases/02/'
     date: '2026-04-01'
@@ -30,4 +36,4 @@ type: data_license_initiative
 
 The IETF Web Bot Auth working group is developing standards for cryptographically authenticating automated clients and conveying more information about their operators to websites. That matters for data-licensing and AI-governance workflows because stronger bot identity can make differentiated access rules, rate limits, and policy enforcement more reliable.
 
-The group is still in an active standardization phase, with chartered work on authentication techniques, bot metadata, and operational guidance.
+The group is still in an active standardization phase, with chartered work on authentication techniques, bot metadata, and operational guidance. Google and Cloudflare now publish implementation guidance for experimental or provider-specific Web Bot Auth handling, which makes the standardization work visible in early operational docs.

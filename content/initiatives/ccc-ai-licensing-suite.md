@@ -19,6 +19,9 @@ tags:
   - publishers
   - enterprise
 evidenceLinks:
+  - label: Higher education AI reuse rights added to ACLHE
+    url: 'https://www.copyright.com/blog/ccc-expands-aclhe-include-ai-reuse-rights/'
+    date: '2026-05-06'
   - label: Four AI licensing options announced
     url: 'https://www.copyright.com/media-press-releases/ccc-launching-new-ai-content-re-use-rights-for-u-s-academic-customers-and-transactional-licensing-capabilities-for-ai/'
     date: '2026-03-03'

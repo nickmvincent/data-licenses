@@ -1,7 +1,7 @@
 ---
 title: IAB Tech Lab CoMP
-summary: Standards initiative for machine-readable commercial agreements, access policies, and monetization workflows before AI crawling or content use.
-status: wip
+summary: Finalized v1 framework for machine-readable commercial agreements, access policies, and monetization workflows before AI crawling or content use.
+status: live
 website: 'https://iabtechlab.com/standards/comp-content-monetization-protocols-initiative/'
 actionsSupported:
   - new-infrastructures
@@ -20,17 +20,20 @@ tags:
   - publishers
   - commercial-terms
 evidenceLinks:
+  - label: CoMP v1 finalized
+    url: 'https://iabtechlab.com/standards/comp-content-monetization-protocols-initiative/'
+    date: '2026-04-28'
   - label: CoMP v1.0 opened for public comment
     url: 'https://iabtechlab.com/press-releases/iab-tech-lab-announces-comp-framework-to-ensure-llms-have-commercial-agreements-with-publishers-before-content-crawling/'
     date: '2026-03-10'
   - label: CoMP working group launched
     url: 'https://iabtechlab.com/press-releases/iab-tech-lab-forms-ai-content-monetization-protocols-comp-working-group-to-set-ai-era-publisher-monetization-standards/'
     date: '2025-08-12'
-considerations: CoMP is still a draft standards effort and explicitly assumes that content owners also have strong blocking or gating controls at the edge.
+considerations: CoMP v1 is a licensed-access workflow framework, not a bot-blocking product, licensing marketplace, or economic model; public deployment evidence is still early.
 visibility: public
 type: data_license_initiative
 ---
 
-CoMP standardizes the commercial side of AI content access rather than only signaling preferences. Its current framing is about making permissions, terms, and marketplace interactions machine-readable before a bot is allowed to crawl or use content.
+CoMP standardizes the commercial side of AI content access by making permissions, terms, and marketplace interactions machine-readable before a bot is allowed to crawl or use content. The v1 framework was finalized on April 28, 2026 after public comment.
 
-As forward-looking infrastructure, it is not yet a settled, widely deployed standard, but it bridges blocking, licensing, and scalable monetization workflows.
+The framework defines APIs for licensed AI systems to request content, receive access tokens, and get packaged content from content owners. IAB Tech Lab positions CoMP alongside blocking and licensing systems rather than as a replacement for them.

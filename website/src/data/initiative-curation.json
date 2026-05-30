@@ -37,7 +37,7 @@
   },
   "ccc-ai-licensing-suite": {
     "adoptionResearchStatus": "hard-to-quantify",
-    "adoptionResearchNotes": "CCC publicly documents multiple AI licensing options, but I could not find a clean AI-specific customer or rightsholder count that maps neatly to the suite."
+    "adoptionResearchNotes": "CCC publicly documents multiple AI licensing options, including higher-education AI reuse rights, but no clean AI-specific customer or rightsholder count maps neatly to the suite."
   },
   "cla-generative-ai-licence": {
     "adoptionResearchStatus": "hard-to-quantify",
@@ -87,6 +87,10 @@
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Registry workflow is in flux and public counts are not clearly available right now."
   },
+  "dow-jones-factiva-ai-marketplace": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Public Dow Jones and News Corp materials support both licensed-source scale and enterprise GenAI deal-count evidence."
+  },
   "easy-dataset-share": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Small OSS project without a strong public reporting surface for usage."
@@ -129,7 +133,7 @@
   },
   "iab-tech-lab-comp": {
     "adoptionResearchStatus": "hard-to-quantify",
-    "adoptionResearchNotes": "CoMP is still a standards effort rather than a deployed service, so adoption is not yet the right unit."
+    "adoptionResearchNotes": "CoMP v1 is finalized standards infrastructure rather than a deployed service, so adoption is not yet the right unit."
   },
   "iptc-plus-data-mining-metadata": {
     "adoptionResearchStatus": "hard-to-quantify",
@@ -161,11 +165,15 @@
   },
   "robots-ai-directives": {
     "adoptionResearchStatus": "hard-to-quantify",
-    "adoptionResearchNotes": "Umbrella pattern spanning many actors; deployment is diffuse and hard to count cleanly."
+    "adoptionResearchNotes": "Umbrella pattern spanning many actors, voluntary crawler policies, managed robots.txt services, HTTP headers, and content-use signals; deployment is diffuse and hard to count cleanly."
   },
   "rsl": {
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Official standards-release materials now support organization and page-scale metrics."
+  },
+  "shutterstock-data-licensing-ai-services": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Official materials name AI partners and describe broad multimodal data licensing, but do not provide a clean current AI customer or dataset-count metric."
   },
   "social-license-data-reuse": {
     "adoptionResearchStatus": "hard-to-quantify",
@@ -219,9 +227,13 @@
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Official materials now support a conservative image-corpus metric."
   },
+  "versos-ai-video-training-data-marketplace": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Launch materials support partner-count and represented-video-volume metrics, though buyer-side deployment remains early."
+  },
   "web-bot-auth": {
     "adoptionResearchStatus": "hard-to-quantify",
-    "adoptionResearchNotes": "IETF working group; adoption is not yet the right unit."
+    "adoptionResearchNotes": "IETF working group with early Google and Cloudflare implementation docs; full adoption is still not the right unit."
   },
   "wikimedia-enterprise": {
     "adoptionResearchStatus": "populated",

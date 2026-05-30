@@ -1,8 +1,8 @@
 ---
 title: Humpback
 summary: LLM paywall and analytics layer for publishers that want to control or monetize AI bot access.
-status: archived
-website: 'https://web.archive.org/web/*/https://gethumpback.com/'
+status: wip
+website: 'https://gethumpback.com/'
 actionsSupported:
   - add-tollgate
   - technical-blocking
@@ -14,13 +14,13 @@ tags:
   - bot-management
   - analytics
 considerations: >-
-  Direct checks on May 2, 2026 could not resolve gethumpback.com or hback.xyz,
-  so this draft record is kept only as an archival lead until a live canonical
-  domain or stronger public evidence trail appears.
+  The canonical domain was live on May 26, 2026, but this draft record still
+  lacks dated launch, customer, or adoption evidence strong enough for the
+  public catalog.
 visibility: draft
 type: data_license_initiative
 ---
 
 Humpback describes itself as an LLM paywall and analytics product for publishers. The apparent goal is to let sites see AI bot traffic, set policies for automated access, and move from unpaid scraping toward metered or permissioned use.
 
-The entry matches the tollgate pattern, but the current public evidence surface is still lighter than more established entries such as TollBit or Cloudflare. It remains a draft while the domain history and public evidence trail are re-verified.
+The entry matches the tollgate pattern, but the public evidence surface is still lighter than more established entries such as TollBit or Cloudflare. It remains a draft while the launch date, customer evidence, and adoption trail are re-verified.
