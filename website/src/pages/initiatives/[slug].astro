@@ -120,8 +120,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         <p class="initiative-summary">{item.summary}</p>
         {item.status === 'archived' && (
           <p class="activity-note initiative-archive-note">
-            This profile remains available for historical context, but it is hidden from the
-            default catalog view because no newer public activity was found during review.
+            Archived profile. Review did not find newer public activity.
           </p>
         )}
 
@@ -408,9 +407,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
     gap: 20px;
     padding: clamp(24px, 4vw, 34px);
-    border-color: color-mix(in srgb, var(--accent) 25%, var(--border));
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--card) 88%, transparent), color-mix(in srgb, var(--accent-soft) 26%, var(--card)));
+    background: var(--card);
   }
 
   .initiative-hero-copy {
@@ -449,9 +446,9 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
   .initiative-hero-meta div {
     padding: 16px;
-    border-radius: 18px;
+    border-radius: 8px;
     border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--card) 94%, var(--accent-soft));
+    background: var(--card);
   }
 
   .initiative-hero-meta dt {
@@ -524,8 +521,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     margin: 0;
     padding: 14px 16px;
     border-left: 3px solid var(--accent);
-    border-radius: 0 16px 16px 0;
-    background: color-mix(in srgb, var(--accent-soft) 52%, var(--card));
+    border-radius: 0;
+    background: var(--card);
     color: color-mix(in srgb, var(--text) 84%, var(--muted));
   }
 
@@ -560,9 +557,9 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
   .initiative-metric-card {
     padding: 16px;
-    border-radius: 18px;
+    border-radius: 8px;
     border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--card) 96%, transparent);
+    background: var(--card);
   }
 
   .initiative-metric-label {

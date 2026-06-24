@@ -75,8 +75,8 @@ const alsoLikeLinks = [
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light dark" />
     <meta name="application-name" content="DataLicenses.org" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4efe6" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111513" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f4" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111312" />
     <meta property="og:site_name" content="DataLicenses.org" />
     <meta property="og:type" content={type} />
     <meta property="og:title" content={pageTitle} />
@@ -333,7 +333,7 @@ const alsoLikeLinks = [
     top: 14px;
     z-index: 200;
     padding: 0.72rem 0.95rem;
-    border-radius: 999px;
+    border-radius: 8px;
     background: var(--accent);
     color: #f6f3ee;
     text-decoration: none;
@@ -350,15 +350,14 @@ const alsoLikeLinks = [
     top: 0;
     z-index: 100;
     border-bottom: 1px solid color-mix(in srgb, var(--border) 88%, var(--accent-soft));
-    background: color-mix(in srgb, var(--bg) 94%, transparent);
-    backdrop-filter: blur(10px);
+    background: var(--bg);
   }
 
   .navbar-inner {
     max-width: 1180px;
     margin: 0 auto;
     padding: 0 24px;
-    min-height: 68px;
+    min-height: 60px;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
@@ -373,10 +372,10 @@ const alsoLikeLinks = [
   }
 
   .brand-wordmark {
-    font-family: var(--font-display);
-    font-size: 1.14rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0;
     color: var(--text);
   }
 
@@ -384,7 +383,7 @@ const alsoLikeLinks = [
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 14px;
+    gap: 12px;
     flex-wrap: wrap;
     min-width: 0;
   }
@@ -401,7 +400,7 @@ const alsoLikeLinks = [
     color: var(--text);
     text-decoration: none;
     font-size: 0.91rem;
-    font-weight: 600;
+    font-weight: 500;
     transition:
       border-color 0.18s ease,
       background 0.18s ease,
@@ -424,25 +423,25 @@ const alsoLikeLinks = [
     min-height: 34px;
     padding: 0 0.72rem;
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 6px;
     color: var(--muted);
   }
 
   .nav-link-secondary:hover {
     border-color: var(--border-strong);
     border-bottom-color: var(--border-strong);
-    background: color-mix(in srgb, var(--card) 84%, transparent);
+    background: var(--card);
   }
 
   .theme-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 999px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
     border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--card) 92%, transparent);
+    background: var(--card);
     color: var(--muted);
     cursor: pointer;
     transition:
@@ -460,11 +459,11 @@ const alsoLikeLinks = [
     display: none;
     align-items: center;
     gap: 0.75rem;
-    min-height: 40px;
+    min-height: 36px;
     padding: 0 0.95rem;
-    border-radius: 999px;
+    border-radius: 8px;
     border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--card) 94%, transparent);
+    background: var(--card);
     color: var(--text);
     cursor: pointer;
     font-weight: 600;
@@ -476,7 +475,7 @@ const alsoLikeLinks = [
 
   .nav-toggle:hover {
     border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-    background: color-mix(in srgb, var(--accent-soft) 45%, var(--card));
+    background: var(--accent-soft);
   }
 
   .nav-toggle-icon {
@@ -523,18 +522,18 @@ const alsoLikeLinks = [
   }
 
   .also-like-footer {
-    margin-top: 3rem;
-    padding: 2rem 1.5rem;
+    margin-top: 2rem;
+    padding: 1.5rem;
     border-top: 1px solid var(--border);
-    background: color-mix(in srgb, var(--card) 66%, transparent);
+    background: var(--bg);
   }
 
   .also-like-inner {
     max-width: 1180px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
-    gap: 18px;
+    grid-template-columns: minmax(200px, 260px) minmax(0, 1fr);
+    gap: 16px;
     align-items: start;
   }
 
@@ -547,7 +546,7 @@ const alsoLikeLinks = [
     margin: 0;
     font-size: 0.74rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--warm);
   }
@@ -567,9 +566,9 @@ const alsoLikeLinks = [
     display: grid;
     gap: 0.3rem;
     padding: 14px 16px;
-    border-radius: 18px;
+    border-radius: 8px;
     border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--card) 94%, transparent);
+    background: var(--card);
     text-decoration: none;
     transition:
       transform 0.18s ease,
@@ -578,9 +577,7 @@ const alsoLikeLinks = [
   }
 
   .also-like-link:hover {
-    transform: translateY(-2px);
     border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-    box-shadow: var(--shadow-soft);
     text-decoration: none;
   }
 
@@ -610,6 +607,7 @@ const alsoLikeLinks = [
     .nav-toggle {
       display: inline-flex;
       grid-column: 3;
+      grid-row: 1;
     }
 
     .navbar-links {
@@ -621,8 +619,8 @@ const alsoLikeLinks = [
       gap: 8px;
       padding: 10px;
       border: 1px solid var(--border);
-      border-radius: 20px;
-      background: color-mix(in srgb, var(--card) 94%, transparent);
+      border-radius: 8px;
+      background: var(--card);
       box-shadow: var(--shadow-soft);
     }
 
@@ -636,14 +634,14 @@ const alsoLikeLinks = [
       justify-content: flex-start;
       padding: 0 0.9rem;
       border: 1px solid transparent;
-      border-radius: 12px;
+      border-radius: 6px;
       white-space: normal;
     }
 
     .nav-link:hover {
       border-color: var(--border-strong);
       border-bottom-color: var(--border-strong);
-      background: color-mix(in srgb, var(--card) 75%, transparent);
+      background: var(--surface-muted);
     }
 
     .nav-link.active {
@@ -653,6 +651,7 @@ const alsoLikeLinks = [
 
     .theme-toggle {
       grid-column: 2;
+      grid-row: 1;
       justify-self: end;
     }
   }
