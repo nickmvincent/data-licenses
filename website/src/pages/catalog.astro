@@ -70,9 +70,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         <div class="catalog-header-copy">
           <h1 class="catalog-title">Catalog</h1>
           <p class="catalog-summary">
-            Browse initiatives shaping AI data access, licensing, and enforcement. Search by name
-            or evidence, filter by status, and use the approach sections below when you want the
-            table view.
+            Public initiatives shaping AI data access, licensing, and enforcement.
           </p>
         </div>
 
@@ -102,7 +100,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           <input
             id="q"
             type="search"
-            placeholder="Search title, summary, website, evidence, or approach type"
+            placeholder="Search catalog"
             autocomplete="off"
             spellcheck="false"
           />
@@ -136,8 +134,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         <div class="catalog-panel-body">
           <div class="catalog-panel-head">
             <p class="catalog-panel-intro">
-              Search and status are always visible. Open this panel when you want to sort, include
-              archived entries, or narrow the catalog by approach type and data type.
+              Sort, archived entries, approach types, and data types.
             </p>
             <button type="button" id="reset-filters" class="catalog-reset" hidden>Reset all</button>
           </div>
@@ -160,8 +157,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                 </button>
               </div>
               <p class="catalog-panel-note">
-                Archived entries stay on the site for historical context, but they are hidden by
-                default because no newer public activity was found during review.
+                Archived entries remain available as historical records.
               </p>
             </div>
           </div>
@@ -176,8 +172,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
               ))}
             </div>
             <p class="catalog-panel-note">
-              Approach types describe the main mechanism in play, such as licenses, registries,
-              marketplaces, tollgates, blocking, or certification.
+              Mechanisms include licenses, registries, marketplaces, tollgates, blocking, and certification.
             </p>
           </div>
 
@@ -191,8 +186,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
               ))}
             </div>
             <p class="catalog-panel-note">
-              Data types help you focus on the kinds of inputs an initiative covers, like text,
-              images, audio, video, or code.
+              Inputs include text, images, audio, video, code, and datasets.
             </p>
           </div>
         </div>
@@ -202,7 +196,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     <section id="catalog-results-anchor" class="catalog-results" aria-live="polite">
       <div class="catalog-results-count"><span id="count">{defaultCatalogItems.length}</span> initiatives</div>
       <p id="active-filters" class="catalog-results-summary">
-        Showing current initiatives. Archived entries are hidden by default.
+        Current initiatives.
       </p>
       <div id="active-filter-chips" class="active-filter-chips" hidden></div>
     </section>
@@ -210,7 +204,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     <section class="catalog-jump" aria-labelledby="catalog-jump-title">
       <div class="catalog-jump-head">
         <h2 id="catalog-jump-title" class="catalog-jump-title">Browse by primary approach</h2>
-        <p class="catalog-jump-copy">Use these jump links when you want to scan the table section by section.</p>
+        <p class="catalog-jump-copy">Primary approach sections.</p>
       </div>
 
       <nav class="catalog-approach-nav" aria-label="Primary approach type sections">
@@ -1035,8 +1029,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           }${rawQuery ? ` for "${rawQuery}"` : ''}.`;
         } else {
           activeFiltersText.textContent = includeArchived
-            ? 'Showing all current and archived initiatives.'
-            : 'Showing current initiatives. Archived entries are hidden by default.';
+            ? 'Current and archived initiatives.'
+            : 'Current initiatives.';
         }
 
         panelSummary.textContent = chips.length > 0

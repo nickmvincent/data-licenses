@@ -14,12 +14,15 @@ evidenceLinks:
   - label: Vocabulary draft 06 updated
     url: 'https://datatracker.ietf.org/doc/draft-ietf-aipref-vocab/'
     date: '2026-04-27'
+  - label: Attachment draft listed as expired
+    url: 'https://datatracker.ietf.org/doc/draft-ietf-aipref-attach/'
+    date: '2026-05-01'
   - label: Milestone for protocol specifications
     url: 'https://datatracker.ietf.org/wg/aipref/about/'
     date: '2025-08-01'
 implementationSnippets:
   - title: HTTP response header draft example
-    summary: Active AIPref attachment work shows AI preferences delivered directly in the HTTP response.
+    summary: The expired attachment draft showed AI preferences delivered directly in the HTTP response.
     language: http
     code: |
       HTTP/1.1 200 OK
@@ -27,7 +30,7 @@ implementationSnippets:
       Content-Usage: train-ai=n
     sourceUrl: 'https://datatracker.ietf.org/doc/draft-ietf-aipref-attach/'
   - title: robots.txt draft example
-    summary: The same attachment draft also sketches a domain-level robots.txt expression.
+    summary: The expired attachment draft also sketched a domain-level robots.txt expression.
     language: text
     code: |
       User-agent: *
@@ -40,8 +43,13 @@ implementationSnippets:
     code: |
       <meta name="AI-PREF" content="allow_training=false; retention_period=0">
     sourceUrl: 'https://datatracker.ietf.org/doc/html/draft-vaughan-aipref-vocab-00'
+considerations: >-
+  The AIPref working group remains active, but the attachment draft referenced
+  by the HTTP header and robots.txt examples is currently expired on the IETF
+  Datatracker. Treat those snippets as draft-history examples until newer
+  attachment work replaces them.
 visibility: public
 type: data_license_initiative
 ---
 
-The AIPref effort investigates a standardized way to express preferences to AI systems, including crawlers and agents. The working group is iterating on vocabulary and attachment drafts; no production deployment signal is available yet.
+The AIPref effort investigates a standardized way to express preferences to AI systems, including crawlers and agents. The working group is still active, with current vocabulary work and an expired attachment draft in its public record. No production deployment signal is available yet.
