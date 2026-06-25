@@ -385,7 +385,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 <style>
   .initiative-page {
     display: grid;
-    gap: 18px;
+    gap: 14px;
   }
 
   .initiative-breadcrumbs {
@@ -405,9 +405,10 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
   .initiative-hero {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
-    gap: 20px;
-    padding: clamp(24px, 4vw, 34px);
-    background: var(--card);
+    gap: 22px;
+    padding: 16px 0 18px;
+    border-width: 1px 0;
+    background: transparent;
   }
 
   .initiative-hero-copy {
@@ -427,35 +428,59 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     margin: 0;
     max-width: 42rem;
     color: color-mix(in srgb, var(--text) 84%, var(--muted));
-    font-size: 1.06rem;
+    font-size: 1rem;
   }
 
   .initiative-hero-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 4px;
+    gap: 0.8rem;
+    margin-top: 2px;
+  }
+
+  .initiative-hero-actions .btn {
+    min-height: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .initiative-hero-actions .btn:hover,
+  .initiative-hero-actions .btn:focus-visible {
+    color: var(--accent-strong);
+    text-decoration: underline;
   }
 
   .initiative-hero-meta {
     display: grid;
     align-content: start;
-    gap: 12px;
+    gap: 0;
     margin: 0;
-  }
-
-  .initiative-hero-meta div {
-    padding: 16px;
-    border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--card);
   }
 
+  .initiative-hero-meta div {
+    padding: 10px 12px;
+    border-radius: 0;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+  }
+
+  .initiative-hero-meta div:last-child {
+    border-bottom: 0;
+  }
+
   .initiative-hero-meta dt {
-    font-size: 0.74rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--muted);
   }
 
@@ -494,8 +519,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
   .initiative-section h2,
   .initiative-sidecard h2 {
-    margin-bottom: 0.8rem;
-    font-size: 1.45rem;
+    margin-bottom: 0.65rem;
+    font-size: 1.35rem;
   }
 
   .initiative-prose :global(p:first-child) {
@@ -519,10 +544,10 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
   .initiative-callout {
     margin: 0;
-    padding: 14px 16px;
+    padding: 10px 12px;
     border-left: 3px solid var(--accent);
     border-radius: 0;
-    background: var(--card);
+    background: transparent;
     color: color-mix(in srgb, var(--text) 84%, var(--muted));
   }
 
@@ -556,18 +581,18 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
   }
 
   .initiative-metric-card {
-    padding: 16px;
-    border-radius: 8px;
+    padding: 12px;
+    border-radius: 0;
     border: 1px solid var(--border);
     background: var(--card);
   }
 
   .initiative-metric-label {
     margin: 0;
-    font-size: 0.76rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--muted);
   }
 
@@ -603,11 +628,12 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
   @media (max-width: 720px) {
     .initiative-hero {
-      padding: 22px;
+      padding: 16px 0;
     }
 
     .initiative-hero-actions .btn {
       width: 100%;
+      justify-content: flex-start;
     }
 
     .initiative-titleline {
