@@ -2,7 +2,7 @@
 title: ProRata / Gist
 summary: >-
   A 50/50 revenue-share platform connecting publishers with AI companies,
-  with 700+ publishers signed up including major news outlets.
+  with 1,000+ publications and content creators listed as partners.
 status: live
 website: 'https://prorata.ai/'
 actionsSupported:
@@ -15,11 +15,14 @@ dataTypes:
 tags:
   - revenue-share
   - publishers
-usersCount: '700+ publishers'
+usersCount: '1,000+ publications and content creators'
 metricEvidence:
   usersCount:
     basis: explicit
     sources:
+      - label: ProRata homepage lists 1,000+ partner publications and content creators
+        url: 'https://prorata.ai/'
+        date: '2026-07-09'
       - label: Gist Answers launched with 700+ participating publications
         url: 'https://www.businesswire.com/news/home/20250905771340/en/ProRata-Closes-%2440-Million-Series-B-Financing-and-Launches-Gist-Answers-Creating-New-Revenue-Opportunities-for-Publishers-in-the-AI-Era'
         date: '2025-09-05'

@@ -1,8 +1,8 @@
 ---
 title: Cloudflare AI Crawl Control
 summary: >-
-  A set of tools to block or charge for scraping; includes AI Audit dashboard,
-  managed robots.txt, and pay-per-crawl marketplace.
+  Live controls for classifying and blocking Search, Agent, and Training bots,
+  alongside managed preference signals and monetization tools.
 status: live
 website: 'https://blog.cloudflare.com/control-content-use-for-ai-training/'
 tags:
@@ -15,7 +15,7 @@ primaryApproachType: add-tollgate
 dataTypes:
   - web-content
 usersCount: '3.8M+ domains on managed robots.txt'
-dataVolume: '1B+ 402 responses/day'
+dataVolume: '1B+ HTTP 402 responses/day across Cloudflare customers'
 metricEvidence:
   usersCount:
     basis: explicit
@@ -25,11 +25,15 @@ metricEvidence:
         date: '2025-09-24'
   dataVolume:
     basis: explicit
+    notes: The company-wide figure is not specific to AI Crawl Control or paid crawling.
     sources:
       - label: AI Crawl Control general availability announced
         url: 'https://blog.cloudflare.com/introducing-ai-crawl-control/'
         date: '2025-08-28'
 evidenceLinks:
+  - label: Search, Agent, and Training bot controls launched
+    url: 'https://blog.cloudflare.com/content-independence-day-ai-options/'
+    date: '2026-07-01'
   - label: Redirects for AI Training launched
     url: 'https://blog.cloudflare.com/ai-redirects/'
     date: '2026-04-17'
@@ -62,16 +66,21 @@ implementationSnippets:
       User-agent: Bytespider
       Disallow: /
     sourceUrl: 'https://blog.cloudflare.com/ai-audit-enforcing-robots-txt/'
-  - title: Content Signals robots.txt example
-    summary: Cloudflare's Content Signals post shows how a site can allow search while disallowing AI training in robots.txt.
+  - title: Managed Content Signals example
+    summary: Cloudflare's July 2026 update adds a reference-use preference to its managed robots.txt signal.
     language: text
     code: |
       User-Agent: *
-      Content-Signal: search=yes, ai-train=no
+      Content-Signal: search=yes, ai-train=no, use=reference
       Allow: /
-    sourceUrl: 'https://blog.cloudflare.com/content-signals-policy/'
+    sourceUrl: 'https://blog.cloudflare.com/content-independence-day-ai-options/'
+considerations: >-
+  Cloudflare's robots.txt Content Signals express preferences and do not issue
+  blocks directly. Its edge security rules can block traffic that Cloudflare
+  classifies as automated, while the effectiveness of preference signals still
+  depends on crawler behavior.
 visibility: public
 type: data_license_initiative
 ---
 
-Cloudflare's AI Crawl Control offers multiple tools: AI Audit dashboard shows which bots crawl a site, managed robots.txt simplifies blocking, redirects can steer verified AI training crawlers toward canonical content, and pay-per-crawl lets publishers monetize automated access.
+Cloudflare's controls distinguish Search, Agent, and Training traffic and let site owners apply edge blocking by use case. Its dashboard and BotBase provide visibility into known bots, managed robots.txt publishes Content Signals, redirects can steer verified training crawlers toward canonical content, and Pay Per Crawl supports monetized automated access.

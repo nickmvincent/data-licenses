@@ -2,7 +2,7 @@
 title: Dow Jones Factiva AI Marketplace
 summary: Licensed Factiva news and business-information sources made available for enterprise GenAI products, APIs, and research workflows.
 status: live
-website: 'https://www.businesswire.com/news/home/20260120489743/en/Dow-Jones-Factiva-Surpasses-8000-Licensed-Sources-for-GenAI-Use'
+website: 'https://www.dowjones.com/business-intelligence/factiva/'
 actionsSupported:
   - data-market-platform
   - attach-formal-license

@@ -14,19 +14,19 @@ dataTypes:
   - multimodal
 tags:
   - proprietary-data
-usersCount: 'hundreds of organizations'
+usersCount: 'hundreds of data-partner organizations'
 metricEvidence:
   usersCount:
     basis: explicit
     sources:
-      - label: Series A extension cites hundreds of data partners and cross-vertical growth
+      - label: Series A extension cites hundreds of data-partner organizations
         url: 'https://withprotege.ai/articles/news/protege-a16z-30million-fundraise'
         date: '2026-01-07'
 evidenceLinks:
   - label: HC1 partnership adds large de-identified lab data repository
     url: 'https://withprotege.ai/articles/news/hc1-data-partnership-healthcare'
     date: '2026-02-12'
-  - label: Series A extension cites hundreds of data partners and cross-vertical growth
+  - label: Series A extension cites hundreds of data-partner organizations
     url: 'https://withprotege.ai/articles/news/protege-a16z-30million-fundraise'
     date: '2026-01-07'
   - label: Seed launch of the AI training data platform

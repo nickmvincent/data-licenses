@@ -4,9 +4,8 @@ summary: Publisher coalition building shared standards and licensing frameworks 
 status: wip
 website: 'https://www.spurcoalition.org/'
 actionsSupported:
-  - join-licensing-collective
   - new-infrastructures
-primaryApproachType: join-licensing-collective
+primaryApproachType: new-infrastructures
 pipelineStages:
   - train
   - retrieve
@@ -16,24 +15,27 @@ tags:
   - publishers
   - journalism
   - coalition
-usersCount: '6 founding publisher members'
+usersCount: '36+ publishers and affiliate organizations'
 metricEvidence:
   usersCount:
     basis: explicit
     sources:
-      - label: Mediahuis joins SPUR as a founding member
-        url: 'https://www.mediahuis.com/en/news/mediahuis-joins-the-spur-coalition-as-founding-member'
-        date: '2026-05-11'
-      - label: Guardian announced the five founding members
-        url: 'https://www.theguardian.com/gnm-press-office/2026/feb/26/major-news-brands-including-the-guardian-form-new-coalition-to-promote-responsible-ai-licensing'
-        date: '2026-02-26'
+      - label: Associated Press joins after SPUR's expansion to 36 organizations
+        url: 'https://www.spurcoalition.org/updates/the-associated-press-joins-the-spur-coalition-as-a-founding-member'
+        date: '2026-07-09'
+      - label: SPUR expansion brought the coalition to 36 organizations
+        url: 'https://www.ringier.com/ringier-joins-international-spur-coalition/'
+        date: '2026-06-03'
 evidenceLinks:
-  - label: Mediahuis joins SPUR as a founding member
-    url: 'https://www.mediahuis.com/en/news/mediahuis-joins-the-spur-coalition-as-founding-member'
-    date: '2026-05-11'
-  - label: Guardian announced SPUR coalition launch
-    url: 'https://www.theguardian.com/gnm-press-office/2026/feb/26/major-news-brands-including-the-guardian-form-new-coalition-to-promote-responsible-ai-licensing'
-    date: '2026-02-26'
+  - label: Associated Press joins SPUR as a founding member
+    url: 'https://www.spurcoalition.org/updates/the-associated-press-joins-the-spur-coalition-as-a-founding-member'
+    date: '2026-07-09'
+  - label: SPUR telemetry standard published for public comment
+    url: 'https://www.spurcoalition.org/updates/spur-telemetry-standard-published-for-public-comment-the-spur-coalition'
+    date: '2026-06-12'
+  - label: SPUR expansion brought the coalition to 36 organizations
+    url: 'https://www.ringier.com/ringier-joins-international-spur-coalition/'
+    date: '2026-06-03'
 considerations: SPUR explicitly says it is not a collective licensing organization; it is a coalition for standards, best practice, and lower-friction rights-cleared pathways.
 visibility: public
 type: data_license_initiative

@@ -26,10 +26,13 @@ metricEvidence:
   dataVolume:
     basis: explicit
     sources:
-      - label: New enterprise partners announced
-        url: 'https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/'
-        date: '2026-01-15'
+      - label: Current API page reports project and page coverage
+        url: 'https://enterprise.wikimedia.com/api/'
+        date: '2026-07-09'
 evidenceLinks:
+  - label: Current API page reports project and page coverage
+    url: 'https://enterprise.wikimedia.com/api/'
+    date: '2026-07-09'
   - label: New enterprise partners announced
     url: 'https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/'
     date: '2026-01-15'

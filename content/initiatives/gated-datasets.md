@@ -1,6 +1,6 @@
 ---
 title: Hugging Face Gated Datasets
-summary: Hugging Face Hub access-control feature that requires users to request approval before downloading a dataset.
+summary: Hugging Face Hub access-control feature requiring authenticated users to submit an access request before downloading; approval can be automatic or manual.
 status: live
 website: 'https://huggingface.co/docs/hub/datasets-gated'
 actionsSupported:

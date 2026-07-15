@@ -16,7 +16,7 @@ tags:
 evidenceLinks:
   - label: Cloudflare documents Web Bot Auth verification support
     url: 'https://developers.cloudflare.com/bots/reference/bot-verification/web-bot-auth/'
-    date: '2026-05-05'
+    date: '2026-07-01'
   - label: Google documents experimental Web Bot Auth support
     url: 'https://developers.google.com/crawling/docs/crawlers-fetchers/web-bot-auth'
     date: '2026-05-04'

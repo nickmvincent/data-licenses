@@ -16,16 +16,14 @@ tags:
   - opt-out
   - registry
 evidenceLinks:
-  - label: Face Reveal launched for Have I Been Trained
-    url: 'https://spawning.ai/blog/have-i-been-traineds-2025-face-reveal'
-    date: '2025-09-15'
-  - label: Project status update published
-    url: 'https://spawning.ai/blog/have-i-been-traineds-project-status'
-    date: '2025-08-28'
+  - label: Have I Been Trained site reports that it is under maintenance
+    url: 'https://haveibeentrained.com/'
+    date: '2026-07-09'
 considerations: >-
   The public site is currently under maintenance, and the registry only works
   when model builders choose to honor it in dataset curation and training
-  workflows.
+  workflows. Earlier Spawning blog posts about the project are no longer
+  available at their cited URLs.
 visibility: public
 type: data_license_initiative
 ---

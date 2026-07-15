@@ -1,6 +1,6 @@
 ---
 title: Amlet
-summary: AI content registry for publishers and authors that links ownership proof, TDM registration, and licensing rules for AI reuse.
+summary: AI content registry that links content-derived identifiers and timestamps to declarer identity, TDM permissions, and licensing preferences.
 status: live
 website: 'https://amlet.ai/'
 actionsSupported:
@@ -28,7 +28,11 @@ evidenceLinks:
   - label: Amlet launched as an AI content registry
     url: 'https://blog.amlet.ai/introducing-amlet-the-global-ai-content-registry-publishers-have-been-waiting-for/'
     date: '2025-10-13'
-considerations: Amlet is early registry infrastructure for publisher workflows, not yet a broadly adopted neutral standard across the wider web.
+considerations: >-
+  Amlet is early registry infrastructure for publisher workflows, not yet a
+  broadly adopted neutral standard across the wider web. Registration records
+  an assertion and provenance trail; it does not by itself establish legal
+  ownership or force downstream AI systems to comply.
 visibility: public
 type: data_license_initiative
 ---

@@ -4,24 +4,24 @@ summary: Trade alliance of dataset licensors pushing for legal clarity, ethical 
 status: live
 website: 'https://www.thedpa.ai/'
 actionsSupported:
-  - join-licensing-collective
-primaryApproachType: join-licensing-collective
+  - new-infrastructures
+primaryApproachType: new-infrastructures
 tags:
   - trade-alliance
   - policy
-usersCount: '12 announced members'
+usersCount: '12 listed members'
 metricEvidence:
   usersCount:
     basis: derived
-    notes: Derived from seven founding members at launch plus five additional members announced in December 2024.
+    notes: Counted as distinct organizations on the current members page, which repeats some entries across modality filters.
     sources:
-      - label: Alliance launch announced
-        url: 'https://www.thedpa.ai/post/leading-dataset-licensors-unite-to-launch-the-dataset-providers-alliance-dpa'
-        date: '2024-06-26'
-      - label: DPA welcomed five new members
-        url: 'https://www.thedpa.ai/post/dpa-welcomes-five-new-members-expanding-representation-in-audio-and-publishing-sectors'
-        date: '2024-12-10'
+      - label: Current DPA members page
+        url: 'https://www.thedpa.ai/members'
+        date: '2026-07-09'
 evidenceLinks:
+  - label: Current member roster verified with 12 distinct organizations
+    url: 'https://www.thedpa.ai/members'
+    date: '2026-07-09'
   - label: DPA welcomed five new members
     url: 'https://www.thedpa.ai/post/dpa-welcomes-five-new-members-expanding-representation-in-audio-and-publishing-sectors'
     date: '2024-12-10'
@@ -31,7 +31,10 @@ evidenceLinks:
   - label: Position paper on AI data licensing released
     url: 'https://www.thedpa.ai/post/dpa-unveils-comprehensive-ai-data-licensing-position-paper'
     date: '2024-09-04'
-considerations: The member count is a conservative announced total through December 10, 2024; DPA's current members page appears consistent with that figure but is undated.
+considerations: >-
+  DPA is a trade alliance that advocates direct licensing and shared policy
+  positions. It is not a collective licensing body and does not itself pool or
+  license member catalogs.
 visibility: public
 type: data_license_initiative
 ---

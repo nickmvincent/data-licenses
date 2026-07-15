@@ -10,7 +10,9 @@ Key paths:
 - `../content/shared-references/bibtex-entries/*.md` — Optional bibliography records used by `references`
 - `src/data/initiative-curation.json` — Editorial tracking for evidence/adoption research backlog
 - `src/lib/content-loader.ts` — Runtime content loader and derived fields
-- `src/pages/index.astro` — Catalog UI
+- `src/pages/index.astro` — Homepage and single public browsing surface
+- `src/components/CatalogExplorer.astro` — Search, task presets, filters, and comparison UI
+- `src/pages/catalog.astro` — Compatibility redirect to the homepage catalog
 - `src/pages/methodology.astro` — Combined methodology and contributing guide
 - `src/pages/contributing.astro` — Compatibility page pointing to the merged guide
 - `src/pages/data/initiatives.json.ts` — Full catalog JSON endpoint
@@ -78,12 +80,13 @@ considerations: Partner count comes from the launch post and may understate curr
 
 ## Catalog behavior
 
-The main catalog in `src/pages/index.astro` supports:
-- Free-text search over title, summary, tags, website, approach text, and evidence labels
-- Goal presets and action filters
-- Status filters
-- Sorting by latest update, alphabetically, or status
-- URL-backed filter state via `q`, `status`, `goal`, repeated `actions`, `sort`, and `view`
+The catalog on the homepage supports:
+- Free-text search over title, summary, tags, website, approach text, data and pipeline types, and evidence labels
+- Goal presets for access control, terms, licensing, and governed data sourcing
+- Approach, data-type, pipeline-stage, status, archive, adoption-evidence, and implementation-example filters
+- Sorting by latest public update, alphabetically, or public status
+- Side-by-side comparison of two or three initiatives
+- URL-backed filter state via `q`, `status`, `goal`, repeated `actions`, `types`, `stages`, `has`, `sort`, and `archived`
 
 ## JSON endpoints
 

@@ -1,0 +1,1244 @@
+---
+import type { LoadedInitiative } from '../lib/content-loader';
+import {
+  ACTION_LABELS,
+  GOAL_DETAILS,
+  PIPELINE_LABELS,
+  STATUS_LABELS,
+  formatApproachLabel,
+  formatDataTypeLabel,
+  formatDate,
+  getEnforcementDetails,
+} from '../lib/catalog';
+
+interface Props {
+  items: LoadedInitiative[];
+}
+
+const { items } = Astro.props;
+const publicItems = items.filter((item) => item.visibility === 'public');
+const currentItems = publicItems.filter((item) => item.status !== 'archived');
+const actions = Array.from(new Set(publicItems.flatMap((item) => item.actionsSupported))).sort((a, b) =>
+  formatApproachLabel(a).localeCompare(formatApproachLabel(b))
+);
+const dataTypes = Array.from(new Set(publicItems.flatMap((item) => item.dataTypes))).sort((a, b) =>
+  formatDataTypeLabel(a).localeCompare(formatDataTypeLabel(b))
+);
+const pipelineStages = Array.from(new Set(publicItems.flatMap((item) => item.pipelineStages))).sort((a, b) =>
+  (PIPELINE_LABELS[a] || a).localeCompare(PIPELINE_LABELS[b] || b)
+);
+const goalActions = Object.fromEntries(GOAL_DETAILS.map((goal) => [goal.key, [...goal.actions]]));
+
+const adoptionLabel = (item: LoadedInitiative) =>
+  [item.usersCount, item.dataVolume, item.moneyVolume].filter(Boolean).join(' · ');
+const latestSourceHost = (item: LoadedInitiative) => {
+  if (!item.latestEvidenceLink) return '';
+  try {
+    return new URL(item.latestEvidenceLink.url).hostname.replace(/^www\./, '');
+  } catch {
+    return 'Source';
+  }
+};
+const secondaryApproaches = (item: LoadedInitiative) =>
+  item.actionsSupported
+    .filter((action) => action !== item.primaryApproachType)
+    .map((action) => formatApproachLabel(action));
+---
+
+<section id="catalog" class="catalog-explorer" aria-labelledby="catalog-title">
+  <header class="explorer-heading">
+    <div>
+      <p class="section-kicker">Explore the catalog</p>
+      <h2 id="catalog-title">Start with what you need to do</h2>
+      <p>
+        Choose a goal or search all {currentItems.length} current initiatives. Categories overlap because many
+        projects combine legal, commercial, and technical mechanisms.
+      </p>
+    </div>
+    <p class="status-explainer">
+      <strong>“Live” means publicly available.</strong>
+      It does not mean widely adopted, legally tested, or effective against non-compliant actors.
+    </p>
+  </header>
+
+  <div class="goal-grid" role="group" aria-label="Filter by goal">
+    {GOAL_DETAILS.map((goal) => (
+      <button type="button" class="goal-card" data-goal={goal.key} aria-pressed="false">
+        <span class="goal-card-title">{goal.title}</span>
+        <span>{goal.description}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="explorer-tools">
+    <div class="explorer-toolbar">
+      <div class="search-shell">
+        <label class="sr-only" for="catalog-search">Search initiatives</label>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input id="catalog-search" type="search" placeholder="Search initiatives, uses, evidence…" autocomplete="off" spellcheck="false" />
+      </div>
+
+      <div class="status-switch" aria-label="Status filter">
+        <button type="button" data-status="all" aria-pressed="true">All</button>
+        <button type="button" data-status="live" aria-pressed="false">Live</button>
+        <button type="button" data-status="wip" aria-pressed="false">In progress</button>
+      </div>
+
+      <button type="button" id="copy-catalog-view" class="quiet-button">Copy view</button>
+    </div>
+
+    <details id="catalog-filters" class="advanced-filters">
+      <summary>
+        <span>More filters</span>
+        <span id="filter-summary">No additional filters</span>
+      </summary>
+      <div class="filter-panel">
+        <div class="filter-block filter-block-compact">
+          <label for="catalog-sort">Sort</label>
+          <select id="catalog-sort">
+            <option value="latest">Latest public update</option>
+            <option value="alpha">A to Z</option>
+            <option value="status">Public status</option>
+          </select>
+        </div>
+
+        <div class="filter-block">
+          <span class="filter-label">Approach</span>
+          <div class="filter-options" id="approach-filters">
+            {actions.map((action) => (
+              <button type="button" data-filter-action={action} aria-pressed="false">
+                {ACTION_LABELS[action] || action}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="filter-block">
+          <span class="filter-label">Data type</span>
+          <div class="filter-options" id="type-filters">
+            {dataTypes.map((dataType) => (
+              <button type="button" data-filter-type={dataType} aria-pressed="false">
+                {formatDataTypeLabel(dataType)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="filter-block">
+          <span class="filter-label">Pipeline stage</span>
+          <div class="filter-options" id="stage-filters">
+            {pipelineStages.map((stage) => (
+              <button type="button" data-filter-stage={stage} aria-pressed="false">
+                {PIPELINE_LABELS[stage] || stage}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="filter-block">
+          <span class="filter-label">Evidence and scope</span>
+          <div class="filter-options" id="capability-filters">
+            <button type="button" data-filter-capability="adoption" aria-pressed="false">Public adoption signal</button>
+            <button type="button" data-filter-capability="examples" aria-pressed="false">Implementation example</button>
+            <button type="button" data-filter-capability="archived" aria-pressed="false">Include archived</button>
+          </div>
+        </div>
+
+        <button type="button" id="reset-catalog" class="quiet-button" hidden>Reset all filters</button>
+      </div>
+    </details>
+  </div>
+
+  <div class="results-bar" aria-live="polite">
+    <p><strong id="catalog-count">{currentItems.length}</strong> <span id="catalog-count-label">initiatives</span></p>
+    <div id="active-filter-chips" class="active-filter-chips" hidden></div>
+  </div>
+
+  <div class="result-columns" aria-hidden="true">
+    <span></span>
+    <span>Initiative</span>
+    <span>Fit and mechanism</span>
+    <span>Practical force</span>
+    <span>Evidence</span>
+  </div>
+
+  <div id="catalog-results" class="catalog-results-list">
+    {publicItems.map((item) => {
+      const latest = item.latestEvidenceLink;
+      const enforcement = getEnforcementDetails(item.primaryApproachType);
+      const primaryLabel = formatApproachLabel(item.primaryApproachType);
+      const secondaryLabels = secondaryApproaches(item);
+      const dataTypeLabels = item.dataTypes.map((value) => formatDataTypeLabel(value));
+      const stageLabels = item.pipelineStages.map((value) => PIPELINE_LABELS[value] || value);
+      const adoption = adoptionLabel(item);
+      const searchText = [
+        item.title,
+        item.summary,
+        item.website,
+        ...(item.tags || []),
+        ...item.actionsSupported.map((action) => formatApproachLabel(action)),
+        ...dataTypeLabels,
+        ...stageLabels,
+        ...(item.evidenceLinks || []).map((link) => link.label),
+      ].join(' ').toLowerCase();
+
+      return (
+        <article
+          class="catalog-result"
+          hidden={item.status === 'archived'}
+          data-slug={item.slug}
+          data-search={searchText}
+          data-status={item.status}
+          data-actions={item.actionsSupported.join(' ')}
+          data-types={item.dataTypes.join(' ')}
+          data-stages={item.pipelineStages.join(' ')}
+          data-latest={item.latestUpdate ? String(new Date(item.latestUpdate).getTime()) : '0'}
+          data-has-adoption={adoption ? 'true' : 'false'}
+          data-has-examples={item.implementationSnippets?.length ? 'true' : 'false'}
+          data-title={item.title}
+          data-summary={item.summary}
+          data-public-status={STATUS_LABELS[item.status] || item.status}
+          data-primary-approach={primaryLabel}
+          data-enforcement={enforcement.shortLabel}
+          data-enforcement-caveat={enforcement.caveat}
+          data-type-labels={dataTypeLabels.join(', ') || 'Not recorded'}
+          data-stage-labels={stageLabels.join(', ') || 'Not recorded'}
+          data-adoption={adoption || 'No public figure recorded'}
+          data-evidence={latest ? `${formatDate(latest.date)} — ${latest.label}` : 'No dated evidence'}
+          data-profile={`/initiatives/${item.slug}`}
+          data-official={item.website}
+        >
+          <label class="compare-control">
+            <input type="checkbox" data-compare={item.slug} />
+            <span class="sr-only">Compare {item.title}</span>
+          </label>
+
+          <div class="result-main">
+            <div class="result-titleline">
+              <h3><a href={`/initiatives/${item.slug}`}>{item.title}</a></h3>
+              <span class={`badge ${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
+            </div>
+            <p>{item.summary}</p>
+            <div class="result-actions">
+              <a href={`/initiatives/${item.slug}`}>Open profile</a>
+              <a href={item.website} target="_blank" rel="noopener">Official site</a>
+            </div>
+          </div>
+
+          <div class="result-fit" data-mobile-label="Fit and mechanism">
+            <strong>{primaryLabel}</strong>
+            {secondaryLabels.length > 0 && <span>Also uses {secondaryLabels.join(' · ')}</span>}
+            {stageLabels.length > 0 && <span>{stageLabels.join(' · ')}</span>}
+            {dataTypeLabels.length > 0 && <span>{dataTypeLabels.join(' · ')}</span>}
+          </div>
+
+          <div class="result-enforcement" data-mobile-label="Practical force">
+            <strong>{enforcement.shortLabel}</strong>
+            <span>{enforcement.caveat}</span>
+          </div>
+
+          <div class="result-evidence" data-mobile-label="Evidence">
+            {latest ? (
+              <>
+                <strong>{formatDate(latest.date)}</strong>
+                <a href={latest.url} target="_blank" rel="noopener" title={latest.label}>{latestSourceHost(item)}</a>
+              </>
+            ) : (
+              <span>No dated evidence</span>
+            )}
+            <span>{adoption || 'No public adoption figure'}</span>
+          </div>
+        </article>
+      );
+    })}
+  </div>
+
+  <p id="catalog-empty" class="empty-state" hidden>
+    No initiatives match this view. <button type="button" id="clear-empty">Clear filters</button>
+  </p>
+</section>
+
+<div id="compare-tray" class="compare-tray" hidden aria-live="polite">
+  <div>
+    <strong id="compare-count">0 selected</strong>
+    <span id="compare-message">Choose two or three initiatives.</span>
+  </div>
+  <div class="compare-tray-actions">
+    <button type="button" id="clear-comparison" class="quiet-button">Clear</button>
+    <button type="button" id="open-comparison" class="compare-button" disabled>Compare</button>
+  </div>
+</div>
+
+<dialog id="comparison-dialog" class="comparison-dialog" aria-labelledby="comparison-title">
+  <div class="comparison-dialog-head">
+    <div>
+      <p class="section-kicker">Side-by-side</p>
+      <h2 id="comparison-title">Compare initiatives</h2>
+    </div>
+    <button type="button" id="close-comparison" class="quiet-button">Close</button>
+  </div>
+  <div id="comparison-table" class="comparison-table-wrap"></div>
+  <p class="comparison-note">
+    These labels summarize public materials. They are not legal advice or a finding that a mechanism will be effective in a particular case.
+  </p>
+</dialog>
+
+<script is:inline define:vars={{ goalActions }}>
+  // @ts-nocheck
+  (() => {
+    const one = (selector, root = document) => root.querySelector(selector);
+    const all = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+    const setPressed = (element, pressed) => element?.setAttribute('aria-pressed', String(pressed));
+    const search = one('#catalog-search');
+    const sort = one('#catalog-sort');
+    const results = one('#catalog-results');
+    const count = one('#catalog-count');
+    const countLabel = one('#catalog-count-label');
+    const empty = one('#catalog-empty');
+    const chips = one('#active-filter-chips');
+    const reset = one('#reset-catalog');
+    const panel = one('#catalog-filters');
+    const panelSummary = one('#filter-summary');
+    const share = one('#copy-catalog-view');
+    const goalButtons = all('[data-goal]');
+    const statusButtons = all('.status-switch button[data-status]');
+    const actionButtons = all('[data-filter-action]');
+    const typeButtons = all('[data-filter-type]');
+    const stageButtons = all('[data-filter-stage]');
+    const capabilityButtons = all('[data-filter-capability]');
+    const rows = all('.catalog-result');
+    const compareTray = one('#compare-tray');
+    const compareCount = one('#compare-count');
+    const compareMessage = one('#compare-message');
+    const compareButton = one('#open-comparison');
+    const clearComparison = one('#clear-comparison');
+    const compareDialog = one('#comparison-dialog');
+    const compareTable = one('#comparison-table');
+    const selectedForComparison = new Set();
+    let activeGoal = '';
+    let shareTimer = 0;
+
+    if (!search || !sort || !results || !count || !empty || !chips) return;
+
+    const selectedValues = (buttons, key) => buttons
+      .filter((button) => button.getAttribute('aria-pressed') === 'true')
+      .map((button) => button.dataset[key])
+      .filter(Boolean);
+    const getStatus = () => statusButtons.find((button) => button.getAttribute('aria-pressed') === 'true')?.dataset.status || 'all';
+    const getCapability = (key) => capabilityButtons.find((button) => button.dataset.filterCapability === key)?.getAttribute('aria-pressed') === 'true';
+    const labelFor = (buttons, key, value) => buttons.find((button) => button.dataset[key] === value)?.textContent?.trim() || value;
+
+    function setStatus(value) {
+      statusButtons.forEach((button) => setPressed(button, button.dataset.status === value));
+    }
+
+    function setGoal(value) {
+      activeGoal = value;
+      goalButtons.forEach((button) => setPressed(button, button.dataset.goal === value));
+    }
+
+    function compareRows(a, b, mode) {
+      if (mode === 'alpha') return (a.dataset.title || '').localeCompare(b.dataset.title || '');
+      if (mode === 'status') {
+        const rank = { live: 0, wip: 1, archived: 2 };
+        const difference = (rank[a.dataset.status] ?? 9) - (rank[b.dataset.status] ?? 9);
+        if (difference) return difference;
+      }
+      const latestDifference = Number(b.dataset.latest || 0) - Number(a.dataset.latest || 0);
+      return latestDifference || (a.dataset.title || '').localeCompare(b.dataset.title || '');
+    }
+
+    function activeState() {
+      return {
+        query: search.value.trim(),
+        status: getStatus(),
+        actions: selectedValues(actionButtons, 'filterAction'),
+        types: selectedValues(typeButtons, 'filterType'),
+        stages: selectedValues(stageButtons, 'filterStage'),
+        adoption: getCapability('adoption'),
+        examples: getCapability('examples'),
+        archived: getCapability('archived'),
+        sort: sort.value || 'latest',
+      };
+    }
+
+    function buildChips(state) {
+      const active = [];
+      if (activeGoal) active.push({ kind: 'goal', label: goalButtons.find((button) => button.dataset.goal === activeGoal)?.querySelector('.goal-card-title')?.textContent?.trim() || activeGoal });
+      if (state.query) active.push({ kind: 'query', label: `Search: ${state.query}` });
+      if (state.status !== 'all') active.push({ kind: 'status', label: `Status: ${state.status === 'wip' ? 'In progress' : 'Live'}` });
+      state.actions.forEach((value) => active.push({ kind: 'action', value, label: labelFor(actionButtons, 'filterAction', value) }));
+      state.types.forEach((value) => active.push({ kind: 'type', value, label: labelFor(typeButtons, 'filterType', value) }));
+      state.stages.forEach((value) => active.push({ kind: 'stage', value, label: labelFor(stageButtons, 'filterStage', value) }));
+      if (state.adoption) active.push({ kind: 'capability', value: 'adoption', label: 'Public adoption signal' });
+      if (state.examples) active.push({ kind: 'capability', value: 'examples', label: 'Implementation example' });
+      if (state.archived) active.push({ kind: 'capability', value: 'archived', label: 'Including archived' });
+      if (state.sort !== 'latest') active.push({ kind: 'sort', label: `Sort: ${sort.options[sort.selectedIndex]?.text || state.sort}` });
+      return active;
+    }
+
+    function renderChips(active) {
+      chips.replaceChildren();
+      active.forEach((item) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.removeKind = item.kind;
+        if (item.value) button.dataset.removeValue = item.value;
+        button.setAttribute('aria-label', `Remove ${item.label}`);
+        button.append(document.createTextNode(item.label));
+        const close = document.createElement('span');
+        close.textContent = '×';
+        close.setAttribute('aria-hidden', 'true');
+        button.append(close);
+        chips.append(button);
+      });
+      chips.hidden = active.length === 0;
+      if (reset) reset.hidden = active.length === 0;
+      if (panelSummary) panelSummary.textContent = active.length ? `${active.length} active` : 'No additional filters';
+    }
+
+    function syncUrl(state) {
+      const params = new URLSearchParams();
+      if (activeGoal) params.set('goal', activeGoal);
+      if (state.query) params.set('q', state.query);
+      if (state.status !== 'all') params.set('status', state.status);
+      state.actions.forEach((value) => params.append('actions', value));
+      state.types.forEach((value) => params.append('types', value));
+      state.stages.forEach((value) => params.append('stages', value));
+      if (state.adoption) params.append('has', 'adoption');
+      if (state.examples) params.append('has', 'examples');
+      if (state.archived) params.set('archived', '1');
+      if (state.sort !== 'latest') params.set('sort', state.sort);
+      const hasCatalogState = params.toString().length > 0 || location.hash === '#catalog';
+      history.replaceState(
+        null,
+        '',
+        `${location.pathname}${params.toString() ? `?${params}` : ''}${hasCatalogState ? '#catalog' : ''}`
+      );
+    }
+
+    function applyFilters() {
+      const state = activeState();
+      const query = state.query.toLowerCase();
+      const actionsForGoal = goalActions[activeGoal] || [];
+      const visible = [];
+
+      rows.forEach((row) => {
+        const rowActions = (row.dataset.actions || '').split(' ').filter(Boolean);
+        const rowTypes = (row.dataset.types || '').split(' ').filter(Boolean);
+        const rowStages = (row.dataset.stages || '').split(' ').filter(Boolean);
+        let matches = !query || (row.dataset.search || '').includes(query);
+        if (matches && state.status !== 'all') matches = row.dataset.status === state.status;
+        if (matches && !state.archived) matches = row.dataset.status !== 'archived';
+        if (matches && actionsForGoal.length) matches = actionsForGoal.some((value) => rowActions.includes(value));
+        if (matches && state.actions.length) matches = state.actions.some((value) => rowActions.includes(value));
+        if (matches && state.types.length) matches = state.types.some((value) => rowTypes.includes(value));
+        if (matches && state.stages.length) matches = state.stages.some((value) => rowStages.includes(value));
+        if (matches && state.adoption) matches = row.dataset.hasAdoption === 'true';
+        if (matches && state.examples) matches = row.dataset.hasExamples === 'true';
+        row.hidden = !matches;
+        if (matches) visible.push(row);
+      });
+
+      visible.sort((a, b) => compareRows(a, b, state.sort)).forEach((row) => results.append(row));
+      count.textContent = String(visible.length);
+      const label = visible.length === 1 ? 'initiative' : 'initiatives';
+      if (countLabel) countLabel.textContent = label;
+      empty.hidden = visible.length !== 0;
+      const active = buildChips(state);
+      renderChips(active);
+      syncUrl(state);
+    }
+
+    function clearFilters() {
+      search.value = '';
+      sort.value = 'latest';
+      setGoal('');
+      setStatus('all');
+      [...actionButtons, ...typeButtons, ...stageButtons, ...capabilityButtons].forEach((button) => setPressed(button, false));
+      applyFilters();
+    }
+
+    function initialize() {
+      const params = new URLSearchParams(location.search);
+      const legacyGoals = { signal: 'terms', block: 'protect', paid: 'license' };
+      const goal = legacyGoals[params.get('goal')] || params.get('goal') || '';
+      if (goalActions[goal]) setGoal(goal);
+      search.value = params.get('q') || '';
+      const status = params.get('status');
+      if (['all', 'live', 'wip'].includes(status)) setStatus(status);
+      const sortValue = params.get('sort');
+      if (Array.from(sort.options).some((option) => option.value === sortValue)) sort.value = sortValue;
+      const actionSet = new Set(params.getAll('actions'));
+      const typeSet = new Set(params.getAll('types'));
+      const stageSet = new Set(params.getAll('stages'));
+      const capabilitySet = new Set(params.getAll('has'));
+      actionButtons.forEach((button) => setPressed(button, actionSet.has(button.dataset.filterAction)));
+      typeButtons.forEach((button) => setPressed(button, typeSet.has(button.dataset.filterType)));
+      stageButtons.forEach((button) => setPressed(button, stageSet.has(button.dataset.filterStage)));
+      capabilityButtons.forEach((button) => {
+        const value = button.dataset.filterCapability;
+        setPressed(button, capabilitySet.has(value) || (value === 'archived' && ['1', 'true'].includes(params.get('archived'))));
+      });
+      if (panel && (actionSet.size || typeSet.size || stageSet.size || capabilitySet.size || params.get('archived') || sortValue)) panel.open = true;
+    }
+
+    function renderCompareTray(message = '') {
+      const size = selectedForComparison.size;
+      compareTray.hidden = size === 0;
+      document.body.classList.toggle('has-compare-tray', size > 0);
+      compareCount.textContent = `${size} selected`;
+      compareMessage.textContent = message || (size < 2 ? 'Choose one more initiative.' : size === 2 ? 'Ready to compare, or add one more.' : 'Maximum of three selected.');
+      compareButton.disabled = size < 2;
+    }
+
+    function clearSelectedComparison() {
+      selectedForComparison.clear();
+      all('[data-compare]').forEach((checkbox) => { checkbox.checked = false; });
+      renderCompareTray();
+    }
+
+    function addCompareRow(table, label, selectedRows, field, isLink = false) {
+      const tr = document.createElement('tr');
+      const th = document.createElement('th');
+      th.scope = 'row';
+      th.textContent = label;
+      tr.append(th);
+      selectedRows.forEach((row) => {
+        const td = document.createElement('td');
+        if (isLink) {
+          const link = document.createElement('a');
+          link.href = row.dataset[field];
+          link.textContent = field === 'profile' ? 'Open profile' : 'Official site';
+          if (field === 'official') { link.target = '_blank'; link.rel = 'noopener'; }
+          td.append(link);
+        } else {
+          td.textContent = row.dataset[field] || 'Not recorded';
+        }
+        tr.append(td);
+      });
+      table.append(tr);
+    }
+
+    function openComparison() {
+      if (selectedForComparison.size < 2 || !(compareDialog instanceof HTMLDialogElement)) return;
+      const selectedRows = Array.from(selectedForComparison).map((slug) => rows.find((row) => row.dataset.slug === slug)).filter(Boolean);
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const headingRow = document.createElement('tr');
+      const blank = document.createElement('th');
+      blank.scope = 'col';
+      headingRow.append(blank);
+      selectedRows.forEach((row) => {
+        const th = document.createElement('th');
+        th.scope = 'col';
+        th.textContent = row.dataset.title;
+        headingRow.append(th);
+      });
+      thead.append(headingRow);
+      table.append(thead);
+      const tbody = document.createElement('tbody');
+      addCompareRow(tbody, 'Summary', selectedRows, 'summary');
+      addCompareRow(tbody, 'Public status', selectedRows, 'publicStatus');
+      addCompareRow(tbody, 'Primary approach', selectedRows, 'primaryApproach');
+      addCompareRow(tbody, 'Practical force', selectedRows, 'enforcement');
+      addCompareRow(tbody, 'Important caveat', selectedRows, 'enforcementCaveat');
+      addCompareRow(tbody, 'Pipeline stages', selectedRows, 'stageLabels');
+      addCompareRow(tbody, 'Data types', selectedRows, 'typeLabels');
+      addCompareRow(tbody, 'Public adoption', selectedRows, 'adoption');
+      addCompareRow(tbody, 'Latest evidence', selectedRows, 'evidence');
+      addCompareRow(tbody, 'Profile', selectedRows, 'profile', true);
+      addCompareRow(tbody, 'Official source', selectedRows, 'official', true);
+      table.append(tbody);
+      compareTable.replaceChildren(table);
+      compareDialog.showModal();
+    }
+
+    goalButtons.forEach((button) => button.addEventListener('click', () => {
+      setGoal(activeGoal === button.dataset.goal ? '' : button.dataset.goal);
+      applyFilters();
+    }));
+    statusButtons.forEach((button) => button.addEventListener('click', () => { setStatus(button.dataset.status); applyFilters(); }));
+    [...actionButtons, ...typeButtons, ...stageButtons, ...capabilityButtons].forEach((button) => button.addEventListener('click', () => {
+      setPressed(button, button.getAttribute('aria-pressed') !== 'true');
+      applyFilters();
+    }));
+    search.addEventListener('input', applyFilters);
+    sort.addEventListener('change', applyFilters);
+    reset?.addEventListener('click', clearFilters);
+    one('#clear-empty')?.addEventListener('click', clearFilters);
+    chips.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-remove-kind]');
+      if (!button) return;
+      const kind = button.dataset.removeKind;
+      const value = button.dataset.removeValue;
+      if (kind === 'goal') setGoal('');
+      if (kind === 'query') search.value = '';
+      if (kind === 'status') setStatus('all');
+      if (kind === 'sort') sort.value = 'latest';
+      const groups = { action: [actionButtons, 'filterAction'], type: [typeButtons, 'filterType'], stage: [stageButtons, 'filterStage'], capability: [capabilityButtons, 'filterCapability'] };
+      if (groups[kind]) {
+        const [buttons, key] = groups[kind];
+        const target = buttons.find((candidate) => candidate.dataset[key] === value);
+        if (target) setPressed(target, false);
+      }
+      applyFilters();
+    });
+    share?.addEventListener('click', async () => {
+      const original = 'Copy view';
+      try {
+        const shareUrl = new URL(location.href);
+        shareUrl.hash = 'catalog';
+        await navigator.clipboard.writeText(shareUrl.toString());
+        share.textContent = 'Link copied';
+      } catch {
+        share.textContent = 'Copy failed';
+      }
+      clearTimeout(shareTimer);
+      shareTimer = window.setTimeout(() => { share.textContent = original; }, 1400);
+    });
+    all('[data-compare]').forEach((checkbox) => checkbox.addEventListener('change', () => {
+      const slug = checkbox.dataset.compare;
+      if (checkbox.checked && selectedForComparison.size >= 3) {
+        checkbox.checked = false;
+        renderCompareTray('You can compare up to three initiatives.');
+        return;
+      }
+      if (checkbox.checked) selectedForComparison.add(slug); else selectedForComparison.delete(slug);
+      renderCompareTray();
+    }));
+    clearComparison?.addEventListener('click', clearSelectedComparison);
+    compareButton?.addEventListener('click', openComparison);
+    one('#close-comparison')?.addEventListener('click', () => compareDialog?.close());
+    compareDialog?.addEventListener('click', (event) => {
+      if (event.target === compareDialog) compareDialog.close();
+    });
+
+    initialize();
+    applyFilters();
+  })();
+</script>
+
+<style>
+  .catalog-explorer {
+    scroll-margin-top: 72px;
+    display: grid;
+    gap: 20px;
+    padding-top: clamp(32px, 5vw, 64px);
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .explorer-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 380px);
+    gap: 24px 48px;
+    align-items: end;
+  }
+
+  .explorer-heading h2 {
+    margin: 4px 0 8px;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .explorer-heading p {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .section-kicker,
+  .filter-label,
+  .filter-block label {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .status-explainer {
+    padding: 14px 16px;
+    border-left: 3px solid var(--accent);
+    background: var(--card);
+    font-size: 0.92rem;
+  }
+
+  .status-explainer strong {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--text);
+  }
+
+  .goal-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid var(--border-strong);
+  }
+
+  .goal-card {
+    min-width: 0;
+    min-height: 116px;
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: 18px;
+    border: 0;
+    border-right: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--card);
+    color: var(--muted);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .goal-card:last-child {
+    border-right: 0;
+  }
+
+  .goal-card:hover,
+  .goal-card[aria-pressed='true'] {
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+
+  .goal-card[aria-pressed='true'] {
+    box-shadow: inset 0 -3px 0 var(--accent);
+  }
+
+  .goal-card-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  .explorer-tools {
+    border-top: 1px solid var(--border-strong);
+    border-bottom: 1px solid var(--border-strong);
+  }
+
+  .explorer-toolbar {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) auto auto;
+    gap: 14px;
+    align-items: stretch;
+    padding: 14px 0;
+  }
+
+  .search-shell {
+    position: relative;
+  }
+
+  .search-shell svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .search-shell input {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 14px 10px 44px;
+    border: 1px solid var(--border-strong);
+    border-radius: 0;
+    background: var(--card);
+    color: var(--text);
+    font: inherit;
+  }
+
+  .status-switch {
+    display: flex;
+    border: 1px solid var(--border-strong);
+  }
+
+  .status-switch button,
+  .filter-options button,
+  .quiet-button,
+  .active-filter-chips button {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .status-switch button {
+    padding: 0 13px;
+    border-right: 1px solid var(--border);
+  }
+
+  .status-switch button:last-child {
+    border-right: 0;
+  }
+
+  .status-switch button[aria-pressed='true'],
+  .filter-options button[aria-pressed='true'] {
+    background: var(--accent-soft);
+    color: var(--text);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+
+  .quiet-button {
+    padding: 10px 12px;
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+  }
+
+  .quiet-button:hover {
+    border-color: var(--text);
+  }
+
+  .advanced-filters {
+    border-top: 1px solid var(--border);
+  }
+
+  .advanced-filters summary {
+    min-height: 48px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+  }
+
+  .advanced-filters summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .advanced-filters summary span:last-child {
+    font-size: 0.86rem;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .filter-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 28px;
+    padding: 20px 0 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .filter-block {
+    display: grid;
+    gap: 9px;
+  }
+
+  .filter-block-compact {
+    align-content: start;
+  }
+
+  .filter-block select {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--card);
+    color: var(--text);
+    font: inherit;
+  }
+
+  .filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .filter-options button {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: 0.88rem;
+  }
+
+  .filter-panel > .quiet-button {
+    justify-self: start;
+    align-self: end;
+  }
+
+  .results-bar {
+    min-height: 34px;
+    display: flex;
+    gap: 12px 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .results-bar p {
+    margin: 0;
+  }
+
+  .active-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .active-filter-chips button {
+    display: inline-flex;
+    gap: 8px;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: 0.82rem;
+  }
+
+  .result-columns,
+  .catalog-result {
+    display: grid;
+    grid-template-columns: 28px minmax(250px, 1.65fr) minmax(170px, 0.85fr) minmax(190px, 0.95fr) minmax(130px, 0.65fr);
+    gap: 18px;
+  }
+
+  .result-columns {
+    padding: 0 12px 9px;
+    border-bottom: 1px solid var(--border-strong);
+    font-size: 0.72rem;
+    font-weight: 750;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .catalog-results-list {
+    border-bottom: 1px solid var(--border-strong);
+  }
+
+  .catalog-result {
+    align-items: start;
+    padding: 18px 12px;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+  }
+
+  .catalog-result:last-child {
+    border-bottom: 0;
+  }
+
+  .catalog-result:hover {
+    background: color-mix(in srgb, var(--card) 60%, transparent);
+  }
+
+  .compare-control {
+    display: flex;
+    justify-content: center;
+    padding-top: 3px;
+  }
+
+  .compare-control input {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--accent);
+  }
+
+  .result-main,
+  .result-fit,
+  .result-enforcement,
+  .result-evidence {
+    min-width: 0;
+    display: grid;
+    align-content: start;
+    gap: 5px;
+  }
+
+  .result-titleline {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+
+  .result-titleline h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1.15;
+  }
+
+  .result-titleline h3 a {
+    color: var(--text);
+    text-decoration-thickness: 1px;
+    text-decoration-color: transparent;
+  }
+
+  .result-titleline h3 a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .result-main > p,
+  .result-fit span,
+  .result-enforcement span,
+  .result-evidence span {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  .result-fit strong,
+  .result-enforcement strong,
+  .result-evidence strong {
+    font-size: 0.9rem;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 3px;
+    font-size: 0.84rem;
+  }
+
+  .result-evidence a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .empty-state {
+    margin: 0;
+    padding: 32px;
+    border: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .empty-state button {
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .compare-tray {
+    position: fixed;
+    z-index: 30;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    width: min(680px, calc(100vw - 32px));
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 14px 12px 18px;
+    border: 1px solid var(--border-strong);
+    background: var(--text);
+    color: var(--bg);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.24);
+  }
+
+  .compare-tray[hidden] {
+    display: none;
+  }
+
+  .compare-tray > div:first-child {
+    display: grid;
+    gap: 2px;
+  }
+
+  .compare-tray span {
+    font-size: 0.82rem;
+    opacity: 0.78;
+  }
+
+  .compare-tray-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .compare-tray .quiet-button,
+  .compare-button {
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid color-mix(in srgb, var(--bg) 45%, transparent);
+    background: transparent;
+    color: var(--bg);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .compare-button {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .compare-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  :global(body.has-compare-tray) {
+    padding-bottom: 84px;
+  }
+
+  .comparison-dialog {
+    width: min(1120px, calc(100vw - 32px));
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 0;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .comparison-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.48);
+  }
+
+  .comparison-dialog-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border-strong);
+    background: var(--bg);
+  }
+
+  .comparison-dialog-head h2 {
+    margin: 2px 0 0;
+  }
+
+  .comparison-table-wrap {
+    overflow: auto;
+    padding: 0 22px;
+  }
+
+  .comparison-table-wrap :global(table) {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+  }
+
+  .comparison-table-wrap :global(th),
+  .comparison-table-wrap :global(td) {
+    min-width: 190px;
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .comparison-table-wrap :global(tbody th) {
+    min-width: 150px;
+    width: 150px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .comparison-note {
+    margin: 0;
+    padding: 18px 22px 22px;
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+
+  @media (max-width: 980px) {
+    .goal-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .goal-card:nth-child(2) {
+      border-right: 0;
+    }
+
+    .goal-card:nth-child(-n + 2) {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-columns {
+      display: none;
+    }
+
+    .catalog-result {
+      grid-template-columns: 24px minmax(0, 1fr) minmax(180px, 0.55fr);
+    }
+
+    .result-main {
+      grid-column: 2;
+    }
+
+    .result-fit,
+    .result-enforcement,
+    .result-evidence {
+      grid-column: 3;
+    }
+
+    .result-fit::before,
+    .result-enforcement::before,
+    .result-evidence::before {
+      content: attr(data-mobile-label);
+      margin-top: 5px;
+      font-size: 0.68rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .explorer-heading,
+    .explorer-toolbar,
+    .filter-panel {
+      grid-template-columns: 1fr;
+    }
+
+    .status-switch button {
+      min-height: 42px;
+      flex: 1;
+    }
+
+    .goal-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .goal-card,
+    .goal-card:nth-child(2) {
+      min-height: 0;
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .goal-card:last-child {
+      border-bottom: 0;
+    }
+
+    .catalog-result {
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 10px 12px;
+      padding: 18px 4px;
+    }
+
+    .result-main,
+    .result-fit,
+    .result-enforcement,
+    .result-evidence {
+      grid-column: 2;
+    }
+
+    .compare-tray {
+      bottom: 8px;
+      align-items: flex-end;
+    }
+
+    .compare-tray #compare-message {
+      display: none;
+    }
+  }
+</style>

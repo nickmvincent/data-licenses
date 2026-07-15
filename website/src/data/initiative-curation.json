@@ -147,6 +147,10 @@
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "The public homepage now supports a conservative visible dataset-count metric, while public materials still give less clarity on uploader/provider totals."
   },
+  "news-media-alliance-ai-licensing-program": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "The program page confirms current opt-in licensing opportunities, but public participation counts and deal uptake are not disclosed."
+  },
   "noml": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Proposal-stage directive with no canonical deployment tracker."
@@ -219,6 +223,10 @@
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "RJI reports the JournalList network at about 3,000 participating publishers, giving this lightweight signal a conservative announced adoption figure."
   },
+  "troveo": {
+    "adoptionResearchStatus": "populated",
+    "adoptionResearchNotes": "Dated company-issued materials support conservative volume and payout metrics for the licensed data marketplace."
+  },
   "user-intents": {
     "adoptionResearchStatus": "hard-to-quantify",
     "adoptionResearchNotes": "Proposal and demo stage, not yet a network-wide deployed control."
@@ -230,6 +238,10 @@
   "versos-ai-video-training-data-marketplace": {
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Launch materials support partner-count and represented-video-volume metrics, though buyer-side deployment remains early."
+  },
+  "veritone-data-marketplace": {
+    "adoptionResearchStatus": "hard-to-quantify",
+    "adoptionResearchNotes": "Launch materials confirm a governed marketplace and rights-tracking workflow, but public buyer, seller, and transaction counts are not disclosed."
   },
   "web-bot-auth": {
     "adoptionResearchStatus": "hard-to-quantify",

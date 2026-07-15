@@ -14,14 +14,14 @@ dataTypes:
 tags:
   - books
   - rights-cleared
-usersCount: '100+ bestselling authors'
+usersCount: 'Supported by 100+ bestselling authors'
 metricEvidence:
   usersCount:
     basis: explicit
     sources:
-      - label: Author overview documents AI Rights licensing and opt-out flows
-        url: 'https://support.createdbyhumans.ai/hc/en-us/articles/30891024362523-Author-Overview'
-        date: '2025-01-18'
+      - label: Funding announcement reports support from 100+ bestselling authors
+        url: 'https://www.createdbyhumans.ai/post/created-by-humans-closes-5-5-million-seed-funding-round'
+        date: '2025-01-28'
 evidenceLinks:
   - label: About page describes mission and company story
     url: 'https://www.createdbyhumans.ai/about'

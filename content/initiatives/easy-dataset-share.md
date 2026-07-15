@@ -15,9 +15,9 @@ tags:
 dependsOn:
   - cloudflare-anti-scraping
 evidenceLinks:
-  - label: easy-dataset-share paper published
-    url: 'https://arxiv.org/abs/2601.06621'
-    date: '2026-01-09'
+  - label: easy-dataset-share v0.5.0 released
+    url: 'https://github.com/Responsible-Dataset-Sharing/easy-dataset-share/releases/tag/v0.5.0'
+    date: '2025-09-15'
   - label: Project launch post published
     url: 'https://www.lesswrong.com/posts/DA3vbSEfABLdoCt59/we-built-a-tool-to-protect-your-dataset-from-simple-scrapers'
     date: '2025-09-13'

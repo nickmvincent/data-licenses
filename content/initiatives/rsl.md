@@ -11,19 +11,19 @@ actionsSupported:
 primaryApproachType: attach-formal-license
 dataTypes:
   - web-content
-usersCount: '1,500+ organizations'
-dataVolume: 'billions of web pages'
+usersCount: '1,500+ endorsing organizations'
+dataVolume: 'supporters represent billions of web pages'
 metricEvidence:
   usersCount:
     basis: explicit
     sources:
-      - label: Technical standards released
+      - label: RSL reports endorsement by 1,500+ organizations
         url: 'https://rslstandard.org/press/rsl-1-specification-2025'
         date: '2025-12-10'
   dataVolume:
     basis: explicit
     sources:
-      - label: Technical standards released
+      - label: RSL reports the web reach represented by supporters
         url: 'https://rslstandard.org/press/rsl-1-specification-2025'
         date: '2025-12-10'
 evidenceLinks:
@@ -51,13 +51,23 @@ implementationSnippets:
     language: json
     code: |
       {
-        "@context": "https://schema.org/",
+        "@context": "https://schema.org",
         "@type": "Book",
-        "license": "https://rslstandard.org/rsl"
+        "name": "Moby Dick; Or, The Whale by Herman Melville",
+        "author": {
+          "@type": "Person",
+          "name": "Herman Melville"
+        },
+        "license": "https://gutenberg.org/ebooks-rsl-license.xml"
       }
     sourceUrl: 'https://rslstandard.org/guide/schema-org'
+considerations: >-
+  The reported organization and page figures describe endorsement and the
+  reach represented by supporters, not verified RSL deployment. RSL expresses
+  terms and rights reservations but does not itself block access, compel
+  crawler compliance, or establish enforceability in every jurisdiction.
 visibility: public
 type: data_license_initiative
 ---
 
-RSL proposes a structured way to express licensing terms in machine-readable form so implementers can reliably interpret reuse permissions across the web. The standard combines rights expression, implementation guidance, and ecosystem backing from publishers and infrastructure providers.
+RSL provides a structured way to express licensing terms in machine-readable form for clients that choose to support it. The standard combines rights expression, implementation guidance, and ecosystem backing from publishers and infrastructure providers.

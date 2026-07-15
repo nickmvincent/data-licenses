@@ -49,6 +49,92 @@ export const STATUS_LABELS: Record<string, string> = {
   archived: 'Archived',
 };
 
+export const GOAL_DETAILS = [
+  {
+    key: 'protect',
+    title: 'Reduce automated access',
+    description: 'Find blocking, metering, and authenticated access controls.',
+    actions: ['technical-blocking', 'add-tollgate'],
+  },
+  {
+    key: 'terms',
+    title: 'State terms for AI use',
+    description: 'Publish preferences or formal terms for collection and reuse.',
+    actions: ['attach-preference-signal', 'attach-formal-license'],
+  },
+  {
+    key: 'license',
+    title: 'License or monetize content',
+    description: 'Explore licenses, collectives, marketplaces, and paid access.',
+    actions: [
+      'attach-formal-license',
+      'join-licensing-collective',
+      'data-market-platform',
+      'add-tollgate',
+    ],
+  },
+  {
+    key: 'source',
+    title: 'Source governed data',
+    description: 'Find rights-cleared data, marketplaces, and access infrastructure.',
+    actions: ['data-market-platform', 'join-licensing-collective', 'new-infrastructures'],
+  },
+] as const;
+
+export const ENFORCEMENT_DETAILS: Record<
+  ApproachKey,
+  { label: string; shortLabel: string; description: string; caveat: string }
+> = {
+  'attach-preference-signal': {
+    label: 'Voluntary preference signal',
+    shortLabel: 'Voluntary signal',
+    description: 'Communicates a requested condition or restriction to automated systems.',
+    caveat: 'It only affects actors that detect and honor the signal; it does not itself prevent reuse.',
+  },
+  'attach-formal-license': {
+    label: 'Legal or license terms',
+    shortLabel: 'Legal terms',
+    description: 'States permissions, restrictions, or conditions for AI-related reuse.',
+    caveat: 'Practical effect depends on applicable law, rights ownership, notice, and contract formation.',
+  },
+  'join-licensing-collective': {
+    label: 'Collective contractual licensing',
+    shortLabel: 'Contractual licensing',
+    description: 'Coordinates licenses and negotiations across participating rights holders.',
+    caveat: 'Coverage and enforcement depend on participation, represented rights, and the resulting agreements.',
+  },
+  'data-market-platform': {
+    label: 'Contractual marketplace access',
+    shortLabel: 'Contractual access',
+    description: 'Offers governed data or content access under platform or transaction terms.',
+    caveat: 'Terms govern participating transactions; they do not control copies obtained elsewhere.',
+  },
+  'add-tollgate': {
+    label: 'Metered or authenticated access',
+    shortLabel: 'Access control',
+    description: 'Conditions access on payment, authentication, identity, or usage limits.',
+    caveat: 'It can control the protected access path, but cannot guarantee control of downstream copies or alternate routes.',
+  },
+  'technical-blocking': {
+    label: 'Technical access control',
+    shortLabel: 'Technical control',
+    description: 'Detects, rate-limits, challenges, or blocks automated collection.',
+    caveat: 'It can reduce access but may be bypassed and does not determine the legality of downstream use.',
+  },
+  'new-infrastructures': {
+    label: 'Emerging governance infrastructure',
+    shortLabel: 'Emerging infrastructure',
+    description: 'Creates registries, protocols, or coordination layers for governed data use.',
+    caveat: 'Practical force depends on adoption, interoperability, governance, and the controls built around it.',
+  },
+  certification: {
+    label: 'Third-party attestation',
+    shortLabel: 'Attestation',
+    description: 'Reviews or signals whether a system follows stated sourcing criteria.',
+    caveat: 'Certification provides an assessment or claim; it does not itself authorize, prevent, or enforce reuse.',
+  },
+};
+
 export const APPROACH_DETAILS: Record<
   ApproachKey,
   { title: string; shortDescription: string; description: string }
@@ -165,4 +251,13 @@ export function formatPipelineSummary(pipelineStages: string[]) {
 
 export function formatDataTypeLabel(dataType: string) {
   return DATA_TYPE_LABELS[dataType] || dataType;
+}
+
+export function getEnforcementDetails(action: string) {
+  return ENFORCEMENT_DETAILS[action as ApproachKey] || {
+    label: 'Unclassified mechanism',
+    shortLabel: 'Unclassified',
+    description: 'The catalog has not classified this initiative\'s practical enforcement mode.',
+    caveat: 'Review the initiative\'s public terms and technical documentation before relying on it.',
+  };
 }

@@ -1,7 +1,7 @@
 ---
 title: Human Native
-summary: AI data marketplace for licensed multimedia datasets, now being integrated into Cloudflare's AI crawl and content-access stack.
-status: live
+summary: Former AI data marketplace for licensed multimedia datasets, acquired by Cloudflare in January 2026.
+status: archived
 website: 'https://www.humannative.ai/'
 actionsSupported:
   - data-market-platform
@@ -19,4 +19,4 @@ visibility: public
 type: data_license_initiative
 ---
 
-Human Native built a marketplace for licensed audio, video, and other premium datasets for AI training. It now appears best tracked as a still-live initiative that is being folded into Cloudflare's broader work on AI crawl control, structured content access, and new payment rails for the web.
+Human Native built a marketplace for licensed audio, video, and other premium datasets for AI training. Cloudflare acquired the company in January 2026 and said its team and technology would support Cloudflare's work on structured content access and new economic models for the web. Human Native no longer presents the marketplace as an independently available service.

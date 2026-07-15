@@ -6,6 +6,8 @@ visibility: public
 
 DataLicenses.org is a community-curated catalog of public initiatives shaping AI data access, licensing, controlled retrieval, and enforcement. The catalog is currently maintained by Nick Vincent with feedback from a small group of contributors and subject-matter observers.
 
+The field is still emerging. Inclusion in the catalog does not mean that an initiative is widely adopted, legally validated, technically effective, or suitable for a particular use. Many preference signals depend on voluntary compliance. Technical controls can reduce access without preventing every collection route or governing downstream copies. Licenses and contract terms depend on the relevant rights, notice, agreement, jurisdiction, and facts. The catalog describes public claims and evidence; it does not provide legal advice or certify effectiveness.
+
 The project is still lightweight, so editorial decisions are made through public issues, pull requests, and direct review rather than a formal governance board. As the catalog grows, the review process should become more explicit about inclusion criteria, writing standards, and how disagreements are resolved.
 
 AI tools may be used to help find sources, compare public materials, draft update packets, and improve code. They do not replace human review. Claims, dates, adoption metrics, and descriptions should be checked against public sources before they are merged.
@@ -50,9 +52,13 @@ If AI is involved, the best output is usually a small review packet with sources
 
 ### Status meanings
 
-- `live`: public and usable now.
-- `wip`: under review, emerging, or not yet fully deployed.
+- `live`: publicly available or deployable now. This does not mean widely adopted, legally tested, or proven effective.
+- `wip`: publicly documented but still under review, emerging, or not yet fully deployed.
 - `archived`: kept for historical context, but hidden from the default catalog view because a review did not find newer public activity.
+
+Status tracks public availability, not enforcement strength. Each initiative profile separately describes the mechanism's practical force and its most important limitation.
+
+The practical-force label is an editorial classification based on the initiative's primary approach. It is a starting point for comparison, not a legal conclusion or a substitute for the initiative's current terms and technical documentation.
 
 ## Contribute
 

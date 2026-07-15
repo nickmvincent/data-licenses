@@ -17,9 +17,9 @@ evidenceLinks:
   - label: Attachment draft listed as expired
     url: 'https://datatracker.ietf.org/doc/draft-ietf-aipref-attach/'
     date: '2026-05-01'
-  - label: Milestone for protocol specifications
-    url: 'https://datatracker.ietf.org/wg/aipref/about/'
-    date: '2025-08-01'
+  - label: Protocol milestones moved to August 2026
+    url: 'https://datatracker.ietf.org/wg/aipref/history/'
+    date: '2025-09-23'
 implementationSnippets:
   - title: HTTP response header draft example
     summary: The expired attachment draft showed AI preferences delivered directly in the HTTP response.
@@ -47,7 +47,9 @@ considerations: >-
   The AIPref working group remains active, but the attachment draft referenced
   by the HTTP header and robots.txt examples is currently expired on the IETF
   Datatracker. Treat those snippets as draft-history examples until newer
-  attachment work replaces them.
+  attachment work replaces them. The working-group charter explicitly excludes
+  technical enforcement: AIPref communicates preferences and does not itself
+  block access or compel compliance.
 visibility: public
 type: data_license_initiative
 ---

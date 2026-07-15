@@ -7,6 +7,7 @@ actionsSupported:
   - data-market-platform
 primaryApproachType: data-market-platform
 pipelineStages:
+  - train
   - retrieve
   - generate
 tags:

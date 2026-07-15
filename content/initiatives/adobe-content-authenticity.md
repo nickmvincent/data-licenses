@@ -1,6 +1,6 @@
 ---
 title: Adobe Content Authenticity
-summary: Content Credentials-based preference system for signaling that generative AI should not train on or use a creator's files.
+summary: Content Credentials-based preference system for asking supported generative AI models not to train on or use a creator's files.
 status: live
 website: 'https://helpx.adobe.com/creative-cloud/apps/adobe-content-authenticity/generative-ai-training-preferences.html'
 actionsSupported:
@@ -22,6 +22,10 @@ evidenceLinks:
   - label: Public beta launch for Adobe Content Authenticity
     url: 'https://blog.adobe.com/en/publish/2025/04/24/adobe-content-authenticity-now-public-beta-helps-creators-secure-attribution'
     date: '2025-04-24'
+considerations: >-
+  Adobe currently documents support in Adobe Firefly. Outside supported Adobe
+  workflows, the preference is metadata signaling rather than technical
+  enforcement, and recognition depends on other model providers.
 visibility: public
 type: data_license_initiative
 ---

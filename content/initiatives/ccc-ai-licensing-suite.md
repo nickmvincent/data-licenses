@@ -1,6 +1,6 @@
 ---
 title: CCC AI Licensing Suite
-summary: Voluntary collective licensing program covering internal AI reuse, external AI training, and transactional AI uses for copyrighted works.
+summary: Live collective licenses for internal AI reuse and external AI training, alongside announced transactional AI rights for copyrighted works.
 status: live
 website: 'https://www.copyright.com/solutions-rightsholders-ai/'
 actionsSupported:
@@ -36,6 +36,6 @@ visibility: public
 type: data_license_initiative
 ---
 
-CCC's AI licensing program adapts voluntary collective licensing for generative AI uses. Its public materials now describe a suite spanning internal AI reuse, external AI training, academic uses, and transactional AI rights.
+CCC's AI licensing program adapts voluntary collective licensing for generative AI uses. Its live offers include internal AI reuse and external AI training. Higher-education AI reuse rights took effect on July 1, 2026; CCC has also announced transactional, pay-per-use AI rights, but has not publicly confirmed their general availability.
 
 The suite provides an operational path for licensing copyrighted text-based works into AI systems without requiring every publisher or developer to negotiate bespoke bilateral deals.

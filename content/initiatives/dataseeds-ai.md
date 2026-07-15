@@ -1,6 +1,6 @@
 ---
 title: DataSeeds.AI
-summary: Rights-cleared image dataset marketplace that uses Zedge and GuruShots creator networks to supply AI training data.
+summary: Multimodal dataset supplier offering off-the-shelf and custom image, video, and audio training data through Zedge and GuruShots creator networks.
 status: live
 website: 'https://www.dataseeds.ai/'
 actionsSupported:
@@ -12,6 +12,7 @@ pipelineStages:
 dataTypes:
   - images
   - video
+  - audio
 tags:
   - visual-data
   - creator-network
@@ -38,6 +39,6 @@ visibility: public
 type: data_license_initiative
 ---
 
-DataSeeds.AI is a visual-data marketplace built around rights-cleared creator networks rather than scraped web imagery. Zedge positions it as a supply layer for enterprises and model builders that need authentic, diverse image datasets for pre-training or fine-tuning.
+DataSeeds.AI is a multimodal dataset supplier built around rights-cleared creator networks rather than scraped web media. Zedge positions it as a supply layer for enterprises and model builders that need off-the-shelf or custom image, video, and audio datasets for pre-training or fine-tuning.
 
-The service turns an existing creator ecosystem into AI dataset licensing infrastructure for visual training data.
+The service turns an existing creator ecosystem into AI dataset licensing infrastructure for multimodal training data.

@@ -1,8 +1,9 @@
 ---
-title: TDMRep (W3C)
+title: TDMRep (W3C Community Group)
 summary: >-
-  W3C specification for expressing text and data mining permissions via a
-  well-known JSON file, designed for EU DSM Directive compliance.
+  W3C Community Group report for expressing text and data mining rights
+  reservations and policy links, designed to support the EU DSM Directive's
+  Article 4 mechanism.
 status: live
 website: 'https://www.w3.org/community/tdmrep/'
 actionsSupported:
@@ -24,9 +25,14 @@ evidenceLinks:
   - label: Community group notes discuss standardization path and vocabulary work
     url: 'https://www.w3.org/community/tdmrep/2025/04/22/notes-april-15th-2025/'
     date: '2025-04-22'
-  - label: Version 3 final report listed
-    url: 'https://www.w3.org/community/tdmrep/'
-    date: '2024-08-09'
+  - label: Version 3 Final Community Group Report published
+    url: 'https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240510/'
+    date: '2024-05-10'
+considerations: >-
+  This is a W3C Community Group Final Report, not a W3C Standard or a document
+  on the W3C Standards Track. A reservation is a machine-readable signal, not
+  technical enforcement; its legal effect depends on applicable law and the
+  circumstances of use.
 visibility: public
 type: data_license_initiative
 implementationSnippets:
@@ -40,14 +46,14 @@ implementationSnippets:
           "tdm-reservation": 1
         }
       ]
-    sourceUrl: 'https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240202/'
+    sourceUrl: 'https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240510/'
   - title: HTML meta tags
     summary: The same report also defines page-level HTML metadata for reservation and policy links.
     language: html
     code: |
       <meta name="tdm-reservation" content="1">
-      <meta name="tdm-policy" content="/policies/policy.json">
-    sourceUrl: 'https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240202/'
+      <meta name="tdm-policy" content="https://provider.com/policies/policy.json">
+    sourceUrl: 'https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240510/'
 ---
 
-TDMRep is a W3C Community Group specification that enables publishers to declare their text and data mining (TDM) policies through a machine-readable file at `/.well-known/tdmrep.json`. Designed specifically to support the EU DSM Directive's opt-out mechanism for commercial TDM.
+The TDMRep Community Group report defines ways for rightsholders to publish machine-readable text and data mining (TDM) rights reservations and links to licensing policies, including through `/.well-known/tdmrep.json`. It was developed as a technical response to the EU DSM Directive's Article 4 mechanism for non-research TDM.
