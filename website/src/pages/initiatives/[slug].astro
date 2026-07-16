@@ -1,9 +1,15 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getMarkdownProcessor } from '../../lib/markdown';
-import { formatCitation, loadInitiatives } from '../../lib/content-loader';
+import {
+  formatCitation,
+  loadInitiatives,
+  type LoadedInitiative,
+} from '../../lib/content-loader';
 import {
   ACTION_LABELS,
+  ARCHIVE_REASON_LABELS,
+  EVIDENCE_SOURCE_LABELS,
   PIPELINE_LABELS,
   STATUS_LABELS,
   formatApproachLabel,
@@ -31,17 +37,15 @@ if (!item) {
 
 const markdown = await getMarkdownProcessor();
 const renderedBody = item.body.trim() ? await markdown.render(item.body) : undefined;
-const bySlug = Object.fromEntries(allItems.map((candidate) => [candidate.slug, candidate]));
-const byId = Object.fromEntries(allItems.map((candidate) => [candidate.id, candidate]));
-
-const dependencyItems = (item.dependsOn || [])
-  .map((dependency) => bySlug[dependency] || byId[dependency])
-  .filter(Boolean);
 const primaryApproachLabel = formatApproachLabel(item.primaryApproachType);
 const enforcement = getEnforcementDetails(item.primaryApproachType);
 const secondaryApproachLabels = item.actionsSupported
   .filter((action) => action !== item.primaryApproachType)
   .map((action) => formatApproachLabel(action));
+const explicitRelatedItems = item.related
+  .map((reference) => allItems.find((candidate) => candidate.slug === reference || candidate.id === reference))
+  .filter((candidate): candidate is LoadedInitiative => Boolean(candidate))
+  .filter((candidate) => candidate.slug !== item.slug);
 
 const metricLabels = {
   usersCount: 'Users',
@@ -58,10 +62,10 @@ const metricEntries = (['usersCount', 'dataVolume', 'moneyVolume'] as const)
     evidence: item.metricEvidence?.[field],
   }));
 
-const relatedItems = allItems
+const algorithmicRelatedItems = allItems
   .map((candidate) => ({
     item: candidate,
-    sharedActions: candidate.slug === item.slug
+    sharedActions: candidate.slug === item.slug || candidate.status === 'archived'
       ? 0
       : candidate.actionsSupported.filter((action) => item.actionsSupported.includes(action)).length,
   }))
@@ -70,8 +74,16 @@ const relatedItems = allItems
     if (a.sharedActions !== b.sharedActions) return b.sharedActions - a.sharedActions;
     return sortByLatestThenTitle(a.item, b.item);
   })
-  .slice(0, 4)
   .map((candidate) => candidate.item);
+const relatedItems = [
+  ...explicitRelatedItems,
+  ...algorithmicRelatedItems.filter(
+    (candidate) => !explicitRelatedItems.some((explicit) => explicit.slug === candidate.slug)
+  ),
+].slice(0, 4);
+const successorItem = item.successor
+  ? allItems.find((candidate) => candidate.slug === item.successor || candidate.id === item.successor)
+  : undefined;
 
 const metadataGroups = [
   {
@@ -100,12 +112,62 @@ const metadataGroups = [
   },
 ].filter((group) => group.values.length > 0);
 
+const structuredFacts = [
+  { label: 'Operator', value: item.operator },
+  { label: 'Launch date', value: item.launchDate ? formatDate(item.launchDate) : undefined },
+  { label: 'Availability', value: item.availability },
+  { label: 'Pricing', value: item.pricing },
+  { label: 'Open source', value: item.openSourceStatus },
+  { label: 'Software license', value: item.softwareLicense },
+  { label: 'Rights contact', value: item.rightsContact },
+  { label: 'Integrations', value: item.integrations.length ? item.integrations.join(' / ') : undefined },
+].filter((entry) => Boolean(entry.value));
+
 const latest = item.latestEvidenceLink;
 const websiteLabel = formatLinkLabel(item.website);
 const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
+const archiveReasonLabel = item.archiveReason
+  ? ARCHIVE_REASON_LABELS[item.archiveReason] || item.archiveReason
+  : undefined;
+const site = Astro.site ?? new URL('https://datalicenses.org');
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Browse',
+        item: new URL('/', site).toString(),
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: item.title,
+        item: new URL(`/initiatives/${item.slug}`, site).toString(),
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: item.title,
+    description: item.summary,
+    url: new URL(`/initiatives/${item.slug}`, site).toString(),
+    mainEntityOfPage: item.website,
+    dateModified: item.lastModified.toISOString().slice(0, 10),
+  },
+];
 ---
 
-<Layout title={item.title} description={item.summary} type="article">
+<Layout
+  title={item.title}
+  description={item.summary}
+  type="article"
+  noindex={item.status === 'archived'}
+  structuredData={structuredData}
+>
   <main class="wrap initiative-page">
     <nav class="initiative-breadcrumbs" aria-label="Breadcrumb">
       <a href="/#catalog">Browse</a>
@@ -122,7 +184,12 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
         <p class="initiative-summary">{item.summary}</p>
         {item.status === 'archived' && (
           <p class="activity-note initiative-archive-note">
-            Archived profile. Review did not find newer public activity.
+            Archived: {archiveReasonLabel || 'current public status could not be verified'}.
+            {successorItem ? (
+              <> Successor or related current offering: <a href={`/initiatives/${successorItem.slug}`}>{successorItem.title}</a>.</>
+            ) : item.successor ? (
+              <> Successor or related current offering: {item.successor}.</>
+            ) : null}
           </p>
         )}
 
@@ -157,7 +224,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           </dd>
         </div>
         <div>
-          <dt>Latest update</dt>
+          <dt>Latest tracked evidence</dt>
           <dd>
             {latest ? (
               <>
@@ -177,6 +244,14 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
               <span class="muted">No evidence links yet</span>
             )}
           </dd>
+        </div>
+        <div>
+          <dt>Last checked</dt>
+          <dd>{formatDate(item.lastChecked)}</dd>
+        </div>
+        <div>
+          <dt>Profile updated</dt>
+          <dd>{formatDate(item.lastModified)}</dd>
         </div>
         <div>
           <dt>Primary approach</dt>
@@ -201,15 +276,18 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
             <dd>{item.pipelineStages.map((stage) => PIPELINE_LABELS[stage] || stage).join(' / ')}</dd>
           </div>
         )}
+        <div>
+          <dt>Status rationale</dt>
+          <dd>{item.statusRationale}</dd>
+        </div>
       </dl>
     </header>
 
     <div class="initiative-layout">
       <article class="initiative-main">
         <section class="box section initiative-section initiative-reality-check">
-          <p class="initiative-reality-kicker">Enforcement reality</p>
-          <h2>{enforcement.label}</h2>
-          <p>{enforcement.description}</p>
+          <h2>Enforcement</h2>
+          <p><strong>{enforcement.label}.</strong> {enforcement.description}</p>
           <p class="initiative-callout">{enforcement.caveat}</p>
           <p class="initiative-reality-note">
             Catalog status describes public availability, not legal validity, adoption, or proven effectiveness.
@@ -236,7 +314,9 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
             <ul class="initiative-evidence-list">
               {item.evidenceLinks.map((link) => (
                 <li>
-                  <span class="initiative-evidence-date">{formatDate(link.date)}</span>
+                  <span class="initiative-evidence-date">
+                    {formatDate(link.date)} · {EVIDENCE_SOURCE_LABELS[link.sourceType] || link.sourceType}
+                  </span>
                   <a
                     class="link-shell"
                     href={link.url}
@@ -247,15 +327,25 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                   >
                     <span class="link-label link-label-multi">{link.label}</span>
                   </a>
+                  {link.archivedUrl && (
+                    <a
+                      class="initiative-archive-link"
+                      href={link.archivedUrl}
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      Archived copy
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
           </section>
         )}
 
-        {metricEntries.length > 0 && (
-          <section class="box section initiative-section">
-            <h2>Adoption signals</h2>
+        <section class="box section initiative-section">
+          <h2>Adoption signals</h2>
+          {metricEntries.length > 0 ? (
             <div class="initiative-metric-grid">
               {metricEntries.map((metric) => (
                 <article class="initiative-metric-card">
@@ -284,8 +374,10 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
                 </article>
               ))}
             </div>
-          </section>
-        )}
+          ) : (
+            <p class="muted">No public adoption figure found.</p>
+          )}
+        </section>
 
         {item.implementationSnippets && item.implementationSnippets.length > 0 && (
           <section class="box section initiative-section">
@@ -368,16 +460,17 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
           </section>
         ))}
 
-        {dependencyItems.length > 0 && (
+        {structuredFacts.length > 0 && (
           <section class="box section initiative-sidecard">
-            <h2>Uses</h2>
-            <ul class="initiative-link-list">
-              {dependencyItems.map((dependency) => (
-                <li>
-                  <a href={`/initiatives/${dependency.slug}`}>{dependency.title}</a>
-                </li>
+            <h2>Additional details</h2>
+            <dl class="initiative-facts">
+              {structuredFacts.map((fact) => (
+                <div>
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
               ))}
-            </ul>
+            </dl>
           </section>
         )}
 
@@ -404,7 +497,19 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 <style>
   .initiative-page {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 14px;
+  }
+
+  .initiative-page > *,
+  .initiative-hero-copy,
+  .initiative-layout > *,
+  .initiative-main,
+  .initiative-sidebar,
+  .initiative-section,
+  .initiative-hero-meta > div {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .initiative-breadcrumbs {
@@ -423,8 +528,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
   .initiative-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
-    gap: 22px;
+    grid-template-columns: 1fr;
+    gap: 18px;
     padding: 16px 0 18px;
     border-width: 1px 0;
     background: transparent;
@@ -476,10 +581,12 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
 
   .initiative-hero-meta {
     display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-content: start;
     gap: 0;
     margin: 0;
     border: 1px solid var(--border);
+    border-width: 1px 0 0 1px;
     background: var(--card);
   }
 
@@ -487,12 +594,9 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     padding: 10px 12px;
     border-radius: 0;
     border: 0;
+    border-right: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     background: transparent;
-  }
-
-  .initiative-hero-meta div:last-child {
-    border-bottom: 0;
   }
 
   .initiative-hero-meta dt {
@@ -518,8 +622,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
   .initiative-meta-date {
     font-size: 0.84rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--muted);
   }
 
@@ -549,24 +653,15 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
   }
 
   .initiative-reality-check {
-    border-top: 3px solid var(--accent);
-    background: var(--card);
+    border-top: 1px solid var(--border-strong);
+    background: transparent;
   }
 
   .initiative-reality-check h2 {
     margin-top: 0.25rem;
   }
 
-  .initiative-reality-check > p:not(.initiative-callout):not(.initiative-reality-kicker) {
-    color: var(--muted);
-  }
-
-  .initiative-reality-kicker {
-    margin: 0;
-    font-size: 0.72rem;
-    font-weight: 750;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .initiative-reality-check > p:not(.initiative-callout) {
     color: var(--muted);
   }
 
@@ -619,6 +714,13 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     gap: 0.2rem;
   }
 
+  .initiative-hero-meta a,
+  .initiative-evidence-list a,
+  .initiative-source-list a,
+  .initiative-link-list a {
+    overflow-wrap: anywhere;
+  }
+
   .initiative-evidence-date,
   .initiative-source-date,
   .initiative-link-meta {
@@ -626,10 +728,50 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     color: var(--muted);
   }
 
+  .initiative-archive-link {
+    justify-self: start;
+    font-size: 0.84rem;
+  }
+
+  .initiative-facts {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .initiative-facts div {
+    display: grid;
+    gap: 2px;
+  }
+
+  .initiative-facts dt {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  .initiative-facts dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: 0.9rem;
+  }
+
   .initiative-metric-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     gap: 14px;
+  }
+
+  .snippets-wrap,
+  .snippet,
+  .snippet-head,
+  .snippet-summary,
+  .code {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .code {
+    width: 100%;
   }
 
   .initiative-metric-card {
@@ -670,7 +812,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
   @media (max-width: 960px) {
     .initiative-hero,
     .initiative-layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .initiative-sidebar {
@@ -681,6 +823,10 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
   @media (max-width: 720px) {
     .initiative-hero {
       padding: 16px 0;
+    }
+
+    .initiative-hero-meta {
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .initiative-hero-actions .btn {

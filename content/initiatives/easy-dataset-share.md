@@ -10,6 +10,8 @@ actionsSupported:
 primaryApproachType: technical-blocking
 pipelineStages:
   - collect
+dataTypes:
+  - multimodal
 tags:
   - dataset-protection
 dependsOn:
@@ -30,3 +32,5 @@ Reference post: https://www.lesswrong.com/posts/DA3vbSEfABLdoCt59/we-built-a-too
 Notes
 - Early-stage writeup about protecting datasets from basic scraping approaches.
 - Tracking here for awareness; details and maturity may change as the work evolves.
+
+easy-dataset-share uses technical controls to restrict or challenge automated collection of multimodal material at the collection stage. Access controls can limit collection from protected infrastructure but may be bypassed and do not govern downstream use after access. Public materials describe a currently available initiative; the newest dated source in this profile is “easy-dataset-share v0.5.0 released” (September 15, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

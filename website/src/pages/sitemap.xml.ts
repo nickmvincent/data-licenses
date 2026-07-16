@@ -1,7 +1,16 @@
 import { loadInitiatives } from '../lib/content-loader';
 
 const SITE_ORIGIN = 'https://datalicenses.org';
-const STATIC_PATHS = ['/', '/glossary', '/methodology', '/contributing'];
+const STATIC_PATHS = [
+  '/',
+  '/glossary',
+  '/methodology',
+  '/contributing',
+  '/about',
+  '/updates',
+  '/data',
+  '/archive',
+];
 
 const escapeXml = (value: string) =>
   value
@@ -20,9 +29,9 @@ export async function GET({ site }: { site?: URL }) {
       loc: new URL(path, origin).toString(),
       lastmod: undefined,
     })),
-    ...initiatives.map((item) => ({
+    ...initiatives.filter((item) => item.status !== 'archived').map((item) => ({
       loc: new URL(`/initiatives/${item.slug}`, origin).toString(),
-      lastmod: item.latestUpdate || undefined,
+      lastmod: item.lastModified || undefined,
     })),
   ];
 

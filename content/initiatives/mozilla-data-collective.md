@@ -4,9 +4,9 @@ summary: Community-centered dataset platform for sharing AI-relevant data under 
 status: live
 website: 'https://mozilladatacollective.com/'
 actionsSupported:
-  - new-infrastructures
+  - governed-data-sharing
   - technical-blocking
-primaryApproachType: new-infrastructures
+primaryApproachType: governed-data-sharing
 pipelineStages:
   - train
   - fine-tune

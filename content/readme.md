@@ -1,26 +1,28 @@
 ---
 type: readme
 visibility: public
-title: Data Licenses
+title: Data Licenses content
 ---
-The `initiatives/` directory stores the public catalog records consumed by the website.
-Each initiative is a Markdown file with frontmatter for merge-ready fields such as:
 
-- `title`, `summary`, `status`, `website`
+The `initiatives/` directory stores catalog records consumed by the public
+website and JSON dataset.
+
+Required publication fields include:
+
+- `title`, `summary`, `website`, and `status`
 - `visibility: public` and `type: data_license_initiative`
-- `evidenceLinks`
-- `dataTypes` for modality or content-type specificity such as `text`, `images`, `music`, or `web-content`
-- `usersCount`, `dataVolume`, `moneyVolume`
-- `metricEvidence`
-- `implementationSnippets` for concrete examples or deployable syntax
-- `considerations`, `references`, and related metadata
+- `actionsSupported` and `primaryApproachType`
+- at least one `pipelineStages` value and one `dataTypes` value
+- a profile body
 
-The `shared-references/bibtex-entries/` directory stores any citation records referenced by initiative frontmatter.
+Current statuses are `live`, `wip`, and `archived`. Archived records also
+require `archiveReason`.
 
-Current initiative statuses are:
+Evidence belongs in dated `evidenceLinks`. Adoption, money, and data-volume
+figures require matching `metricEvidence`. Useful optional fields include
+operator, launch date, availability, pricing, open-source status, software
+license, rights contact, integrations, status rationale, successor,
+considerations, implementation snippets, and shared references.
 
-- `live` for public initiatives that are usable now
-- `wip` for efforts still emerging
-- `archived` for historical or dormant entries that remain accessible but are hidden from the default catalog view
-
-The `memos/` directory stores longer editorial notes kept in the repo. These are not currently routed on the public site.
+The `shared-references/bibtex-entries/` directory stores citation records
+referenced by initiative frontmatter.

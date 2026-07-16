@@ -6,13 +6,17 @@ interface Props {
   description?: string;
   image?: string;
   type?: 'website' | 'article';
+  noindex?: boolean;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
   title = 'DataLicenses.org',
-  description = 'A curated catalog of public initiatives shaping AI data access, licensing, technical enforcement, and creator leverage.',
-  image = '/social-card.svg',
+  description = 'A public reference catalog of licenses and license-adjacent infrastructure for AI data use.',
+  image = '/social-card.png',
   type = 'website',
+  noindex = false,
+  structuredData = [],
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
@@ -20,44 +24,60 @@ const pageTitle = title === 'DataLicenses.org' ? title : `${title} | DataLicense
 const site = Astro.site ?? new URL('https://datalicenses.org');
 const canonicalUrl = new URL(currentPath, site).toString();
 const socialImageUrl = new URL(image, site).toString();
-const isGuidePath = currentPath.startsWith('/methodology') || currentPath.startsWith('/contributing');
-const isBrowsePath =
-  currentPath === '/' || currentPath === '/catalog' || currentPath.startsWith('/initiatives/');
-const isNavActive = (href: string) =>
-  href === '/#catalog'
-    ? isBrowsePath
-    : href === '/methodology'
-      ? isGuidePath
-      : currentPath.startsWith(href);
+const contactUrl = 'https://github.com/nickmvincent/data-licenses/issues/new/choose';
 
 const navLinks = [
-  { href: '/#catalog', label: 'Browse' },
+  { href: '/', label: 'Browse' },
   { href: '/glossary', label: 'Glossary' },
   { href: '/methodology', label: 'Methodology' },
+  { href: '/contributing', label: 'Contribute' },
+  { href: '/about', label: 'About' },
+  { href: '/updates', label: 'Updates' },
+  { href: '/data', label: 'Data' },
+  { href: contactUrl, label: 'Contact', external: true },
 ];
 
-const alsoLikeLinks = [
+const isNavActive = (href: string) => {
+  if (href.startsWith('http')) return false;
+  if (href === '/') return currentPath === '/' || currentPath.startsWith('/initiatives/');
+  return currentPath === href || currentPath.startsWith(`${href}/`);
+};
+
+const relatedLinks = [
   {
     href: 'https://sr.ithaka.org/our-work/generative-ai-licensing-agreement-tracker',
     label: 'Data Deals Tracker',
-    desc: 'Tracks licensing agreements between AI companies and content providers.',
-  },
-  {
-    href: 'https://www.mckoolsmith.com/newsroom-ailitigation',
-    label: 'AI Litigation Tracker',
-    desc: 'Maintains a broad list of lawsuits involving AI and data rights.',
   },
   {
     href: 'https://exploringai.org/',
     label: 'ExploringAI.org',
-    desc: 'Research notes and quantitative sketches about AI data flows.',
   },
   {
     href: 'https://datalevers.org',
     label: 'DataLevers.org',
-    desc: 'Tools and strategy for collective action around data rights.',
   },
 ];
+
+const baseStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'DataLicenses.org',
+    url: site.toString(),
+    description:
+      'A public reference catalog of licenses and license-adjacent infrastructure for AI data use.',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'DataLicenses.org',
+    url: site.toString(),
+    sameAs: ['https://github.com/nickmvincent/data-licenses'],
+  },
+];
+const customStructuredData = Array.isArray(structuredData) ? structuredData : [structuredData];
+const jsonLd = JSON.stringify([...baseStructuredData, ...customStructuredData].filter(Boolean))
+  .replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -74,38 +94,36 @@ const alsoLikeLinks = [
     <meta name="application-name" content="DataLicenses.org" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f4" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111312" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <meta property="og:site_name" content="DataLicenses.org" />
     <meta property="og:type" content={type} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={socialImageUrl} />
-    <meta property="og:image:alt" content="DataLicenses.org catalog preview" />
+    <meta property="og:image:alt" content="DataLicenses.org" />
     <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImageUrl} />
     <title>{pageTitle}</title>
+    <script is:inline type="application/ld+json" set:html={jsonLd}></script>
     <script is:inline>
       (() => {
-        const storageKey = 'theme';
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const saved = localStorage.getItem(storageKey);
-        const theme = saved === 'light' || saved === 'dark'
-          ? saved
-          : mediaQuery.matches
-            ? 'dark'
-            : 'light';
-        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.classList.add('js');
+        document.documentElement.classList.toggle(
+          'dark',
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+        );
       })();
     </script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <nav class="navbar">
+    <nav class="navbar" aria-label="Primary">
       <div class="navbar-inner">
-        <a href="/" class="navbar-brand">
+        <a href="/" class="navbar-brand" aria-label="DataLicenses.org home">
           <span class="brand-wordmark">DataLicenses.org</span>
         </a>
 
@@ -115,43 +133,33 @@ const alsoLikeLinks = [
           class="nav-toggle"
           aria-expanded="false"
           aria-controls="site-nav-panel"
-          aria-label="Open navigation menu"
         >
-          <span class="nav-toggle-label">Menu</span>
-          <span class="nav-toggle-icon" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
+          Menu
         </button>
 
         <div id="site-nav-panel" class="navbar-links">
           {navLinks.map((link) => (
             <a
               href={link.href}
-              class:list={[
-                'nav-link',
-                { active: isNavActive(link.href) },
-              ]}
+              class:list={['nav-link', { active: isNavActive(link.href) }]}
               aria-current={isNavActive(link.href) ? 'page' : undefined}
+              target={link.external ? '_blank' : undefined}
+              rel={link.external ? 'noopener' : undefined}
             >
               {link.label}
             </a>
           ))}
-
-          <a href="/data/initiatives.json" class="nav-link nav-link-secondary" title="JSON API" aria-label="Open the catalog API">API</a>
         </div>
 
         <button
           type="button"
           id="theme-toggle"
           class="theme-toggle"
-          title="Switch to dark theme"
-          aria-label="Switch to dark theme"
+          title="Switch color theme"
+          aria-label="Switch color theme"
           aria-pressed="false"
         >
-          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span aria-hidden="true">◐</span>
         </button>
       </div>
     </nav>
@@ -160,18 +168,38 @@ const alsoLikeLinks = [
       <slot />
     </div>
 
-    <footer class="also-like-footer">
-      <div class="also-like-inner">
-        <div class="also-like-heading">
-          <p class="also-like-kicker">Adjacent work</p>
-          <p class="also-like-label">Trackers and research projects related to AI data rights.</p>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-section">
+          <strong>DataLicenses.org</strong>
+          <p>
+            Public evidence about licenses and license-adjacent infrastructure for AI data use.
+          </p>
+          <p>
+            Catalog data and written content are licensed under
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener">CC BY 4.0</a>.
+            Site code is <a href="https://github.com/nickmvincent/data-licenses" target="_blank" rel="noopener">MIT licensed</a>.
+          </p>
         </div>
-        <div class="also-like-links">
-          {alsoLikeLinks.map((link) => (
-            <a href={link.href} target="_blank" rel="noopener" class="also-like-link" title={link.desc}>
-              {link.label}
-            </a>
-          ))}
+
+        <div class="footer-section">
+          <strong>Site</strong>
+          <div class="footer-links">
+            <a href="/archive">Archive</a>
+            <a href="/data">Data and downloads</a>
+            <a href="/contributing">Contribute</a>
+            <a href="/about#disclosures">Disclosures</a>
+            <a href="https://github.com/nickmvincent/data-licenses/security" target="_blank" rel="noopener">Security</a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <strong>Related projects</strong>
+          <div class="footer-links">
+            {relatedLinks.map((link) => (
+              <a href={link.href} target="_blank" rel="noopener">{link.label}</a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>
@@ -180,143 +208,83 @@ const alsoLikeLinks = [
       (() => {
         const root = document.documentElement;
         const navbar = document.querySelector('.navbar');
-        const toggle = document.getElementById('theme-toggle');
+        const themeToggle = document.getElementById('theme-toggle');
         const navToggle = document.getElementById('nav-toggle');
-        const storageKey = 'theme';
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const desktopNavMedia = window.matchMedia('(min-width: 721px)');
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+        const desktopNav = window.matchMedia('(min-width: 961px)');
+        let manualTheme = false;
 
-        function readStoredTheme() {
-          const saved = localStorage.getItem(storageKey);
-          return saved === 'light' || saved === 'dark' ? saved : null;
-        }
-
-        function currentSystemTheme() {
-          return mediaQuery.matches ? 'dark' : 'light';
-        }
-
-        function applyTheme(theme) {
-          const isDark = theme === 'dark';
+        function applyTheme(isDark) {
           root.classList.toggle('dark', isDark);
-
-          if (toggle instanceof HTMLButtonElement) {
-            const nextTheme = isDark ? 'light' : 'dark';
-            toggle.setAttribute('aria-pressed', String(isDark));
-            toggle.setAttribute('aria-label', `Switch to ${nextTheme} theme`);
-            toggle.title = `Switch to ${nextTheme} theme`;
+          if (themeToggle instanceof HTMLButtonElement) {
+            themeToggle.setAttribute('aria-pressed', String(isDark));
+            themeToggle.setAttribute('aria-label', `Switch to ${isDark ? 'light' : 'dark'} theme`);
+            themeToggle.title = `Switch to ${isDark ? 'light' : 'dark'} theme`;
           }
         }
 
         function setNavOpen(isOpen) {
           if (!(navbar instanceof HTMLElement) || !(navToggle instanceof HTMLButtonElement)) return;
-
           navbar.classList.toggle('menu-open', isOpen);
           navToggle.setAttribute('aria-expanded', String(isOpen));
-          navToggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
-
-          const label = navToggle.querySelector('.nav-toggle-label');
-          if (label) label.textContent = isOpen ? 'Close' : 'Menu';
+          navToggle.textContent = isOpen ? 'Close' : 'Menu';
         }
 
-        applyTheme(readStoredTheme() || currentSystemTheme());
+        applyTheme(systemTheme.matches);
 
-        if (toggle) {
-          toggle.addEventListener('click', () => {
-            const nextTheme = root.classList.contains('dark') ? 'light' : 'dark';
-            applyTheme(nextTheme);
-            localStorage.setItem(storageKey, nextTheme);
-          });
-        }
+        themeToggle?.addEventListener('click', () => {
+          manualTheme = true;
+          applyTheme(!root.classList.contains('dark'));
+        });
+
+        const onSystemThemeChange = (event) => {
+          if (!manualTheme) applyTheme(event.matches);
+        };
+        systemTheme.addEventListener?.('change', onSystemThemeChange);
 
         if (navbar instanceof HTMLElement && navToggle instanceof HTMLButtonElement) {
           setNavOpen(false);
-
-          navToggle.addEventListener('click', () => {
-            setNavOpen(!navbar.classList.contains('menu-open'));
-          });
-
+          navToggle.addEventListener('click', () => setNavOpen(!navbar.classList.contains('menu-open')));
           navbar.querySelectorAll('.navbar-links a').forEach((link) => {
             link.addEventListener('click', () => {
-              if (!desktopNavMedia.matches) setNavOpen(false);
+              if (!desktopNav.matches) setNavOpen(false);
             });
           });
-
           document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && navbar.classList.contains('menu-open')) {
               setNavOpen(false);
+              navToggle.focus();
             }
+          });
+          desktopNav.addEventListener?.('change', () => {
+            if (desktopNav.matches) setNavOpen(false);
           });
         }
 
-        const legacyExecCommand = /** @type {{ [key: string]: any }} */ (document)['execCommand']?.bind(document);
-        const legacyAddListener = /** @type {{ [key: string]: any }} */ (mediaQuery)['addListener']?.bind(mediaQuery);
-        const legacyDesktopAddListener = /** @type {{ [key: string]: any }} */ (desktopNavMedia)['addListener']?.bind(desktopNavMedia);
-
         async function copyText(value) {
-          if (navigator.clipboard?.writeText) {
+          if (!navigator.clipboard?.writeText) return false;
+          try {
             await navigator.clipboard.writeText(value);
             return true;
-          }
-
-          const probe = document.createElement('textarea');
-          probe.value = value;
-          probe.setAttribute('readonly', '');
-          probe.style.position = 'absolute';
-          probe.style.left = '-9999px';
-          document.body.appendChild(probe);
-          probe.select();
-
-          try {
-            return legacyExecCommand?.('copy') !== false;
           } catch {
             return false;
-          } finally {
-            document.body.removeChild(probe);
           }
         }
 
         document.addEventListener('click', async (event) => {
           const target = event.target;
           if (!(target instanceof Element)) return;
-
           const button = target.closest('.copy');
           if (!(button instanceof HTMLButtonElement)) return;
-
-          const rawCopyValue = button.getAttribute('data-copy');
-          const codeValue = button.getAttribute('data-code');
-          const value = rawCopyValue || decodeURIComponent(codeValue || '');
+          const value = button.getAttribute('data-copy') ||
+            decodeURIComponent(button.getAttribute('data-code') || '');
           if (!value) return;
-
-          const defaultLabel = button.dataset.resetLabel || button.textContent || 'Copy';
-          const didCopy = await copyText(value);
-          button.textContent = didCopy ? 'Copied' : 'Copy failed';
-
+          const original = button.textContent || 'Copy';
+          button.textContent = await copyText(value) ? 'Copied' : 'Copy failed';
           window.setTimeout(() => {
-            button.textContent = defaultLabel;
+            button.textContent = original;
           }, 1200);
         });
-
-        /** @param {MediaQueryListEvent} event */
-        const onSystemThemeChange = (event) => {
-          if (readStoredTheme()) return;
-          applyTheme(event.matches ? 'dark' : 'light');
-        };
-
-        if (typeof mediaQuery.addEventListener === 'function') {
-          mediaQuery.addEventListener('change', onSystemThemeChange);
-        } else if (typeof legacyAddListener === 'function') {
-          legacyAddListener(onSystemThemeChange);
-        }
-
-        const onDesktopNavChange = () => {
-          if (desktopNavMedia.matches) setNavOpen(false);
-        };
-
-        if (typeof desktopNavMedia.addEventListener === 'function') {
-          desktopNavMedia.addEventListener('change', onDesktopNavChange);
-        } else if (typeof legacyDesktopAddListener === 'function') {
-          legacyDesktopAddListener(onDesktopNavChange);
-        }
       })();
     </script>
   </body>
@@ -326,15 +294,13 @@ const alsoLikeLinks = [
   .skip-link {
     position: absolute;
     left: 16px;
-    top: 14px;
-    z-index: 200;
-    padding: 0.72rem 0.95rem;
-    border-radius: 8px;
+    top: 12px;
+    z-index: 300;
+    padding: 0.7rem 0.9rem;
     background: var(--accent);
-    color: #f6f3ee;
-    text-decoration: none;
+    color: var(--bg);
+    font-weight: 700;
     transform: translateY(-180%);
-    transition: transform 0.18s ease;
   }
 
   .skip-link:focus {
@@ -346,304 +312,198 @@ const alsoLikeLinks = [
     top: 0;
     z-index: 100;
     border-bottom: 1px solid var(--border);
-    background: color-mix(in srgb, var(--card) 94%, var(--bg));
+    background: color-mix(in srgb, var(--card) 95%, var(--bg));
   }
 
   .navbar-inner {
-    max-width: 1120px;
+    max-width: 1180px;
+    min-height: 50px;
     margin: 0 auto;
-    padding: 0 24px;
-    min-height: 46px;
+    padding: 7px 24px;
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 18px;
     align-items: center;
-    gap: 16px;
   }
 
   .navbar-brand {
-    display: inline-flex;
-    align-items: center;
-    color: inherit;
+    color: var(--text);
     text-decoration: none;
   }
 
   .brand-wordmark {
-    font-family: var(--font-display);
-    font-size: 1.08rem;
-    font-weight: 600;
-    letter-spacing: 0;
-    color: var(--text);
+    font-size: 0.96rem;
+    font-weight: 700;
   }
 
   .navbar-links {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    flex-wrap: wrap;
     min-width: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px 13px;
+    align-items: center;
+    flex-wrap: wrap;
   }
 
   .nav-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 30px;
-    padding: 0.2rem 0;
-    border-radius: 0;
-    border: 0;
+    padding: 0.15rem 0;
     border-bottom: 1px solid transparent;
     color: var(--text);
+    font-size: 0.84rem;
     text-decoration: none;
-    font-size: 0.88rem;
-    font-weight: 500;
-    transition:
-      border-color 0.18s ease,
-      background 0.18s ease,
-      color 0.18s ease;
   }
 
   .nav-link:hover {
     border-bottom-color: var(--border-strong);
-    background: none;
     text-decoration: none;
   }
 
   .nav-link.active {
     border-bottom-color: var(--accent);
-    background: none;
     color: var(--accent);
   }
 
-  .nav-link-secondary {
-    min-height: 30px;
-    padding: 0;
-    border: 0;
-    border-bottom: 1px solid transparent;
+  .theme-toggle,
+  .nav-toggle {
+    min-width: 34px;
+    min-height: 34px;
+    border: 1px solid var(--border);
     border-radius: 0;
-    color: var(--muted);
-  }
-
-  .nav-link-secondary:hover {
-    border-bottom-color: var(--border-strong);
-    background: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
   }
 
   .theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 2px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--muted);
-    cursor: pointer;
-    transition:
-      border-color 0.18s ease,
-      color 0.18s ease,
-      background 0.18s ease;
-  }
-
-  .theme-toggle:hover {
-    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-    color: var(--text);
+    padding: 0;
   }
 
   .nav-toggle {
     display: none;
-    align-items: center;
-    gap: 0.75rem;
-    min-height: 32px;
-    padding: 0 0.75rem;
-    border-radius: 2px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--text);
-    cursor: pointer;
-    font-weight: 600;
-    transition:
-      border-color 0.18s ease,
-      background 0.18s ease,
-      color 0.18s ease;
+    padding: 0 10px;
   }
 
-  .nav-toggle:hover {
-    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-    background: var(--accent-soft);
-  }
-
-  .nav-toggle-icon {
-    display: inline-grid;
-    gap: 3px;
-  }
-
-  .nav-toggle-icon span {
-    width: 14px;
-    height: 1.5px;
-    border-radius: 999px;
-    background: currentColor;
-    transition:
-      transform 0.18s ease,
-      opacity 0.18s ease;
-  }
-
-  .navbar.menu-open .nav-toggle-icon span:nth-child(1) {
-    transform: translateY(4.5px) rotate(45deg);
-  }
-
-  .navbar.menu-open .nav-toggle-icon span:nth-child(2) {
-    opacity: 0;
-  }
-
-  .navbar.menu-open .nav-toggle-icon span:nth-child(3) {
-    transform: translateY(-4.5px) rotate(-45deg);
-  }
-
-  .icon-sun {
-    display: none;
-  }
-
-  .icon-moon {
-    display: block;
-  }
-
-  :root.dark .icon-sun {
-    display: block;
-  }
-
-  :root.dark .icon-moon {
-    display: none;
-  }
-
-  .also-like-footer {
-    margin-top: 1.5rem;
-    padding: 1rem 1.5rem;
+  .site-footer {
+    margin-top: 24px;
+    padding: 30px 24px 36px;
     border-top: 1px solid var(--border);
-    background: var(--bg);
   }
 
-  .also-like-inner {
+  .footer-inner {
     max-width: 1120px;
     margin: 0 auto;
-    display: flex;
-    align-items: baseline;
-    gap: 0.85rem 1.25rem;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(280px, 1.5fr) repeat(2, minmax(180px, 0.7fr));
+    gap: 28px 48px;
   }
 
-  .also-like-heading {
-    display: contents;
+  .footer-section {
+    display: grid;
+    gap: 8px;
+    align-content: start;
   }
 
-  .also-like-kicker {
+  .footer-section p {
+    max-width: 600px;
     margin: 0;
-    font-size: 0.74rem;
-    font-weight: 700;
-    letter-spacing: 0;
-    text-transform: none;
     color: var(--muted);
+    font-size: 0.85rem;
   }
 
-  .also-like-label {
-    display: none;
+  .footer-links {
+    display: grid;
+    gap: 5px;
   }
 
-  .also-like-links {
-    display: flex;
-    gap: 0.35rem 1rem;
-    flex-wrap: wrap;
-  }
-
-  .also-like-link {
+  .footer-links a {
+    justify-self: start;
     color: var(--muted);
-    font-size: 0.86rem;
-    text-decoration: underline;
-    text-decoration-color: transparent;
-    text-underline-offset: 0.16em;
+    font-size: 0.85rem;
   }
 
-  .also-like-link:hover {
-    color: var(--text);
-    text-decoration-color: currentColor;
-  }
-
-  @media (max-width: 720px) {
+  @media (max-width: 960px) {
     .navbar-inner {
-      padding: 10px 16px;
       grid-template-columns: minmax(0, 1fr) auto auto;
-      gap: 8px;
-    }
-
-    .brand-wordmark {
-      font-size: 1rem;
+      padding: 8px 16px;
     }
 
     .nav-toggle {
       display: inline-flex;
+      align-items: center;
+      justify-content: center;
       grid-column: 3;
       grid-row: 1;
-      width: 32px;
-      padding: 0;
-      justify-content: center;
-    }
-
-    .nav-toggle-label {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .navbar-links {
-      display: none;
-      grid-column: 1 / -1;
-      width: 100%;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0;
-      padding: 8px 0 0;
-      border: 1px solid var(--border);
-      border-radius: 0;
-      background: var(--card);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .navbar.menu-open .navbar-links {
-      display: flex;
-    }
-
-    .nav-link {
-      width: 100%;
-      min-height: 44px;
-      justify-content: flex-start;
-      padding: 0 0.9rem;
-      border: 1px solid transparent;
-      border-radius: 0;
-      white-space: normal;
-    }
-
-    .nav-link:hover {
-      border-color: var(--border-strong);
-      border-bottom-color: var(--border-strong);
-      background: var(--surface-muted);
-    }
-
-    .nav-link.active {
-      border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
-      background: color-mix(in srgb, var(--accent-soft) 45%, transparent);
     }
 
     .theme-toggle {
       grid-column: 2;
       grid-row: 1;
-      justify-self: end;
+    }
+
+    .navbar-links {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      width: 100%;
+      justify-content: flex-start;
+      align-items: stretch;
+      gap: 0;
+      padding-top: 8px;
+    }
+
+    .js .navbar-links {
+      display: none;
+    }
+
+    .js .navbar.menu-open .navbar-links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .nav-link {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-bottom: 0;
+    }
+
+    .nav-link:nth-last-child(-n + 2) {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-section:first-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .js .navbar.menu-open .navbar-links,
+    .footer-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-link:nth-last-child(2) {
+      border-bottom: 0;
+    }
+
+    .footer-section:first-child {
+      grid-column: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
     }
   }
 </style>

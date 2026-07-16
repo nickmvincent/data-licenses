@@ -3,8 +3,8 @@
   "short_name": "DataLicenses",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f4efe6",
-  "theme_color": "#0b6a61",
+  "background_color": "#f7f7f4",
+  "theme_color": "#0f766e",
   "icons": [
     {
       "src": "/favicon.svg",

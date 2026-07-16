@@ -301,11 +301,25 @@ const grouped = terms.reduce((acc, t) => {
 const letters = Object.keys(grouped).sort();
 const totalTerms = terms.length;
 const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
+const site = Astro.site ?? new URL('https://datalicenses.org');
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTermSet',
+  name: 'DataLicenses.org glossary',
+  url: new URL('/glossary', site).toString(),
+  hasDefinedTerm: terms.map((item) => ({
+    '@type': 'DefinedTerm',
+    name: item.term,
+    description: item.definition,
+    url: new URL(`/glossary#${slugify(item.term)}`, site).toString(),
+  })),
+};
 ---
 
 <Layout
   title="Glossary"
   description="Definitions and related references for the AI data licensing, access, and enforcement landscape."
+  structuredData={structuredData}
 >
   <main class="wrap glossary-page">
     <header class="page-header glossary-header">
@@ -333,7 +347,7 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
       <p class="glossary-meta"><span id="glossary-count">{totalTerms}</span> terms</p>
     </section>
 
-    <nav id="letter-nav" class="letter-nav">
+    <nav id="letter-nav" class="letter-nav" aria-label="Glossary letters">
       {letters.map(letter => (
         <a href={`#letter-${letter}`} class="letter-link">{letter}</a>
       ))}
@@ -446,8 +460,10 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
-    padding: 16px 18px;
+    padding: 0 0 14px;
     margin-bottom: 16px;
+    border-width: 0 0 1px;
+    background: transparent;
   }
 
   .glossary-search-shell {
@@ -457,8 +473,8 @@ const newTabAriaLabel = (label: string) => `${label} (opens in a new tab)`;
   }
 
   .glossary-search-shell input {
-    min-height: 48px;
-    padding-left: 2.85rem;
+    min-height: 38px;
+    padding-left: 2.5rem;
   }
 
   .glossary-search-icon {

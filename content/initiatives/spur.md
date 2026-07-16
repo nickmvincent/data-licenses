@@ -4,8 +4,8 @@ summary: Publisher coalition building shared standards and licensing frameworks 
 status: wip
 website: 'https://www.spurcoalition.org/'
 actionsSupported:
-  - new-infrastructures
-primaryApproachType: new-infrastructures
+  - protocol-standard
+primaryApproachType: protocol-standard
 pipelineStages:
   - train
   - retrieve
@@ -44,3 +44,5 @@ type: data_license_initiative
 SPUR is a coalition of major news organizations working on the technical and commercial rules that should govern AI use of journalism. Its public materials emphasize shared standards, measurement, responsible licensing pathways, and infrastructure that lets publishers retain control while still supporting legitimate AI access.
 
 It is still early-stage, but it is notable because it shows large publishers coordinating around a common framework rather than relying only on one-off bilateral deals or litigation.
+
+SPUR (Standards for Publisher Usage Rights) defines a shared protocol or technical standard for text across the training and retrieval stages. The protocol coordinates participating systems; practical coverage depends on implementation, interoperability, and adoption. Public materials describe an in-progress proposal or implementation; the newest dated source in this profile is “Associated Press joins SPUR as a founding member” (July 9, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

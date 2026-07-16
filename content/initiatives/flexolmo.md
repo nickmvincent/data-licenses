@@ -4,8 +4,8 @@ summary: Distributed language-model training approach that lets data owners cont
 status: wip
 website: 'https://allenai.org/blog/flexolmo'
 actionsSupported:
-  - new-infrastructures
-primaryApproachType: new-infrastructures
+  - governed-data-sharing
+primaryApproachType: governed-data-sharing
 pipelineStages:
   - train
 dataTypes:
@@ -21,3 +21,5 @@ type: data_license_initiative
 ---
 
 FlexOlmo is an Ai2 research effort for collaborative model training where each data owner trains private expert modules locally and can activate or deactivate them later. It is best understood as a promising new infrastructure pattern rather than a turnkey production platform today.
+
+FlexOlmo establishes governance for data contribution, access, and computation involving text at the training stage. Access depends on technical configuration and governance rules, including who may contribute, query, or export material. Public materials describe an in-progress proposal or implementation; the newest dated source in this profile is “Ai2 introduces FlexOlmo and invites organizations with sensitive data to participate” (July 9, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

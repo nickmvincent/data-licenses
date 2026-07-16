@@ -1,71 +1,145 @@
 ---
 title: Methodology
-description: How the catalog is scoped, sourced, reviewed, and updated.
+description: Scope, evidence, classification, review, and correction rules for the catalog.
 visibility: public
 ---
 
-DataLicenses.org is a community-curated catalog of public initiatives shaping AI data access, licensing, controlled retrieval, and enforcement. The catalog is currently maintained by Nick Vincent with feedback from a small group of contributors and subject-matter observers.
+DataLicenses.org is a public reference catalog of licenses and license-adjacent infrastructure for controlling how data is collected, shared, licensed, accessed, and used in AI pipelines. Nick Vincent maintains the catalog and gives final editorial approval.
 
-The field is still emerging. Inclusion in the catalog does not mean that an initiative is widely adopted, legally validated, technically effective, or suitable for a particular use. Many preference signals depend on voluntary compliance. Technical controls can reduce access without preventing every collection route or governing downstream copies. Licenses and contract terms depend on the relevant rights, notice, agreement, jurisdiction, and facts. The catalog describes public claims and evidence; it does not provide legal advice or certify effectiveness.
+The catalog reports public claims and evidence. Inclusion is not endorsement, legal advice, procurement advice, or proof that an initiative is effective.
 
-The project is still lightweight, so editorial decisions are made through public issues, pull requests, and direct review rather than a formal governance board. As the catalog grows, the review process should become more explicit about inclusion criteria, writing standards, and how disagreements are resolved.
+## Scope
 
-AI tools may be used to help find sources, compare public materials, draft update packets, and improve code. They do not replace human review. Claims, dates, adoption metrics, and descriptions should be checked against public sources before they are merged.
+The catalog includes publicly documented initiatives in these areas:
 
-## How we collect initiatives
+- Preference signals and machine-readable terms.
+- Formal licenses and licensing collectives.
+- Data marketplaces and brokers.
+- Technical access controls and tollgates.
+- Rights and preference registries.
+- Protocols and standards.
+- Governed data-sharing infrastructure.
+- Certification and provenance programs.
+- Research proposals with a defined mechanism, even when no deployable product exists.
+- Coalitions or advocacy groups that operate a concrete initiative.
 
-The catalog is maintained through a mix of source review, conference and community monitoring, public announcements, standards work, and contributor submissions. Entries are included when they have a clear relationship to AI data rights or AI-relevant data access.
+The geographic and source-language scope is global. A record needs a canonical public page plus dated primary evidence supporting its inclusion or current status.
 
-Initiatives are stored as markdown records in the GitHub repository. Each record should have a canonical website, a short summary, a status, a primary mechanism, and dated evidence links for meaningful public updates.
+## Exclusions
 
-### Workflow
+The catalog excludes:
 
-1. You spot a new initiative or a possible update.
-2. Read the current entry first.
-3. Check the strongest public sources first: official sites, docs, changelogs, repos, and filings.
-4. If helpful, use AI to gather links or draft a small update packet as a single markdown file. Existing entries in the repository show the current schema.
-5. Review the key claims.
-6. If evidence is weak, conflicting, or indirect, note the uncertainty or leave the claim out.
-7. A person makes the final merge.
+- Pure commentary or advocacy without a concrete initiative.
+- Private offerings with no public documentation.
+- General AI governance unrelated to data rights or access.
+- Litigation trackers and legal case databases.
+- Unverified announcements or stealth projects.
+- Tools focused only on model outputs or synthetic-content detection.
+- Complete withholding and data-poisoning approaches that do not use a license, preference, market, or controlled-access mechanism.
 
-### Good update
+## Unit of analysis
 
-- A short factual summary.
-- At least one public source.
-- Exact dates when timing matters.
-- A clear note on any uncertainty or limits.
+One record represents one public initiative that can be understood and sourced independently.
 
-If AI is involved, the best output is usually a small review packet with sources, a draft summary, and notes on anything unclear.
+Related products, standards, or programs are merged when they share the same operator, mechanism, canonical documentation, and lifecycle. They are split when they have materially different terms, technical behavior, operators, evidence trails, or public statuses. Editorial judgment is documented in the record or review discussion when the boundary is not obvious.
 
-### Quick Checklist
+An initiative may have multiple approach labels. The primary approach identifies the mechanism most central to how the initiative operates; secondary labels capture material supporting mechanisms.
 
-- Make sure it has a clear AI data rights angle.
-- Include one canonical website and at least one dated public source for any factual update.
-- Keep summaries short, neutral, and specific.
-- If you add a metric, add matching `metricEvidence` too.
+## Approach categories
 
-### In scope
+- **Preference signal:** publishes machine-readable AI-use preferences.
+- **Formal license:** states permissions, restrictions, or conditions in legal terms.
+- **Licensing collective:** coordinates licensing or negotiation across rights holders.
+- **Marketplace:** matches data or content suppliers with AI buyers.
+- **Tollgate:** conditions access on payment, metering, or authentication.
+- **Technical blocking:** blocks, challenges, or rate-limits automated collection.
+- **Rights registry:** records rights, preferences, declarations, or provenance for lookup.
+- **Protocol or standard:** defines interoperable messages, workflows, or interfaces.
+- **Governed data sharing:** provides controlled ways to contribute, host, access, or compute with data.
+- **Certification:** assesses or signals compliance with stated sourcing criteria.
 
-- Initiatives that shape AI data flows through preference signals, licenses or terms, collectives, marketplaces, technical controls, certification, or new infrastructure.
-- Concrete implementation details, canonical websites, and dated evidence links.
-- Metadata like status, pipeline stage, data type, jurisdiction, and adoption signals.
+These labels describe mechanisms, not legal validity or effectiveness. “Practical force” is a short explanation derived from the primary approach and paired with a caveat.
 
-### Status meanings
+## Status
 
-- `live`: publicly available or deployable now. This does not mean widely adopted, legally tested, or proven effective.
-- `wip`: publicly documented but still under review, emerging, or not yet fully deployed.
-- `archived`: kept for historical context, but hidden from the default catalog view because a review did not find newer public activity.
+- **Live:** publicly available or deployable at the latest review.
+- **In progress:** publicly documented but still emerging or not fully deployed.
+- **Archived:** retained for historical context after discontinuation, acquisition, replacement, dormancy, loss of scope, or an unresolved status review.
 
-Status tracks public availability, not enforcement strength. Each initiative profile separately describes the mechanism's practical force and its most important limitation.
+“Live” does not mean widely adopted, legally tested, or proven effective. Archived profiles state an archive reason and are excluded from search-engine indexing.
 
-The practical-force label is an editorial classification based on the initiative's primary approach. It is a starting point for comparison, not a legal conclusion or a substitute for the initiative's current terms and technical documentation.
+## Pipeline stages and data types
+
+Pipeline stages are collect, train, fine-tune, evaluate, retrieve, and generate.
+
+Data types are web content, text, images, video, audio, music, code, structured data, and multimodal data. Labels describe documented scope and may overlap.
+
+## Sources and evidence
+
+Acceptable sources include:
+
+- Official product, organization, documentation, standards, repository, announcement, filing, and changelog pages.
+- Partner or customer announcements.
+- Credible independent reporting.
+- Archived pages or web captures.
+- Posts from official social accounts.
+- Conference talks or recordings with identifiable speakers and dates.
+
+Evidence is labeled as a **primary source**, **partner or customer source**, or **independent source**. Primary sources are preferred for an initiative’s existence, features, and current status. Independent sources are useful for context, conflicts, corrections, adoption, and third-party claims.
+
+Evidence links are ordered newest first. “Latest tracked evidence” means the newest dated source recorded on the profile. “Last checked” is the date a maintainer last reviewed the profile’s public sources. These dates measure different things.
+
+Key sources may include an archived copy when legally and technically appropriate. A broken live link does not by itself invalidate a claim if a reliable archived copy remains available.
+
+## Required profile information
+
+A public profile requires:
+
+- A title and neutral summary.
+- A canonical website.
+- Status and a status rationale.
+- Approximately 100 to 250 words explaining what the initiative is.
+- At least one pipeline stage and data type.
+- A last-checked date.
+
+Useful optional fields include operator, launch date, geographic availability, pricing, open-source status, software license, rights contact, integrations, archive reason, and successor.
+
+Missing optional information is labeled as unavailable or omitted; it is not inferred. Missing adoption data is shown as “No public adoption figure found.”
+
+## Adoption claims
+
+Users, partners, revenue, payments, transaction volume, and data-volume figures require a matching public source. Simple arithmetic across explicit public figures may be labeled as derived. Marketing language is not converted into a numeric adoption claim.
+
+## Freshness and archiving
+
+Current profiles are scheduled for review at least once every three months. Reviews also happen when a correction, acquisition, discontinuation, replacement, or material new source is reported.
+
+Evidence of discontinuation or a superseding initiative triggers an archive review. Lack of recent evidence may lead to a dormant archive status after checking the canonical site and other reasonable public sources.
+
+## Conflicting or corrected claims
+
+When credible sources conflict, the profile states the conflict and avoids presenting the disputed claim as settled. Newer primary evidence does not automatically erase a reliable older record; both may be retained when the change itself matters.
+
+Corrections update the profile and its evidence trail. Material disputes are handled through a public GitHub issue unless privacy, security, or legal concerns require limiting sensitive details.
+
+## Related initiatives
+
+“Related in catalog” prioritizes current initiatives that share the most approach labels, then uses evidence recency and title for a stable order. Editorial relationships may be added when taxonomy alone would miss an important successor or close counterpart.
+
+## Human review and AI assistance
+
+AI tools may help locate, compare, or draft summaries of sources. A person reviews claims, dates, links, classifications, and status changes before publication. Initiative owners are welcome to submit corrections, but they do not have pre-publication approval rights.
+
+## Corrections, disputes, and takedowns
+
+Use the public contribution forms for factual corrections, disputes, privacy concerns, rights issues, or takedown requests. Requests should identify the affected page, the disputed text or data, supporting evidence, and the requested outcome.
+
+Urgent privacy, security, or rights concerns receive an expedited review. Content may be temporarily removed while a credible high-risk concern is assessed. Editorial corrections are documented in GitHub history.
+
+## Conflicts of interest
+
+Contributors must disclose material financial, employment, advisory, or organizational relationships with an initiative they propose or edit. Paid placement, sponsored rankings, and affiliate links are not accepted.
 
 ## Contribute
 
-- Suggest a new initiative or update an existing one with a canonical site and dated sources.
-- Open an issue for leads, scope questions, or early discussion.
-- Open an issue if you are unsure whether something belongs in scope.
-- Open a pull request when the wording and metadata are ready to review.
-- Every suggested `evidenceLinks`, `usersCount`, `dataVolume`, or `moneyVolume` value should include a clickable source and date. If you add a metric, add matching `metricEvidence`.
-
-Developers can add or update a markdown file under `content/initiatives/`. Each entry should have one canonical `website`, a `status` of `live`, `wip`, or `archived`, `visibility: public`, `type: data_license_initiative`, and optional dated `evidenceLinks`.
+Open a GitHub issue for a lead, correction, dispute, or scope question. Open a pull request for a source-backed record, wording change, test, or site improvement. See the [contribution page](/contributing) for the forms and review workflow.

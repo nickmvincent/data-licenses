@@ -4,8 +4,8 @@ summary: Working group standardizing cryptographic authentication for bots and A
 status: wip
 website: 'https://datatracker.ietf.org/wg/webbotauth/about/'
 actionsSupported:
-  - new-infrastructures
-primaryApproachType: new-infrastructures
+  - protocol-standard
+primaryApproachType: protocol-standard
 pipelineStages:
   - collect
   - retrieve
@@ -37,3 +37,5 @@ type: data_license_initiative
 The IETF Web Bot Auth working group is developing standards for cryptographically authenticating automated clients and conveying more information about their operators to websites. That matters for data-licensing and AI-governance workflows because stronger bot identity can make differentiated access rules, rate limits, and policy enforcement more reliable.
 
 The group is still in an active standardization phase, with chartered work on authentication techniques, bot metadata, and operational guidance. Google and Cloudflare now publish implementation guidance for experimental or provider-specific Web Bot Auth handling, which makes the standardization work visible in early operational docs.
+
+IETF Web Bot Auth defines a shared protocol or technical standard for web content across the collection and retrieval stages. The protocol coordinates participating systems; practical coverage depends on implementation, interoperability, and adoption. Public materials describe an in-progress proposal or implementation; the newest dated source in this profile is “Cloudflare documents Web Bot Auth verification support” (July 1, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

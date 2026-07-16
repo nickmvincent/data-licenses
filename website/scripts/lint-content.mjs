@@ -7,6 +7,7 @@ import {
   ADOPTION_RESEARCH_STATUSES,
   normalizeEvidenceLinks,
   normalizeImplementationSnippets,
+  normalizeInitiativeFrontmatter,
   normalizeMetricEvidence,
   normalizeStringArray,
   normalizeUrl,
@@ -128,6 +129,9 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.md'))) {
   collectIssue(issues, context, () => normalizeMetricEvidence(parsedFm.metricEvidence, context));
   collectIssue(issues, context, () =>
     normalizeImplementationSnippets(parsedFm.implementationSnippets, context)
+  );
+  collectIssue(issues, context, () =>
+    normalizeInitiativeFrontmatter(parsedFm, context, { allowLegacyEvidenceFallback: false })
   );
 
   const body = txt.replace(/^---\n[\s\S]*?\n---\n?/, '').trim();

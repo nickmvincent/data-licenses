@@ -1,58 +1,152 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const issueForms = [
+  {
+    title: 'Suggest an initiative',
+    description: 'Propose a new public initiative with a canonical page and dated primary evidence.',
+    href: 'https://github.com/nickmvincent/data-licenses/issues/new?template=new-initiative.yml',
+  },
+  {
+    title: 'Report a correction',
+    description: 'Correct a claim, status, date, source, classification, or missing disclosure.',
+    href: 'https://github.com/nickmvincent/data-licenses/issues/new?template=correction.yml',
+  },
+  {
+    title: 'Request a review or takedown',
+    description: 'Raise a dispute, privacy concern, rights issue, or request for expedited review.',
+    href: 'https://github.com/nickmvincent/data-licenses/issues/new?template=review-request.yml',
+  },
+];
 ---
 
 <Layout
   title="Contribute"
-  description="How to suggest updates, sources, and new initiatives for DataLicenses.org."
+  description="Submit a new initiative, correction, source, dispute, or pull request to DataLicenses.org."
 >
   <main class="wrap narrow contribute-page">
-    <header class="page-header contribute-hero">
+    <header class="page-header contribute-header">
       <h1 class="page-title-sm">Contribute</h1>
-      <p class="muted contribute-intro">
-        Start with the methodology page for scope, sourcing rules, and contribution steps.
+      <p>
+        Additions and corrections are reviewed in public through GitHub issues and pull requests.
+        Every material claim should be tied to a source.
       </p>
-
-      <div class="contribute-actions">
-        <a class="btn btn-primary" href="/methodology#contribute">Open guide</a>
-        <a class="btn" href="/methodology#how-we-collect-initiatives">Collection method</a>
-      </div>
     </header>
 
+    <section class="contribution-forms" aria-labelledby="forms-title">
+      <h2 id="forms-title">Choose a form</h2>
+      <div>
+        {issueForms.map((form) => (
+          <article class="box contribution-card">
+            <h3>{form.title}</h3>
+            <p>{form.description}</p>
+            <a class="btn" href={form.href} target="_blank" rel="noopener">Open GitHub form</a>
+          </article>
+        ))}
+      </div>
+    </section>
+
     <section class="box section">
+      <h2>What to include</h2>
+      <ul>
+        <li>The canonical website or documentation page.</li>
+        <li>At least one dated primary source for inclusion or a material update.</li>
+        <li>A short, neutral description of what the initiative does.</li>
+        <li>The relevant AI pipeline stages and data types.</li>
+        <li>Exact support for any adoption, money, or data-volume figure.</li>
+        <li>Known uncertainty, conflicting evidence, or an archive link when available.</li>
+        <li>Any material employment, financial, advisory, or organizational connection.</li>
+      </ul>
+    </section>
+
+    <section class="box section">
+      <h2>Review workflow</h2>
+      <ol>
+        <li>A submission is checked against the published scope and minimum evidence rule.</li>
+        <li>Claims, dates, links, status, and classifications are reviewed against public sources.</li>
+        <li>Questions or requested changes remain in the issue or pull request for a public record.</li>
+        <li>Nick Vincent gives final editorial approval before publication.</li>
+        <li>Merged changes publish through the production build and deployment checks.</li>
+      </ol>
       <p>
-        Start on the <a href="/methodology">methodology page</a> for the checklist,
-        workflow, and links to open an issue or pull request.
+        There is no guaranteed response time. Urgent factual, privacy, security, or rights concerns
+        should be labeled clearly in the issue title.
+      </p>
+    </section>
+
+    <section class="box section">
+      <h2>Pull requests</h2>
+      <p>
+        Pull requests are welcome for source-backed records, corrections, glossary changes, tests,
+        and site improvements. Read <a href="/methodology">the methodology</a> before editing catalog
+        content.
+      </p>
+      <a
+        class="btn btn-primary"
+        href="https://github.com/nickmvincent/data-licenses/compare"
+        target="_blank"
+        rel="noopener"
+      >
+        Open a pull request
+      </a>
+    </section>
+
+    <section class="box section">
+      <h2>Credit</h2>
+      <p>
+        GitHub preserves contributor and reviewer credit in issue and commit history. Substantive
+        source contributions may also be acknowledged in the related profile when appropriate.
       </p>
     </section>
   </main>
 </Layout>
 
 <style>
-  .contribute-page {
+  .contribute-page,
+  .contribute-header,
+  .contribution-forms {
     display: grid;
-    gap: 2px;
+    gap: 16px;
   }
 
-  .contribute-hero {
-    display: grid;
-    gap: 12px;
-  }
-
-  .contribute-intro {
+  .contribute-header p {
+    max-width: 680px;
     margin: 0;
-    max-width: 40rem;
+    color: var(--muted);
   }
 
-  .contribute-actions {
-    display: flex;
-    flex-wrap: wrap;
+  .contribution-forms > div {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .contribution-card {
+    display: grid;
     gap: 12px;
+    align-content: start;
+    padding: 18px;
   }
 
-  @media (max-width: 720px) {
-    .contribute-actions .btn {
-      width: 100%;
+  .contribution-card p {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .contribution-card .btn {
+    justify-self: start;
+    margin-top: auto;
+  }
+
+  .section p:last-child,
+  .section ol:last-child,
+  .section ul:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 760px) {
+    .contribution-forms > div {
+      grid-template-columns: 1fr;
     }
   }
 </style>

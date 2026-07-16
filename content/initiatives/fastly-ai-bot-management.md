@@ -31,3 +31,5 @@ type: data_license_initiative
 Fastly AI Bot Management gives site operators dedicated signals for spotting and responding to AI crawlers and AI fetchers. Its materials frame the product as a way to detect, block, intercept, or otherwise manage automated traffic that consumes content without consent or compensation.
 
 Fastly's product shows another major edge provider converging on AI-specific access control as a practical near-term response to unlicensed scraping.
+
+Fastly AI Bot Management uses technical controls to restrict or challenge automated collection for web content across the collection and retrieval stages. Access controls can limit collection from protected infrastructure but may be bypassed and do not govern downstream use after access. Public materials describe a currently available initiative; the newest dated source in this profile is “Threat Insights post covers bot traffic and AI-bot access” (April 16, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

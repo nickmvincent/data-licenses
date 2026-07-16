@@ -6,6 +6,10 @@ website: 'https://copyright.sh/'
 actionsSupported:
   - attach-formal-license
 primaryApproachType: attach-formal-license
+pipelineStages:
+  - collect
+  - train
+  - retrieve
 dataTypes:
   - web-content
 evidenceLinks:
@@ -17,3 +21,5 @@ type: data_license_initiative
 ---
 
 copyright.sh packages an `ai-license` meta-tag grammar, API checks, and CMS tooling into a web-first licensing layer for AI use. It is notable here because it tries to turn a simple rights declaration into something operational, with payment, verification, and eventually enforcement hooks rather than a purely symbolic signal.
+
+copyright.sh sets out formal reuse terms for web content across the collection, training, and retrieval stages. The terms can state permissions and restrictions, but their legal effect depends on applicable law, ownership, notice, and agreement formation. Public materials describe a currently available initiative; the newest dated source in this profile is “WordPress plugin launched” (October 28, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

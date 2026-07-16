@@ -39,3 +39,5 @@ type: data_license_initiative
 CCC's AI licensing program adapts voluntary collective licensing for generative AI uses. Its live offers include internal AI reuse and external AI training. Higher-education AI reuse rights took effect on July 1, 2026; CCC has also announced transactional, pay-per-use AI rights, but has not publicly confirmed their general availability.
 
 The suite provides an operational path for licensing copyrighted text-based works into AI systems without requiring every publisher or developer to negotiate bespoke bilateral deals.
+
+CCC AI Licensing Suite coordinates licensing through a collective for text across the training, fine-tuning, retrieval, and generation stages. It also incorporates formal licensing. Coverage depends on participation, the rights represented, and the agreements reached with users. Public materials describe a currently available initiative; the newest dated source in this profile is “Higher education AI reuse rights added to ACLHE” (May 6, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

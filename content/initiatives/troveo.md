@@ -10,6 +10,7 @@ primaryApproachType: data-market-platform
 pipelineStages:
   - train
   - fine-tune
+  - evaluate
 dataTypes:
   - multimodal
   - video
@@ -46,3 +47,5 @@ type: data_license_initiative
 Troveo packages licensed, non-public data from media archives, private collections, enterprise workflows, gaming, robotics, audio, and text sources for AI model training and evaluation.
 
 The April 2026 expansion announcement reports more than $20 million paid to content owners and describes every dataset in Troveo's library as sourced and licensed from content owners.
+
+Troveo organizes licensed access through a marketplace or exchange for multimodal material, video, audio, and text across the training, fine-tuning, and evaluation stages. It also incorporates formal licensing. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Training-data platform expansion announced” (April 28, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

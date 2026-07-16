@@ -1,6 +1,3 @@
 name = "datalicenses"
 pages_build_output_dir = "./dist"
-compatibility_date = "2026-07-15"
-
-[vars]
-# Set any build-time env vars here (or override with `--var KEY=VALUE`).
+compatibility_date = "2026-07-16"

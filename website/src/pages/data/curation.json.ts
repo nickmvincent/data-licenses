@@ -46,7 +46,13 @@ export async function GET() {
     increment(summary.adoptionResearchStatus, item.adoptionResearchStatus);
   }
 
-  return new Response(JSON.stringify({ count: items.length, summary, items }, null, 2), {
+  return new Response(JSON.stringify({
+    schemaVersion: '1.0',
+    generatedAt: new Date().toISOString(),
+    count: items.length,
+    summary,
+    items,
+  }, null, 2), {
     headers: { 'content-type': 'application/json; charset=utf-8' },
   });
 }

@@ -12,6 +12,9 @@ actionsSupported:
 primaryApproachType: attach-preference-signal
 jurisdictions:
   - EU
+pipelineStages:
+  - collect
+  - train
 dataTypes:
   - web-content
 tags:
@@ -57,3 +60,5 @@ implementationSnippets:
 ---
 
 The TDMRep Community Group report defines ways for rightsholders to publish machine-readable text and data mining (TDM) rights reservations and links to licensing policies, including through `/.well-known/tdmrep.json`. It was developed as a technical response to the EU DSM Directive's Article 4 mechanism for non-research TDM.
+
+TDMRep (W3C Community Group) publishes or proposes a machine-readable preference signal for web content across the collection and training stages. It also incorporates formal licensing. The signal communicates requested conditions; compliance depends on discovery, interpretation, and voluntary support by downstream systems. Public materials describe a currently available initiative; the newest dated source in this profile is “Community group notes outline 2025 alignment work with AI-Pref” (October 1, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

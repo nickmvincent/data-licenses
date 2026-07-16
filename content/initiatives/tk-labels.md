@@ -10,10 +10,15 @@ pipelineStages:
   - collect
   - retrieve
   - train
+dataTypes:
+  - multimodal
 tags:
   - indigenous-data-governance
   - cultural-heritage
 evidenceLinks:
+  - label: Local Contexts certifies a new Hub integration using its labels
+    url: 'https://localcontexts.org/aotearoa-genomic-data-repository-joins-local-contexts-as-one-of-our-first-certified-integration-partners/'
+    date: '2026-05-13'
   - label: Oriana TV case study shows TK Labels in use
     url: 'https://localcontexts.org/labels-in-use-oriana-tv/'
     date: '2022-06-17'
@@ -47,3 +52,5 @@ type: data_license_initiative
 TK Labels from Local Contexts let Indigenous communities communicate culturally grounded protocols for access, use, attribution, and circulation of traditional knowledge materials. They are designed to travel with records and metadata so that community expectations remain visible outside their original context.
 
 Although not AI-specific, they are directly relevant to data governance and machine-readable reuse signals because they express conditions that conventional licensing systems often fail to capture.
+
+TK Labels publishes or proposes a machine-readable preference signal for multimodal material across the collection, retrieval, and training stages. The signal communicates requested conditions; compliance depends on discovery, interpretation, and voluntary support by downstream systems. Public materials describe a currently available initiative; the newest dated source in this profile is “Local Contexts certifies a new Hub integration using its labels” (May 13, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

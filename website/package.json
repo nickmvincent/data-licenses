@@ -1,23 +1,35 @@
 {
-  "name": "",
+  "name": "datalicenses-site",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.8 <25"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "npm run lint:content && astro build",
-    "check": "npm run lint:content && astro check",
+    "check": "astro check",
+    "check:a11y": "html-validate \"dist/**/*.html\"",
+    "check:built": "node scripts/check-built-site.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "cf:deploy": "npx wrangler pages deploy dist --project-name datalicenses",
     "lint:content": "node scripts/lint-content.mjs",
-    "export:xlsx": "node scripts/export-catalog-xlsx.mjs"
+    "export:xlsx": "node scripts/export-catalog-xlsx.mjs",
+    "test": "node --test",
+    "verify": "npm test && npm run check && npm run build && npm run check:a11y && npm run check:built"
   },
   "dependencies": {
-    "astro": "^5.13.7",
-    "js-yaml": "^4.1.1"
+    "astro": "^7.1.0",
+    "js-yaml": "^4.3.0"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.7",
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/markdown-remark": "^7.2.1",
+    "@types/node": "^26.1.1",
+    "html-validate": "^11.5.6",
     "typescript": "^5.9.3"
   }
 }

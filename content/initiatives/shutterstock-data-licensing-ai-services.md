@@ -10,6 +10,7 @@ primaryApproachType: data-market-platform
 pipelineStages:
   - train
   - fine-tune
+  - evaluate
   - retrieve
   - generate
 dataTypes:
@@ -40,3 +41,5 @@ type: data_license_initiative
 Shutterstock Data Licensing & AI Services packages licensed multimodal assets, custom datasets, curation, annotation, preference data, and model-evaluation services for AI developers. Public releases describe data licensing for model training and fine-tuning, plus licensed asset discovery inside ChatGPT.
 
 Shutterstock describes access to rights-cleared multimodal content, clear data provenance, and commercial licensing paths for model builders and enterprise partners.
+
+Shutterstock Data Licensing & AI Services organizes licensed access through a marketplace or exchange for multimodal material, images, video, and music across the training, fine-tuning, evaluation, retrieval, and generation stages. It also incorporates formal licensing. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Licensed content app launched in ChatGPT” (April 1, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

@@ -48,3 +48,5 @@ type: data_license_initiative
 ---
 
 IPTC and the PLUS Coalition have added machine-readable data-mining fields to image and video metadata standards so rights holders can express permissions or prohibitions for uses including AI/ML training. The fields carry the signal at the asset level, complementing site-level approaches such as robots.txt or domain-level preference headers, but they do not force recipients to comply.
+
+IPTC + PLUS Data Mining Metadata publishes or proposes a machine-readable preference signal for images and video across the collection, training, and fine-tuning stages. The signal communicates requested conditions; compliance depends on discovery, interpretation, and voluntary support by downstream systems. Public materials describe a currently available initiative; the newest dated source in this profile is “IPTC publishes version 2.0 of AI opt-out guidelines” (March 30, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

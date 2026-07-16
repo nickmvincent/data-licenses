@@ -7,7 +7,9 @@ export const APPROACH_KEYS = [
   'data-market-platform',
   'add-tollgate',
   'technical-blocking',
-  'new-infrastructures',
+  'rights-registry',
+  'protocol-standard',
+  'governed-data-sharing',
   'certification',
 ] as const;
 type ApproachKey = typeof APPROACH_KEYS[number];
@@ -19,7 +21,9 @@ export const ACTION_LABELS: Record<string, string> = {
   'data-market-platform': 'Marketplace',
   'add-tollgate': 'Tollgate',
   'technical-blocking': 'Technical blocking',
-  'new-infrastructures': 'New infrastructure',
+  'rights-registry': 'Rights registry',
+  'protocol-standard': 'Protocol or standard',
+  'governed-data-sharing': 'Governed data sharing',
   certification: 'Certification',
 };
 
@@ -27,6 +31,7 @@ export const PIPELINE_LABELS: Record<string, string> = {
   collect: 'Collect',
   train: 'Train',
   'fine-tune': 'Fine-tune',
+  evaluate: 'Evaluate',
   retrieve: 'Retrieve',
   generate: 'Generate',
 };
@@ -49,37 +54,20 @@ export const STATUS_LABELS: Record<string, string> = {
   archived: 'Archived',
 };
 
-export const GOAL_DETAILS = [
-  {
-    key: 'protect',
-    title: 'Reduce automated access',
-    description: 'Find blocking, metering, and authenticated access controls.',
-    actions: ['technical-blocking', 'add-tollgate'],
-  },
-  {
-    key: 'terms',
-    title: 'State terms for AI use',
-    description: 'Publish preferences or formal terms for collection and reuse.',
-    actions: ['attach-preference-signal', 'attach-formal-license'],
-  },
-  {
-    key: 'license',
-    title: 'License or monetize content',
-    description: 'Explore licenses, collectives, marketplaces, and paid access.',
-    actions: [
-      'attach-formal-license',
-      'join-licensing-collective',
-      'data-market-platform',
-      'add-tollgate',
-    ],
-  },
-  {
-    key: 'source',
-    title: 'Source governed data',
-    description: 'Find rights-cleared data, marketplaces, and access infrastructure.',
-    actions: ['data-market-platform', 'join-licensing-collective', 'new-infrastructures'],
-  },
-] as const;
+export const ARCHIVE_REASON_LABELS: Record<string, string> = {
+  discontinued: 'Discontinued',
+  acquired: 'Acquired or absorbed',
+  superseded: 'Replaced or superseded',
+  dormant: 'Dormant or no recent evidence',
+  'out-of-scope': 'No longer in scope',
+  unknown: 'Status unknown',
+};
+
+export const EVIDENCE_SOURCE_LABELS: Record<string, string> = {
+  primary: 'Primary source',
+  partner: 'Partner or customer source',
+  independent: 'Independent source',
+};
 
 export const ENFORCEMENT_DETAILS: Record<
   ApproachKey,
@@ -121,11 +109,23 @@ export const ENFORCEMENT_DETAILS: Record<
     description: 'Detects, rate-limits, challenges, or blocks automated collection.',
     caveat: 'It can reduce access but may be bypassed and does not determine the legality of downstream use.',
   },
-  'new-infrastructures': {
-    label: 'Emerging governance infrastructure',
-    shortLabel: 'Emerging infrastructure',
-    description: 'Creates registries, protocols, or coordination layers for governed data use.',
-    caveat: 'Practical force depends on adoption, interoperability, governance, and the controls built around it.',
+  'rights-registry': {
+    label: 'Rights registry infrastructure',
+    shortLabel: 'Registry infrastructure',
+    description: 'Records rights, preferences, declarations, or provenance for later lookup.',
+    caveat: 'Practical force depends on reliable identity, accurate declarations, adoption, and downstream use of the registry.',
+  },
+  'protocol-standard': {
+    label: 'Protocol or coordination standard',
+    shortLabel: 'Protocol or standard',
+    description: 'Defines shared messages, workflows, or interfaces for communicating and applying data-use conditions.',
+    caveat: 'Practical force depends on implementation, interoperability, adoption, and any legal or technical controls built around it.',
+  },
+  'governed-data-sharing': {
+    label: 'Governed data-sharing infrastructure',
+    shortLabel: 'Governed sharing',
+    description: 'Creates controlled ways to contribute, host, access, or compute with data under stated governance terms.',
+    caveat: 'Practical force depends on participation, access rules, technical configuration, and governance after data is shared.',
   },
   certification: {
     label: 'Third-party attestation',
@@ -175,11 +175,23 @@ export const APPROACH_DETAILS: Record<
     description:
       'Technical controls that deny, rate-limit, or otherwise constrain crawling, downloading, or automated collection unless a requester meets specific conditions.',
   },
-  'new-infrastructures': {
-    title: 'New infrastructure',
-    shortDescription: 'Builds new rails for governed data sharing.',
+  'rights-registry': {
+    title: 'Rights registry',
+    shortDescription: 'Records rights, preferences, or provenance for later lookup.',
     description:
-      'New registries, protocols, hosting patterns, or coordination layers that make governed data access, compliance, or contribution easier to operate.',
+      'Registries that publish or resolve declarations about rights, provenance, opt-outs, licenses, or permitted reuse.',
+  },
+  'protocol-standard': {
+    title: 'Protocol or standard',
+    shortDescription: 'Defines interoperable messages and workflows.',
+    description:
+      'Standards, protocols, and shared interfaces that help systems communicate or apply data-use preferences, terms, identity, and access conditions.',
+  },
+  'governed-data-sharing': {
+    title: 'Governed data sharing',
+    shortDescription: 'Provides controlled ways to contribute or access data.',
+    description:
+      'Infrastructure and governance models for sharing, hosting, or computing with data under contributor, community, or platform-defined conditions.',
   },
   certification: {
     title: 'Certification',
@@ -204,6 +216,11 @@ export function sortByLatestThenTitle(a: LoadedInitiative, b: LoadedInitiative) 
   const rankDiff = statusRank(a.status) - statusRank(b.status);
   if (rankDiff !== 0) return rankDiff;
 
+  return a.title.localeCompare(b.title);
+}
+
+export function sortByFeaturedThenTitle(a: LoadedInitiative, b: LoadedInitiative) {
+  if (a.featuredRank !== b.featuredRank) return a.featuredRank - b.featuredRank;
   return a.title.localeCompare(b.title);
 }
 

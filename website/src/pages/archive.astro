@@ -1,0 +1,125 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { loadInitiatives } from '../lib/content-loader';
+import {
+  ARCHIVE_REASON_LABELS,
+  STATUS_LABELS,
+  formatApproachLabel,
+  formatDate,
+} from '../lib/catalog';
+
+const archivedItems = (await loadInitiatives())
+  .filter((item) => item.status === 'archived')
+  .sort((a, b) => a.title.localeCompare(b.title));
+---
+
+<Layout
+  title="Archive"
+  description="Initiatives retained for historical context after discontinuation, acquisition, replacement, dormancy, or a scope review."
+>
+  <main class="wrap narrow archive-page">
+    <header class="page-header archive-header">
+      <h1 class="page-title-sm">Archived initiatives</h1>
+      <p>
+        These records are retained for historical context. Each profile states why it was archived
+        and is excluded from search-engine indexing.
+      </p>
+    </header>
+
+    {archivedItems.length > 0 ? (
+      <div class="archive-list">
+        {archivedItems.map((item) => (
+          <article class="archive-entry">
+            <div>
+              <h2><a href={`/initiatives/${item.slug}`}>{item.title}</a></h2>
+              <p>{item.summary}</p>
+            </div>
+            <dl>
+              <div>
+                <dt>Status</dt>
+                <dd>{STATUS_LABELS[item.status]}</dd>
+              </div>
+              <div>
+                <dt>Archive reason</dt>
+                <dd>
+                  {item.archiveReason
+                    ? ARCHIVE_REASON_LABELS[item.archiveReason] || item.archiveReason
+                    : 'Status unknown'}
+                </dd>
+              </div>
+              <div>
+                <dt>Primary approach</dt>
+                <dd>{formatApproachLabel(item.primaryApproachType)}</dd>
+              </div>
+              <div>
+                <dt>Last checked</dt>
+                <dd>{formatDate(item.lastChecked)}</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <p>No archived initiatives are currently published.</p>
+    )}
+  </main>
+</Layout>
+
+<style>
+  .archive-page,
+  .archive-header {
+    display: grid;
+    gap: 16px;
+  }
+
+  .archive-header p {
+    max-width: 680px;
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .archive-list {
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .archive-entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.8fr);
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .archive-entry h2 {
+    margin-bottom: 8px;
+    font-size: 1.25rem;
+  }
+
+  .archive-entry p {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .archive-entry dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+  }
+
+  .archive-entry dt {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  .archive-entry dd {
+    margin: 2px 0 0;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 700px) {
+    .archive-entry {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

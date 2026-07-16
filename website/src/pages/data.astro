@@ -1,0 +1,173 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { loadInitiatives } from '../lib/content-loader';
+
+const items = await loadInitiatives();
+const site = Astro.site ?? new URL('https://datalicenses.org');
+const datasetUrl = new URL('/data/initiatives.json', site).toString();
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'DataLicenses.org initiative catalog',
+  description:
+    'Public structured records about licenses and license-adjacent infrastructure for AI data use.',
+  url: new URL('/data', site).toString(),
+  distribution: {
+    '@type': 'DataDownload',
+    encodingFormat: 'application/json',
+    contentUrl: datasetUrl,
+  },
+  license: 'https://creativecommons.org/licenses/by/4.0/',
+  creator: {
+    '@type': 'Organization',
+    name: 'DataLicenses.org',
+  },
+};
+---
+
+<Layout
+  title="Data and downloads"
+  description="Download and reuse the public DataLicenses.org catalog as versioned JSON."
+  structuredData={structuredData}
+>
+  <main class="wrap narrow data-page">
+    <header class="page-header data-header">
+      <h1 class="page-title-sm">Data and downloads</h1>
+      <p>
+        The complete public catalog is available as structured JSON for research, journalism,
+        analysis, and other reuse.
+      </p>
+      <a class="btn btn-primary" href="/data/initiatives.json" download>Download JSON</a>
+    </header>
+
+    <dl class="data-summary">
+      <div>
+        <dt>Published records</dt>
+        <dd>{items.length}</dd>
+      </div>
+      <div>
+        <dt>Schema version</dt>
+        <dd>1.0</dd>
+      </div>
+      <div>
+        <dt>Format</dt>
+        <dd>JSON</dd>
+      </div>
+      <div>
+        <dt>License</dt>
+        <dd><a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a></dd>
+      </div>
+    </dl>
+
+    <section class="box section">
+      <h2>Endpoint</h2>
+      <p><a href="/data/initiatives.json">{datasetUrl}</a></p>
+      <p>
+        Draft and private records are excluded. Published archived records remain in the dataset and
+        are identified by their status and archive reason.
+      </p>
+    </section>
+
+    <section class="box section">
+      <h2>Versioning</h2>
+      <p>
+        The response includes a semantic <code>schemaVersion</code>. Additive fields may appear in
+        minor versions. Removing or renaming a field requires a new major version and a documented
+        migration.
+      </p>
+      <p>
+        Individual records include evidence dates, last-checked dates, and profile modification
+        dates. Repository history provides versioned snapshots of the dataset.
+      </p>
+    </section>
+
+    <section class="box section">
+      <h2>Top-level response</h2>
+      <pre><code>{`{
+  "schemaVersion": "1.0",
+  "generatedAt": "ISO-8601 timestamp",
+  "license": "CC BY 4.0",
+  "count": 0,
+  "items": []
+}`}</code></pre>
+    </section>
+
+    <section class="box section">
+      <h2>Reuse and attribution</h2>
+      <p>
+        Attribute the dataset to DataLicenses.org and link to this page or the repository. Source
+        links retain their own terms and are not relicensed by the catalog.
+      </p>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .data-page,
+  .data-header {
+    display: grid;
+    gap: 16px;
+  }
+
+  .data-header p {
+    max-width: 680px;
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .data-header .btn {
+    justify-self: start;
+  }
+
+  .data-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0;
+    border: 1px solid var(--border);
+  }
+
+  .data-summary div {
+    padding: 14px;
+    border-right: 1px solid var(--border);
+  }
+
+  .data-summary div:last-child {
+    border-right: 0;
+  }
+
+  .data-summary dt {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  .data-summary dd {
+    margin: 4px 0 0;
+    font-weight: 600;
+  }
+
+  pre {
+    max-width: 100%;
+    overflow: auto;
+    padding: 14px;
+    background: var(--surface-muted);
+  }
+
+  pre code {
+    padding: 0;
+    border: 0;
+  }
+
+  @media (max-width: 700px) {
+    .data-summary {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .data-summary div:nth-child(2) {
+      border-right: 0;
+    }
+
+    .data-summary div:nth-child(-n + 2) {
+      border-bottom: 1px solid var(--border);
+    }
+  }
+</style>

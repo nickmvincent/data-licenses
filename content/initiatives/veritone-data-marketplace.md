@@ -31,3 +31,5 @@ type: data_license_initiative
 Veritone Data Marketplace links content and data rightsholders with accredited AI developers seeking rights-cleared datasets. The product is paired with Veritone Data Refinery, which turns unstructured media into AI-ready assets.
 
 The launch materials emphasize developer accreditation, chain-of-custody rights tracking, and governed delivery pipelines for data spanning media, entertainment, sports, public safety, and human behavior.
+
+Veritone Data Marketplace organizes licensed access through a marketplace or exchange for multimodal material, video, audio, and images across the training and fine-tuning stages. It also incorporates formal licensing. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Veritone Data Marketplace launched” (March 10, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

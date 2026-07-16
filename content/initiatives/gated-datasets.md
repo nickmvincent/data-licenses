@@ -5,12 +5,14 @@ status: live
 website: 'https://huggingface.co/docs/hub/datasets-gated'
 actionsSupported:
   - technical-blocking
-  - new-infrastructures
+  - governed-data-sharing
 primaryApproachType: technical-blocking
 pipelineStages:
   - collect
   - train
   - fine-tune
+dataTypes:
+  - multimodal
 tags:
   - dataset-hosting
   - access-control
@@ -43,3 +45,5 @@ type: data_license_initiative
 Hugging Face Gated Datasets let dataset publishers require access requests before files can be downloaded. Publishers can ask for contact details or additional form fields, and they can approve requests automatically or manually.
 
 Gated repository infrastructure is increasingly common for conditional dataset sharing, even though it is closer to platform access control than to interoperable web signaling.
+
+Hugging Face Gated Datasets uses technical controls to restrict or challenge automated collection for multimodal material across the collection, training, and fine-tuning stages. It also incorporates governed data sharing. Access controls can limit collection from protected infrastructure but may be bypassed and do not govern downstream use after access. Public materials describe a currently available initiative; the newest dated source in this profile is “Hugging Face docs updated with EU-specific gated-dataset guidance” (August 18, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

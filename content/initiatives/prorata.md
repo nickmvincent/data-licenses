@@ -10,6 +10,9 @@ actionsSupported:
   - data-market-platform
   - add-tollgate
 primaryApproachType: data-market-platform
+pipelineStages:
+  - retrieve
+  - generate
 dataTypes:
   - text
 tags:
@@ -41,3 +44,5 @@ type: data_license_initiative
 ---
 
 ProRata offers a 50/50 revenue-share model between publishers and AI companies, pairing licensed content ingestion with attribution and monetization infrastructure. Its Gist products extend that model into publisher-controlled AI search and on-site AI experiences around licensed content.
+
+ProRata / Gist organizes licensed access through a marketplace or exchange for text across the retrieval and generation stages. It also incorporates collective licensing and tollgate controls. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Gist Answers launched” (September 5, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

@@ -32,3 +32,5 @@ type: data_license_initiative
 ---
 
 Microsoft Publisher Content Marketplace is a pilot for matching demand from AI products with licensed premium publisher content. Microsoft says it has tested focused grounding scenarios in enterprise and consumer versions of Copilot and is beginning to onboard demand partners. Publishers define usage terms, but the marketplace's broader availability and adoption remain unproven.
+
+Microsoft Publisher Content Marketplace organizes licensed access through a marketplace or exchange for text across the retrieval and generation stages. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe an in-progress proposal or implementation; the newest dated source in this profile is “Building Toward a Sustainable Content Economy for the Agentic Web” (February 3, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

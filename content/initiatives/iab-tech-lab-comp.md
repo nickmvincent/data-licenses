@@ -4,8 +4,8 @@ summary: Finalized v1 API and content-packaging framework through which already-
 status: live
 website: 'https://iabtechlab.com/standards/comp-content-monetization-protocols-initiative/'
 actionsSupported:
-  - new-infrastructures
-primaryApproachType: new-infrastructures
+  - protocol-standard
+primaryApproachType: protocol-standard
 pipelineStages:
   - collect
   - train
@@ -39,3 +39,5 @@ type: data_license_initiative
 CoMP defines APIs for communication between content owners and AI systems that already have a license to access content. The v1 framework was finalized on April 28, 2026 after public comment.
 
 The framework lets licensed AI systems request content, receive access tokens, and get packaged content from content owners. A separate agreement establishes the license, and separate traffic controls must block or admit bots. CoMP does not itself enforce compliance, create a marketplace, or define payment terms.
+
+IAB Tech Lab CoMP defines a shared protocol or technical standard for web content and text across the collection, training, and retrieval stages. The protocol coordinates participating systems; practical coverage depends on implementation, interoperability, and adoption. Public materials describe a currently available initiative; the newest dated source in this profile is “CoMP v1 finalized” (April 28, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

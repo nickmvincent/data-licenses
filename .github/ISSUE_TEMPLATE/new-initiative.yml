@@ -1,0 +1,60 @@
+name: Suggest an initiative
+description: Propose a new public initiative for the catalog.
+title: "[New initiative] "
+labels:
+  - content
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New records require a canonical public page and dated primary evidence. Do not include private or sensitive information.
+  - type: input
+    id: name
+    attributes:
+      label: Initiative name
+    validations:
+      required: true
+  - type: input
+    id: canonical
+    attributes:
+      label: Canonical website or documentation
+      placeholder: https://
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Neutral summary
+      description: In two or three sentences, what does it do?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Dated primary evidence
+      description: Provide source URLs, exact dates, and the claim each source supports.
+    validations:
+      required: true
+  - type: textarea
+    id: classification
+    attributes:
+      label: Suggested classification
+      description: Include status, approach, pipeline stages, and data types if known.
+  - type: textarea
+    id: uncertainty
+    attributes:
+      label: Uncertainty or conflicting evidence
+  - type: textarea
+    id: conflicts
+    attributes:
+      label: Conflict-of-interest disclosure
+      description: State any material employment, financial, advisory, or organizational connection, or write "None."
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: This initiative is publicly documented and fits the published methodology.
+          required: true

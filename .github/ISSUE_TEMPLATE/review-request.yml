@@ -1,0 +1,44 @@
+name: Request a review or takedown
+description: Raise a dispute, privacy concern, rights issue, or takedown request.
+title: "[Review request] "
+labels:
+  - review-request
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not post private personal data, secrets, or security exploit details. Use private vulnerability reporting for security issues.
+  - type: input
+    id: page
+    attributes:
+      label: Affected page
+    validations:
+      required: true
+  - type: dropdown
+    id: reason
+    attributes:
+      label: Reason
+      options:
+        - Factual dispute
+        - Privacy concern
+        - Rights or ownership concern
+        - Takedown request
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details and requested outcome
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+  - type: textarea
+    id: conflicts
+    attributes:
+      label: Relationship to the affected initiative or material
+    validations:
+      required: true
