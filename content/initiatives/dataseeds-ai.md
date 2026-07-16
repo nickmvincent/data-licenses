@@ -42,3 +42,5 @@ type: data_license_initiative
 DataSeeds.AI is a multimodal dataset supplier built around rights-cleared creator networks rather than scraped web media. Zedge positions it as a supply layer for enterprises and model builders that need off-the-shelf or custom image, video, and audio datasets for pre-training or fine-tuning.
 
 The service turns an existing creator ecosystem into AI dataset licensing infrastructure for multimodal training data.
+
+DataSeeds.AI organizes licensed access through a marketplace or exchange for images, video, and audio across the training and fine-tuning stages. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Enterprise customer base growth update” (October 20, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

@@ -1,0 +1,39 @@
+name: Report a correction
+description: Correct a claim, date, source, status, or classification.
+title: "[Correction] "
+labels:
+  - correction
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Affected page
+      placeholder: https://datalicenses.org/initiatives/...
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current text or data
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: Requested correction
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+      description: Provide source URLs, dates, and relevant context.
+    validations:
+      required: true
+  - type: textarea
+    id: conflicts
+    attributes:
+      label: Conflict-of-interest disclosure
+      description: State any material connection to the affected initiative, or write "None."
+    validations:
+      required: true

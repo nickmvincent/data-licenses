@@ -9,7 +9,6 @@ import {
   ADOPTION_METRIC_FIELDS,
   normalizeInitiativeFrontmatter,
   parseVisibility,
-  requireMemoType,
 } from '../src/lib/content-schema.js';
 
 const WEBSITE_ORIGIN = 'https://datalicenses.org';
@@ -26,7 +25,9 @@ const ACTION_LABELS = {
   'data-market-platform': 'Marketplace',
   'add-tollgate': 'Tollgate',
   'technical-blocking': 'Technical blocking',
-  'new-infrastructures': 'New infrastructure',
+  'rights-registry': 'Rights registry',
+  'protocol-standard': 'Protocol or standard',
+  'governed-data-sharing': 'Governed data sharing',
   certification: 'Certification',
 };
 
@@ -34,6 +35,7 @@ const PIPELINE_LABELS = {
   collect: 'Collect',
   train: 'Train',
   'fine-tune': 'Fine-tune',
+  evaluate: 'Evaluate',
   retrieve: 'Retrieve',
   generate: 'Generate',
 };
@@ -208,6 +210,18 @@ async function loadInitiatives(root, curationBySlug, referencesByKey) {
       signals: frontmatter.signals,
       pipelineStages: frontmatter.pipelineStages,
       dataTypes: frontmatter.dataTypes,
+      operator: frontmatter.operator || '',
+      launchDate: frontmatter.launchDate || null,
+      availability: frontmatter.availability || '',
+      pricing: frontmatter.pricing || '',
+      openSourceStatus: frontmatter.openSourceStatus || '',
+      softwareLicense: frontmatter.softwareLicense || '',
+      rightsContact: frontmatter.rightsContact || '',
+      integrations: frontmatter.integrations,
+      related: frontmatter.related,
+      statusRationale: frontmatter.statusRationale || '',
+      archiveReason: frontmatter.archiveReason || '',
+      successor: frontmatter.successor || '',
       considerations: frontmatter.considerations || '',
       tags: frontmatter.tags,
       dependsOn: frontmatter.dependsOn,
@@ -234,24 +248,6 @@ async function loadInitiatives(root, curationBySlug, referencesByKey) {
   }
 
   return items.sort((a, b) => a.title.localeCompare(b.title));
-}
-
-async function loadMemo(root) {
-  const raw = await readFile(join(root, 'memos', 'memo.md'), 'utf8');
-  const { data, body } = parseFrontmatter(raw);
-  const context = 'Memo memo.md';
-  const visibility = parseVisibility(data?.visibility, context);
-  requireMemoType(data?.type, context);
-  if (visibility !== 'public') return null;
-
-  return {
-    kind: 'memo',
-    slug: 'memo',
-    title: data?.title || 'Memo',
-    description: data?.description || '',
-    url: `${WEBSITE_ORIGIN}/memo/`,
-    body,
-  };
 }
 
 async function loadPage(root, slug) {
@@ -291,6 +287,18 @@ function buildSheets(initiatives, siteContent) {
     pipelineLabels: joinList(item.pipelineStages, (stage) => PIPELINE_LABELS[stage] || stage),
     dataTypes: joinList(item.dataTypes),
     dataTypeLabels: joinList(item.dataTypes, (type) => DATA_TYPE_LABELS[type] || type),
+    operator: item.operator,
+    launchDate: formatDate(item.launchDate),
+    availability: item.availability,
+    pricing: item.pricing,
+    openSourceStatus: item.openSourceStatus,
+    softwareLicense: item.softwareLicense,
+    rightsContact: item.rightsContact,
+    integrations: joinList(item.integrations),
+    related: joinList(item.related),
+    statusRationale: item.statusRationale,
+    archiveReason: item.archiveReason,
+    successor: item.successor,
     tags: joinList(item.tags),
     dependsOn: joinList(item.dependsOn),
     considerations: item.considerations,
@@ -510,7 +518,7 @@ function workbookXml(sheets) {
 function workbookRelsXml(sheets) {
   const sheetRelationships = sheets
     .map(
-      (sheet, index) =>
+      (_sheet, index) =>
         `<Relationship Id="rId${index + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${index + 1}.xml"/>`
     )
     .join('');
@@ -528,7 +536,7 @@ function workbookRelsXml(sheets) {
 function contentTypesXml(sheets) {
   const sheetOverrides = sheets
     .map(
-      (sheet, index) =>
+      (_sheet, index) =>
         `<Override PartName="/xl/worksheets/sheet${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`
     )
     .join('');
@@ -723,7 +731,6 @@ async function main() {
   const references = await loadReferences(contentRoot);
   const initiatives = await loadInitiatives(contentRoot, curation, references);
   const siteContent = await Promise.all([
-    loadMemo(contentRoot),
     loadPage(contentRoot, 'methodology'),
   ]);
   const sheets = buildSheets(initiatives, siteContent);

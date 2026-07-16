@@ -4,8 +4,14 @@ summary: Trade alliance of dataset licensors pushing for legal clarity, ethical 
 status: live
 website: 'https://www.thedpa.ai/'
 actionsSupported:
-  - new-infrastructures
-primaryApproachType: new-infrastructures
+  - governed-data-sharing
+primaryApproachType: governed-data-sharing
+pipelineStages:
+  - train
+  - fine-tune
+  - evaluate
+dataTypes:
+  - multimodal
 tags:
   - trade-alliance
   - policy
@@ -40,3 +46,5 @@ type: data_license_initiative
 ---
 
 The Dataset Providers Alliance brings together commercial dataset providers to advocate for licensed and ethically sourced training data, develop common positions, and normalize licensing markets for AI developers. It is less a product than a coalition shaping how data-market platforms and licensors coordinate.
+
+Dataset Providers Alliance (DPA) establishes governance for data contribution, access, and computation involving multimodal material across the training, fine-tuning, and evaluation stages. Access depends on technical configuration and governance rules, including who may contribute, query, or export material. Public materials describe a currently available initiative; the newest dated source in this profile is “Current member roster verified with 12 distinct organizations” (July 9, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

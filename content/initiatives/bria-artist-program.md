@@ -33,3 +33,5 @@ type: data_license_initiative
 ---
 
 Bria combines a contributor program, licensed training catalog, and enterprise model stack to offer generative AI built on commercial rights. Its model turns dataset licensing and artist compensation into a product layer rather than treating them only as back-office compliance.
+
+Bria Artist Program / Licensed Training Catalog organizes licensed access through a marketplace or exchange for images at the training stage. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Platform release highlights rights-clear models” (September 18, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

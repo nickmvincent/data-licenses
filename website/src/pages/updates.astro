@@ -1,0 +1,94 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { loadInitiatives } from '../lib/content-loader';
+import { EVIDENCE_SOURCE_LABELS, formatDate } from '../lib/catalog';
+
+const updates = (await loadInitiatives())
+  .flatMap((item) =>
+    item.evidenceLinks.map((link) => ({
+      item,
+      link,
+    }))
+  )
+  .sort((a, b) => b.link.date.getTime() - a.link.date.getTime());
+---
+
+<Layout
+  title="Updates"
+  description="Dated evidence tracked across the DataLicenses.org catalog."
+>
+  <main class="wrap narrow updates-page">
+    <header class="page-header updates-header">
+      <h1 class="page-title-sm">Updates</h1>
+      <p>
+        This page is generated from dated evidence in published profiles. A source date records the
+        evidence, not necessarily the date every profile field changed.
+      </p>
+    </header>
+
+    <ol class="updates-list">
+      {updates.map(({ item, link }) => (
+        <li>
+          <time datetime={link.date.toISOString().slice(0, 10)}>{formatDate(link.date)}</time>
+          <div>
+            <h2><a href={`/initiatives/${item.slug}`}>{item.title}</a></h2>
+            <a href={link.url} target="_blank" rel="noopener">{link.label}</a>
+            <p>{EVIDENCE_SOURCE_LABELS[link.sourceType] || link.sourceType}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </main>
+</Layout>
+
+<style>
+  .updates-page,
+  .updates-header {
+    display: grid;
+    gap: 16px;
+  }
+
+  .updates-header p {
+    max-width: 680px;
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .updates-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .updates-list li {
+    display: grid;
+    grid-template-columns: 145px minmax(0, 1fr);
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .updates-list time {
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .updates-list h2 {
+    margin-bottom: 5px;
+    font-size: 1rem;
+  }
+
+  .updates-list p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 560px) {
+    .updates-list li {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>

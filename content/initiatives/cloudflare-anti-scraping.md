@@ -12,6 +12,9 @@ actionsSupported:
   - add-tollgate
   - attach-preference-signal
 primaryApproachType: add-tollgate
+pipelineStages:
+  - collect
+  - retrieve
 dataTypes:
   - web-content
 usersCount: '3.8M+ domains on managed robots.txt'
@@ -84,3 +87,5 @@ type: data_license_initiative
 ---
 
 Cloudflare's controls distinguish Search, Agent, and Training traffic and let site owners apply edge blocking by use case. Its dashboard and BotBase provide visibility into known bots, managed robots.txt publishes Content Signals, redirects can steer verified training crawlers toward canonical content, and Pay Per Crawl supports monetized automated access.
+
+Cloudflare AI Crawl Control conditions automated access through authentication, payment, or rate controls for web content across the collection and retrieval stages. It also incorporates technical blocking and preference signaling. The mechanism controls a protected access route; it does not determine how acquired material is used or whether alternate routes remain available. Public materials describe a currently available initiative; the newest dated source in this profile is “Search, Agent, and Training bot controls launched” (July 1, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

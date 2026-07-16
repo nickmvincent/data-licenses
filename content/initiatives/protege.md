@@ -5,7 +5,7 @@ status: live
 website: 'https://withprotege.ai/'
 actionsSupported:
   - data-market-platform
-  - new-infrastructures
+  - governed-data-sharing
 primaryApproachType: data-market-platform
 pipelineStages:
   - train
@@ -37,3 +37,5 @@ type: data_license_initiative
 ---
 
 Protege connects data holders with model builders and handles the licensing, curation, and delivery of proprietary datasets for AI development. Its recent updates position it as a dedicated AI data market platform rather than a crawler-control or publisher-paywall tool.
+
+Protege organizes licensed access through a marketplace or exchange for multimodal material across the training and fine-tuning stages. It also incorporates governed data sharing. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “HC1 partnership adds large de-identified lab data repository” (February 12, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

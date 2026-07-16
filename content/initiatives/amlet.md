@@ -4,9 +4,9 @@ summary: AI content registry that links content-derived identifiers and timestam
 status: live
 website: 'https://amlet.ai/'
 actionsSupported:
-  - new-infrastructures
+  - rights-registry
   - attach-formal-license
-primaryApproachType: new-infrastructures
+primaryApproachType: rights-registry
 pipelineStages:
   - collect
   - train
@@ -40,3 +40,5 @@ type: data_license_initiative
 Amlet positions itself as registry infrastructure for the post-scraping era, combining persistent content identifiers with publisher-controlled declarations about ownership and licensing. Its public materials frame this as a way to make AI-use permissions discoverable and verifiable even when content moves beyond the original website.
 
 That makes it a good catalog fit as new infrastructure rather than a pure preference signal or marketplace: the main idea is to create dependable rails for future licensing and compliance workflows.
+
+Amlet records rights, preferences, or provenance in a registry for text across the collection, training, and retrieval stages. It also incorporates formal licensing. Registry usefulness depends on accurate declarations, identity and rights verification, and adoption by the systems expected to consult it. Public materials describe a currently available initiative; the newest dated source in this profile is “TDM registry case made for AI licensing workflows” (December 15, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

@@ -1,7 +1,8 @@
 ---
 title: NoML
-summary: Proposed robots-style directive for keeping content searchable while asking crawlers not to use it for machine learning.
+summary: 2023 robots-style proposal for limiting machine-learning use, with no newer public development found in the 2026 freshness review.
 status: archived
+archiveReason: dormant
 website: 'https://noml.info/'
 actionsSupported:
   - attach-preference-signal
@@ -43,3 +44,5 @@ type: data_license_initiative
 NoML proposes a simple extension to existing robots-style signaling: a `noml` value that can be added to HTML meta tags or `X-Robots-Tag` headers. The goal is to let publishers keep content discoverable in search while separately asking that it not be used for machine learning.
 
 It is intentionally lightweight and easy to deploy, but it remains an advocacy proposal rather than a settled web standard.
+
+NoML publishes or proposes a machine-readable preference signal for web content across the collection and training stages. The signal communicates requested conditions; compliance depends on discovery, interpretation, and voluntary support by downstream systems. The initiative is archived as dormant; the newest dated source in this profile is “Mojeek publishes NoML proposal and open letter” (October 25, 2023). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

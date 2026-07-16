@@ -10,6 +10,12 @@ actionsSupported:
   - attach-preference-signal
 primaryApproachType: attach-preference-signal
 status: wip
+pipelineStages:
+  - collect
+  - train
+  - retrieve
+dataTypes:
+  - web-content
 evidenceLinks:
   - label: Vocabulary draft 06 updated
     url: 'https://datatracker.ietf.org/doc/draft-ietf-aipref-vocab/'
@@ -55,3 +61,5 @@ type: data_license_initiative
 ---
 
 The AIPref effort investigates a standardized way to express preferences to AI systems, including crawlers and agents. The working group is still active, with current vocabulary work and an expired attachment draft in its public record. No production deployment signal is available yet.
+
+IETF AI Preferences (AIPref) publishes or proposes a machine-readable preference signal for web content across the collection, training, and retrieval stages. The signal communicates requested conditions; compliance depends on discovery, interpretation, and voluntary support by downstream systems. Public materials describe an in-progress proposal or implementation; the newest dated source in this profile is “Attachment draft listed as expired” (May 1, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

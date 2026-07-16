@@ -1,129 +1,65 @@
-# datalicenses.org
+# DataLicenses.org website
 
-This Astro site renders the public catalog for DataLicenses.org from the shared content in the repo root.
+This Astro project builds the static DataLicenses.org reference site from the
+repository's Markdown content.
 
-## Project structure
+## Important paths
 
-Key paths:
-- `src/lib/content-schema.js` — Shared runtime validation rules for the loader and linter
-- `../content/initiatives/*.md` — Main dataset
-- `../content/shared-references/bibtex-entries/*.md` — Optional bibliography records used by `references`
-- `src/data/initiative-curation.json` — Editorial tracking for evidence/adoption research backlog
-- `src/lib/content-loader.ts` — Runtime content loader and derived fields
-- `src/pages/index.astro` — Homepage and single public browsing surface
-- `src/components/CatalogExplorer.astro` — Search, task presets, filters, and comparison UI
-- `src/pages/catalog.astro` — Compatibility redirect to the homepage catalog
-- `src/pages/methodology.astro` — Combined methodology and contributing guide
-- `src/pages/contributing.astro` — Compatibility page pointing to the merged guide
-- `src/pages/data/initiatives.json.ts` — Full catalog JSON endpoint
-- `src/pages/data/curation.json.ts` — Curation/backlog JSON endpoint
-- `scripts/lint-content.mjs` — Content linter
-
-## Initiative schema
-
-Required frontmatter:
-- `title`: string
-- `summary`: string
-- `status`: `live` | `wip`
-- `website`: URL
-- `visibility`: `public` | `private` | `draft`
-- `type`: `data_license_initiative`
-
-Common optional fields:
-- `actionsSupported`: array of `attach-preference-signal`, `attach-formal-license`, `join-licensing-collective`, `data-market-platform`, `add-tollgate`, `technical-blocking`, `new-infrastructures`, `certification`
-- `evidenceLinks`: array of `{ label, url, date }`
-- `jurisdictions`, `signals`, `pipelineStages`, `tags`, `dependsOn`
-- `usersCount`, `dataVolume`, `moneyVolume`
-- `metricEvidence`: per-metric attribution matching any populated adoption metric
-- `considerations`
-- `implementationSnippets` (optional `summary`, `exampleUrl`, and `exampleLabel` supported for online examples)
-- `references`: citation keys from `../content/shared-references/bibtex-entries`
-
-Example:
-
-```md
----
-title: Example Initiative
-summary: One-line neutral summary.
-status: live
-website: https://example.org/
-visibility: public
-type: data_license_initiative
-evidenceLinks:
-  - label: Partner program announced
-    url: https://example.org/blog/partners
-    date: 2026-01-15
-usersCount: "10+ announced partners"
-metricEvidence:
-  usersCount:
-    basis: explicit
-    sources:
-      - label: Partner program announced
-        url: https://example.org/blog/partners
-        date: 2026-01-15
-considerations: Partner count comes from the launch post and may understate current uptake.
----
-```
-
-## Evidence workflow
-
-- The catalog's "Latest update" is the newest dated `evidenceLinks` entry.
-- Prefer primary sources: official sites, docs, repos, changelogs, announcements, filings, and product pages.
-- Use top-level `usersCount`, `dataVolume`, and `moneyVolume` only when a public source states or clearly supports the metric.
-- When a metric is present, add matching `metricEvidence`.
-- `metricEvidence.basis: derived` is only for simple, reviewable rollups across public sources.
-- Keep caveats in `considerations` instead of hiding uncertainty.
-
-`src/data/initiative-curation.json` tracks editorial backlog state:
-- `adoptionResearchStatus`: `populated` | `needs-research` | `hard-to-quantify`
-- `adoptionResearchNotes`: short rationale
+- `src/lib/content-schema.js` — runtime content validation
+- `src/lib/content-loader.ts` — public content loader and derived metadata
+- `src/lib/catalog.ts` — public labels and classification details
+- `src/lib/catalog-view.js` — tested catalog filtering and sorting logic
+- `src/components/CatalogExplorer.astro` — progressive-enhancement catalog UI
+- `src/pages/data/initiatives.json.ts` — versioned public JSON dataset
+- `scripts/lint-content.mjs` — content lint
+- `scripts/check-built-site.mjs` — generated-site checks
 
 ## Catalog behavior
 
-The catalog on the homepage supports:
-- Free-text search over title, summary, tags, website, approach text, data and pipeline types, and evidence labels
-- Goal presets for access control, terms, licensing, and governed data sourcing
-- Approach, data-type, pipeline-stage, status, archive, adoption-evidence, and implementation-example filters
-- Sorting by latest public update, alphabetically, or public status
-- Side-by-side comparison of two or three initiatives
-- URL-backed filter state via `q`, `status`, `goal`, repeated `actions`, `types`, `stages`, `has`, `sort`, and `archived`
+- All current rows are rendered in HTML and readable without JavaScript.
+- Search covers title, summary, and profile body.
+- Filters cover status, approach, data type, pipeline stage, and adoption
+  evidence.
+- The default order is editorially featured; A–Z, status, and latest-evidence
+  sorts are optional.
+- One table is the default layout; grouping by primary approach is optional.
+- Only the search query is written to the URL.
+- Archived initiatives appear on a dedicated archive page.
 
-## JSON endpoints
+## Content model
 
-`/data/initiatives.json`
-- Response: `{ count, items }`
-- Includes initiative frontmatter plus derived fields such as `slug`, `latestUpdate`, `evidenceStatus`, and resolved references
+Public initiative records require a title, neutral summary, website, status,
+approach, primary approach, pipeline stage, data type, and profile body.
+Archived records require an archive reason.
 
-`/data/curation.json`
-- Response: `{ count, summary, items }`
-- Includes derived sourcing/adoption status fields for editorial triage
+Approach values are:
 
-## Validation
+- `attach-preference-signal`
+- `attach-formal-license`
+- `join-licensing-collective`
+- `data-market-platform`
+- `add-tollgate`
+- `technical-blocking`
+- `rights-registry`
+- `protocol-standard`
+- `governed-data-sharing`
+- `certification`
 
-Run:
-- `npm run lint:content`
-- `npm run build`
-- `npm run check`
+Pipeline stages are `collect`, `train`, `fine-tune`, `evaluate`, `retrieve`,
+and `generate`.
 
-The content linter validates required fields, evidence/metric structure, placeholder text, shared-reference integrity, and a few weak-evidence patterns.
+## Commands
 
-## Development
+- `npm run dev` — local development
+- `npm run lint:content` — validate catalog content
+- `npm run check` — Astro type check
+- `npm test` — unit tests
+- `npm run build` — production build
+- `npm run verify` — complete pre-release checks
+- `npm run export:xlsx` — spreadsheet export
 
-Commands:
-- `npm install`
-- `npm run dev`
-- `npm run build`
-- `npm run preview`
-- `npm run check`
-- `npm run export:xlsx`
+## Hosting
 
-`npm run export:xlsx` writes `dist/data-licenses-catalog.xlsx`, with worksheet tabs for the main initiative catalog plus supporting evidence, references, implementation snippets, and longer-form site content. Pass a custom output path with `npm run export:xlsx -- ./dist/custom-name.xlsx`.
-
-## Deploying to Cloudflare Pages
-
-This repo includes a `wrangler.toml` configured for Pages.
-
-1. Authenticate once: `npx wrangler login`
-2. Build the static assets: `npm run build`
-3. Deploy to your Pages project: `npm run cf:deploy`
-4. Optional: test locally with `npx wrangler pages dev dist`
+`wrangler.toml` configures the static output for Cloudflare Pages. Production
+deployments should use the Pages Git integration so approved merges publish
+automatically. Do not bypass the verification checks.

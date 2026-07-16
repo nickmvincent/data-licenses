@@ -4,7 +4,9 @@
 /** @typedef {'public' | 'private' | 'draft'} Visibility */
 /** @typedef {'explicit' | 'derived'} MetricEvidenceBasis */
 /** @typedef {'populated' | 'needs-research' | 'hard-to-quantify'} AdoptionResearchStatus */
-/** @typedef {{ label: string, url: string, date: Date }} EvidenceLink */
+/** @typedef {'primary' | 'partner' | 'independent'} EvidenceSourceType */
+/** @typedef {'discontinued' | 'acquired' | 'superseded' | 'dormant' | 'out-of-scope' | 'unknown'} ArchiveReason */
+/** @typedef {{ label: string, url: string, date: Date, sourceType?: EvidenceSourceType, archivedUrl?: string }} EvidenceLink */
 /** @typedef {{ basis?: MetricEvidenceBasis, notes?: string, sources: EvidenceLink[] }} MetricEvidenceEntry */
 /**
  * @typedef {{
@@ -32,6 +34,18 @@
  * @property {string[]} signals
  * @property {string[]} pipelineStages
  * @property {string[]} dataTypes
+ * @property {string | undefined} operator
+ * @property {Date | undefined} launchDate
+ * @property {string | undefined} availability
+ * @property {string | undefined} pricing
+ * @property {string | undefined} openSourceStatus
+ * @property {string | undefined} softwareLicense
+ * @property {string | undefined} rightsContact
+ * @property {string[]} integrations
+ * @property {string[]} related
+ * @property {string | undefined} statusRationale
+ * @property {ArchiveReason | undefined} archiveReason
+ * @property {string | undefined} successor
  * @property {string | undefined} considerations
  * @property {string[]} tags
  * @property {string[]} dependsOn
@@ -45,14 +59,46 @@
  */
 
 const INITIATIVE_TYPE = 'data_license_initiative';
-const MEMO_TYPE = 'data_license_memo';
 
 export const ADOPTION_METRIC_FIELDS = ['usersCount', 'dataVolume', 'moneyVolume'];
 export const ADOPTION_RESEARCH_STATUSES = ['populated', 'needs-research', 'hard-to-quantify'];
+export const APPROACH_TYPES = [
+  'attach-preference-signal',
+  'attach-formal-license',
+  'join-licensing-collective',
+  'data-market-platform',
+  'add-tollgate',
+  'technical-blocking',
+  'rights-registry',
+  'protocol-standard',
+  'governed-data-sharing',
+  'certification',
+];
+export const PIPELINE_STAGES = ['collect', 'train', 'fine-tune', 'evaluate', 'retrieve', 'generate'];
+export const DATA_TYPES = [
+  'web-content',
+  'text',
+  'images',
+  'video',
+  'audio',
+  'music',
+  'code',
+  'structured-data',
+  'multimodal',
+];
 
 const VALID_STATUSES = new Set(['live', 'wip', 'archived']);
 const VALID_VISIBILITY = new Set(['public', 'private', 'draft']);
 const VALID_METRIC_EVIDENCE_BASIS = new Set(['explicit', 'derived']);
+const VALID_EVIDENCE_SOURCE_TYPES = new Set(['primary', 'partner', 'independent']);
+const VALID_ARCHIVE_REASONS = new Set([
+  'discontinued',
+  'acquired',
+  'superseded',
+  'dormant',
+  'out-of-scope',
+  'unknown',
+]);
 
 function hasOwn(value, key) {
   return Object.prototype.hasOwnProperty.call(value, key);
@@ -89,6 +135,25 @@ function coerceDate(value) {
   return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
+function optionalDate(value, field, context) {
+  if (value === undefined || value === null || value === '') return undefined;
+  const date = coerceDate(value);
+  if (!date) {
+    throw new Error(`${context} has invalid ${field}`);
+  }
+  return date;
+}
+
+function optionalEnum(value, field, allowed, context) {
+  const text = optionalString(value);
+  if (!text) return undefined;
+  const normalized = text.toLowerCase();
+  if (!allowed.has(normalized)) {
+    throw new Error(`${context} has invalid ${field}: ${text}`);
+  }
+  return normalized;
+}
+
 export function parseStatus(value, context) {
   const raw = requireString(value, 'status', context);
   const normalized = raw.toLowerCase();
@@ -113,10 +178,6 @@ export function requireInitiativeType(value, context) {
   return /** @type {'data_license_initiative'} */ (requireContentType(value, INITIATIVE_TYPE, context));
 }
 
-export function requireMemoType(value, context) {
-  return /** @type {'data_license_memo'} */ (requireContentType(value, MEMO_TYPE, context));
-}
-
 export function normalizeStringArray(value, field, context) {
   if (value === undefined) return [];
   if (!Array.isArray(value)) {
@@ -124,6 +185,15 @@ export function normalizeStringArray(value, field, context) {
   }
 
   return value.map((entry, index) => requireString(entry, `${field}[${index}]`, context));
+}
+
+export function requireAllowedValues(values, field, allowedValues, context) {
+  const allowed = new Set(allowedValues);
+  const invalid = values.filter((value) => !allowed.has(value));
+  if (invalid.length > 0) {
+    throw new Error(`${context} has invalid ${field} value(s): ${invalid.join(', ')}`);
+  }
+  return values;
 }
 
 export function requirePrimaryApproachType(value, actionsSupported, context) {
@@ -174,6 +244,16 @@ function normalizeEvidenceCollection(value, context, field = 'evidenceLinks') {
           }
           return date;
         })(),
+        sourceType: optionalEnum(
+          link.sourceType,
+          `${field}[${index}].sourceType`,
+          VALID_EVIDENCE_SOURCE_TYPES,
+          context
+        ),
+        archivedUrl:
+          link.archivedUrl === undefined
+            ? undefined
+            : requireUrlString(link.archivedUrl, `${field}[${index}].archivedUrl`, context),
       };
     })
     .sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -284,9 +364,50 @@ export function normalizeImplementationSnippets(value, context) {
 
 export function normalizeInitiativeFrontmatter(data, context, options = {}) {
   const { allowLegacyEvidenceFallback = true } = options;
-  const actionsSupported = normalizeStringArray(data.actionsSupported, 'actionsSupported', context);
+  const status = parseStatus(data.status, context);
+  const visibility = parseVisibility(data.visibility, context);
+  const archiveReason = optionalEnum(data.archiveReason, 'archiveReason', VALID_ARCHIVE_REASONS, context);
+  const actionsSupported = requireAllowedValues(
+    normalizeStringArray(data.actionsSupported, 'actionsSupported', context),
+    'actionsSupported',
+    APPROACH_TYPES,
+    context
+  );
   if (actionsSupported.length === 0) {
     throw new Error(`${context} has invalid actionsSupported: expected at least one approach type`);
+  }
+  const pipelineStages = requireAllowedValues(
+    normalizeStringArray(data.pipelineStages, 'pipelineStages', context),
+    'pipelineStages',
+    PIPELINE_STAGES,
+    context
+  );
+  const dataTypes = requireAllowedValues(
+    normalizeStringArray(data.dataTypes, 'dataTypes', context),
+    'dataTypes',
+    DATA_TYPES,
+    context
+  );
+  if (pipelineStages.length === 0) {
+    throw new Error(`${context} has invalid pipelineStages: expected at least one stage`);
+  }
+  if (dataTypes.length === 0) {
+    throw new Error(`${context} has invalid dataTypes: expected at least one data type`);
+  }
+  if (status === 'archived' && !archiveReason) {
+    throw new Error(`${context} is archived but is missing archiveReason`);
+  }
+  const evidenceLinks = normalizeEvidenceLinks(data, context, {
+    allowLegacyFallback: allowLegacyEvidenceFallback,
+  });
+  if (visibility === 'public' && evidenceLinks.length === 0) {
+    throw new Error(`${context} is public but has no dated evidenceLinks`);
+  }
+  if (
+    visibility === 'public' &&
+    !evidenceLinks.some((link) => !link.sourceType || link.sourceType === 'primary')
+  ) {
+    throw new Error(`${context} is public but has no primary evidence source`);
   }
 
   return /** @type {NormalizedInitiativeFrontmatter} */ ({
@@ -294,15 +415,27 @@ export function normalizeInitiativeFrontmatter(data, context, options = {}) {
     title: requireString(data.title, 'title', context),
     summary: requireString(data.summary, 'summary', context),
     website: requireUrlString(data.website, 'website', context),
-    status: parseStatus(data.status, context),
-    visibility: parseVisibility(data.visibility, context),
+    status,
+    visibility,
     type: requireInitiativeType(data.type, context),
     actionsSupported,
     primaryApproachType: requirePrimaryApproachType(data.primaryApproachType, actionsSupported, context),
     jurisdictions: normalizeStringArray(data.jurisdictions, 'jurisdictions', context),
     signals: normalizeStringArray(data.signals, 'signals', context),
-    pipelineStages: normalizeStringArray(data.pipelineStages, 'pipelineStages', context),
-    dataTypes: normalizeStringArray(data.dataTypes, 'dataTypes', context),
+    pipelineStages,
+    dataTypes,
+    operator: optionalString(data.operator),
+    launchDate: optionalDate(data.launchDate, 'launchDate', context),
+    availability: optionalString(data.availability),
+    pricing: optionalString(data.pricing),
+    openSourceStatus: optionalString(data.openSourceStatus),
+    softwareLicense: optionalString(data.softwareLicense),
+    rightsContact: optionalString(data.rightsContact),
+    integrations: normalizeStringArray(data.integrations, 'integrations', context),
+    related: normalizeStringArray(data.related, 'related', context),
+    statusRationale: optionalString(data.statusRationale),
+    archiveReason,
+    successor: optionalString(data.successor),
     considerations: optionalString(data.considerations),
     tags: normalizeStringArray(data.tags, 'tags', context),
     dependsOn: normalizeStringArray(data.dependsOn, 'dependsOn', context),
@@ -312,9 +445,7 @@ export function normalizeInitiativeFrontmatter(data, context, options = {}) {
     metricEvidence: normalizeMetricEvidence(data.metricEvidence, context),
     implementationSnippets: normalizeImplementationSnippets(data.implementationSnippets, context),
     references: normalizeStringArray(data.references, 'references', context),
-    evidenceLinks: normalizeEvidenceLinks(data, context, {
-      allowLegacyFallback: allowLegacyEvidenceFallback,
-    }),
+    evidenceLinks,
   });
 }
 

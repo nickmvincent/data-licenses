@@ -47,3 +47,5 @@ type: data_license_initiative
 Stack Data Licensing packages Stack Overflow's moderated technical corpus as a licensed input for AI systems. The public product materials explicitly position it for model training, fine-tuning, RAG, chatbots, copilots, and AI agents.
 
 It is a strong catalog example because it combines explicit licensing, attribution framing, marketplace distribution, and a very recognizable content corpus that AI developers already value.
+
+Stack Data Licensing organizes licensed access through a marketplace or exchange for text and code across the training, fine-tuning, and retrieval stages. It also incorporates formal licensing. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Current product page cites 83M+ questions and answers” (May 14, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

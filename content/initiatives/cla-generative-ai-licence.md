@@ -38,3 +38,5 @@ type: data_license_initiative
 CLA, PLS, and ALCS are extending collective licensing into AI model development, with an opt-in publisher scheme and a content repository for training, fine-tuning, and RAG over published text content.
 
 The offer is a UK collective licensing path focused on explicit permissioning and compliance, rather than crawler preference signals or technical blocking.
+
+CLA Generative AI Training Licence coordinates licensing through a collective for text across the training, fine-tuning, and retrieval stages. It also incorporates formal licensing. Coverage depends on participation, the rights represented, and the agreements reached with users. Public materials describe a currently available initiative; the newest dated source in this profile is “PLS launches first opt-in stage for collective AI licensing” (March 1, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

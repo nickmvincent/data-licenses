@@ -9,6 +9,7 @@ primaryApproachType: data-market-platform
 pipelineStages:
   - train
   - fine-tune
+  - evaluate
 dataTypes:
   - images
   - video
@@ -38,3 +39,5 @@ type: data_license_initiative
 ---
 
 vAIsual sells curated image, video, computer-vision, and biometric datasets through a commercial storefront aimed at AI developers. It is narrower than a general licensing standard, but it is a direct example of the market-platform layer emerging around training data supply.
+
+vAIsual organizes licensed access through a marketplace or exchange for images and video across the training, fine-tuning, and evaluation stages. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Dataset Shop remains available with image and video datasets” (July 9, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

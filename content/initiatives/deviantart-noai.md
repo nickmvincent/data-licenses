@@ -50,3 +50,5 @@ type: data_license_initiative
 ---
 
 DeviantArt introduced the noai and noimageai directives to communicate that artwork is not authorized for use in third-party AI-training datasets unless the creator opts in. The project is notable because it paired policy defaults with concrete HTML meta tags and HTTP headers that other platforms could reuse.
+
+DeviantArt NoAI / NoImageAI publishes or proposes a machine-readable preference signal for images across the collection and training stages. The signal communicates requested conditions; compliance depends on discovery, interpretation, and voluntary support by downstream systems. Public materials describe a currently available initiative; the newest dated source in this profile is “Current help documentation explains the NoAI setting” (July 9, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

@@ -44,3 +44,5 @@ type: data_license_initiative
 Versos AI turns professional video archives into structured datasets for AI model training. Its platform indexes video libraries, checks licensing eligibility, packages datasets, and tracks delivery between studios, aggregators, and AI developers.
 
 The launch announcement is anchored by a multi-year CuriosityStream partnership and data-delivery contract. Versos also reports relationships with more than 20 studios and content owners representing more than one million hours of professional video content.
+
+Versos AI Video Training Data Marketplace organizes licensed access through a marketplace or exchange for video across the training and fine-tuning stages. It also incorporates formal licensing. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Video Library Intelligence Platform launch” (February 23, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

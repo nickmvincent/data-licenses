@@ -10,6 +10,8 @@ pipelineStages:
   - collect
   - train
   - retrieve
+dataTypes:
+  - multimodal
 signals:
   - org.user-intents.syntheticContentGeneration
 tags:
@@ -52,3 +54,5 @@ type: data_license_initiative
 User Intents is an AT Protocol proposal for letting people declare how their public social data may be reused, including for generative-AI training. A public demo already maps these declarations to draft AIPref-style HTTP signaling for web access.
 
 The work is notable because it moves preference signaling from site operators toward end users, but it is still early and not yet a standardized, network-wide default.
+
+User Intents publishes or proposes a machine-readable preference signal for multimodal material across the collection, training, and retrieval stages. The signal communicates requested conditions; compliance depends on discovery, interpretation, and voluntary support by downstream systems. Public materials describe an in-progress proposal or implementation; the newest dated source in this profile is “Proposal discussion opened” (March 8, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

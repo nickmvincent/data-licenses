@@ -5,7 +5,7 @@ status: live
 website: 'https://journallist.net/'
 actionsSupported:
   - attach-preference-signal
-  - new-infrastructures
+  - protocol-standard
 primaryApproachType: attach-preference-signal
 pipelineStages:
   - train
@@ -24,6 +24,9 @@ metricEvidence:
         url: 'https://rjionline.org/news/trust-txt-launches-browser-extension-making-verification-of-trusted-news-sources-easier-for-publishers-and-audiences-alike/'
         date: '2025-02-21'
 evidenceLinks:
+  - label: JournalList continues to publish the trust.txt specification
+    url: 'https://journallist.net/wp-content/uploads/2024/08/trust.txt-specification-v1.5-.pdf'
+    date: '2026-07-16'
   - label: Browser extension launch described the network at about 3,000 publishers
     url: 'https://rjionline.org/news/trust-txt-launches-browser-extension-making-verification-of-trusted-news-sources-easier-for-publishers-and-audiences-alike/'
     date: '2025-02-21'
@@ -38,3 +41,5 @@ type: data_license_initiative
 trust.txt is a machine-readable file used by publishers to declare affiliations and other trust metadata. In April 2024, the specification added a `datatrainingallowed=` variable, extending the framework into AI-related permissions as well.
 
 The AI-use field adds training-permission metadata to an existing publisher coordination system rather than requiring a separate AI-only standard.
+
+trust.txt publishes or proposes a machine-readable preference signal for web content at the training stage. It also incorporates protocol standardization. The signal communicates requested conditions; compliance depends on discovery, interpretation, and voluntary support by downstream systems. Public materials describe a currently available initiative; the newest dated source in this profile is “JournalList continues to publish the trust.txt specification” (July 16, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

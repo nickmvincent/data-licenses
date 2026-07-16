@@ -4,12 +4,14 @@ summary: Registry of signed, attributable rights declarations for public-domain 
 status: live
 website: 'https://www.commonsdb.org/'
 actionsSupported:
-  - new-infrastructures
-primaryApproachType: new-infrastructures
+  - rights-registry
+primaryApproachType: rights-registry
 pipelineStages:
   - collect
   - train
   - retrieve
+dataTypes:
+  - multimodal
 tags:
   - registry
   - public-domain
@@ -45,3 +47,5 @@ type: data_license_initiative
 CommonsDB is building public infrastructure for publishing and checking claims that digital works are in the public domain or openly licensed. It combines content-derived identifiers, signed declarations, and public APIs so that the provenance of rights information can be inspected across sources rather than trusted only on one platform.
 
 That makes it an important adjacent layer for preference signals and AI data discovery: it is less about declaring new permissions than about making attributed rights claims easier to inspect at scale.
+
+CommonsDB records rights, preferences, or provenance in a registry for multimodal material across the collection, training, and retrieval stages. Registry usefulness depends on accurate declarations, identity and rights verification, and adoption by the systems expected to consult it. Public materials describe a currently available initiative; the newest dated source in this profile is “Registry dashboard launched with 3.5M+ declarations” (June 25, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

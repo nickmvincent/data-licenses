@@ -6,6 +6,10 @@ website: 'https://site.spawning.ai/spawning-ai-txt'
 actionsSupported:
   - attach-preference-signal
 primaryApproachType: attach-preference-signal
+pipelineStages:
+  - collect
+  - train
+  - retrieve
 dataTypes:
   - web-content
 evidenceLinks:
@@ -24,3 +28,5 @@ type: data_license_initiative
 ---
 
 The `ai.txt` approach from spawning.ai introduces an optional file to express commercial text-and-data-mining preferences to AI crawlers and tools.
+
+Spawning ai.txt publishes or proposes a machine-readable preference signal for web content across the collection, training, and retrieval stages. Site operators publish the file at a predictable location for participating tools to find. The signal communicates requested conditions; compliance depends on discovery, interpretation, and voluntary support by downstream systems. Public materials describe an in-progress proposal or implementation; the newest dated source in this profile is “Improved crawler-control post published” (August 28, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

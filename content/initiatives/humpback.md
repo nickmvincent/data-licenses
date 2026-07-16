@@ -7,6 +7,9 @@ actionsSupported:
   - add-tollgate
   - technical-blocking
 primaryApproachType: add-tollgate
+pipelineStages:
+  - collect
+  - retrieve
 dataTypes:
   - web-content
 tags:

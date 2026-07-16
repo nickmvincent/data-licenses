@@ -55,3 +55,5 @@ type: data_license_initiative
 ---
 
 SourceAudio lets labels, publishers, and creators opt catalogs into AI dataset partnerships rather than leaving music-model training entirely opaque. It frames dataset licensing as a recurring commercial channel, with public examples of catalog scale, contracts, and rights-holder revenue rather than only a generic rights-cleared claim.
+
+SourceAudio AI Dataset Licensing organizes licensed access through a marketplace or exchange for music across the training and fine-tuning stages. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “April recap covers AI training data economy panel” (May 6, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

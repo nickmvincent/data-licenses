@@ -2,71 +2,59 @@
 import CatalogExplorer from '../components/CatalogExplorer.astro';
 import Layout from '../layouts/Layout.astro';
 import { loadInitiatives, type LoadedInitiative } from '../lib/content-loader';
-import { formatApproachLabel, formatDate, sortByLatestThenTitle } from '../lib/catalog';
+import { APPROACH_KEYS, formatDate } from '../lib/catalog';
 
-const items: LoadedInitiative[] = (await loadInitiatives()).sort(sortByLatestThenTitle);
+const items: LoadedInitiative[] = await loadInitiatives();
 const currentItems = items.filter((item) => item.visibility === 'public' && item.status !== 'archived');
 const liveItems = currentItems.filter((item) => item.status === 'live');
-const datedItems = currentItems.filter((item) => item.latestUpdate);
-const recentlyActiveItems = [...datedItems].sort(sortByLatestThenTitle).slice(0, 6);
-const latestTrackedUpdate = recentlyActiveItems[0]?.latestUpdate;
-
-const sourceHost = (url: string) => {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return 'Source';
-  }
-};
+const latestTrackedUpdate = currentItems
+  .map((item) => item.latestUpdate)
+  .filter((value): value is Date => Boolean(value))
+  .sort((a, b) => b.getTime() - a.getTime())[0];
 ---
 
 <Layout
   title="DataLicenses.org"
-  description="Find and compare public initiatives for controlling, licensing, monetizing, and sourcing data for AI, with dated evidence and clear enforcement caveats."
+  description="A public reference catalog of licenses and license-adjacent infrastructure for controlling how data is collected, shared, licensed, and used in AI pipelines."
 >
   <main class="wrap home-page">
     <section class="home-hero" aria-labelledby="home-title">
       <div class="hero-copy">
-        <p class="eyebrow">AI data rights and access</p>
-        <h1 id="home-title">Find ways to control, license, sell, or source data for AI.</h1>
+        <h1 id="home-title">Approaches for controlling how data is used in AI pipelines.</h1>
         <p class="hero-lede">
-          A community-curated catalog of public initiatives, standards, services, and proposals—organized around
-          the decisions people are trying to make.
+          DataLicenses.org tracks licenses, preference signals, markets, access controls, registries,
+          standards, certification, and governed sharing for AI training, evaluation, retrieval, and
+          generation.
         </p>
-        <div class="hero-actions">
-          <a class="hero-primary" href="#catalog">Browse and compare</a>
-          <a href="/methodology">How the catalog works</a>
-        </div>
+        <p class="hero-scope">
+          The catalog focuses on permissions, terms, and controlled access. It does not cover complete
+          withholding, data poisoning, litigation tracking, or general AI governance.
+        </p>
+        <a class="hero-primary" href="#catalog">Browse initiatives</a>
       </div>
 
-      <aside class="emerging-panel" aria-labelledby="emerging-title">
-        <p class="eyebrow">Important context</p>
-        <h2 id="emerging-title">Still emerging. Often voluntary.</h2>
+      <aside class="boundary-note" aria-labelledby="boundary-title">
+        <h2 id="boundary-title">Evidence, not endorsement</h2>
         <p>
-          Many AI-use signals depend on companies choosing to honor them. Legal theories remain unsettled,
-          technical controls can be bypassed, and public adoption is uneven.
+          Profiles summarize public claims and dated sources. Inclusion is not legal advice,
+          procurement advice, endorsement, or proof that an approach works.
         </p>
-        <ul>
-          <li>A signal communicates a preference; it does not itself enforce one.</li>
-          <li>An access control governs a route; it cannot guarantee control of downstream copies.</li>
-          <li>“Live” means publicly available—not proven effective or legally validated.</li>
-        </ul>
-        <a href="/methodology#status-meanings">Read the status definitions</a>
+        <a href="/methodology">Read the methodology</a>
       </aside>
     </section>
 
-    <dl class="catalog-snapshot" aria-label="Catalog snapshot">
+    <dl class="catalog-snapshot">
       <div>
         <dt>Current initiatives</dt>
         <dd>{currentItems.length}</dd>
       </div>
       <div>
-        <dt>Publicly available</dt>
+        <dt>Live</dt>
         <dd>{liveItems.length}</dd>
       </div>
       <div>
-        <dt>With dated evidence</dt>
-        <dd>{datedItems.length}</dd>
+        <dt>Approach categories</dt>
+        <dd>{APPROACH_KEYS.length}</dd>
       </div>
       <div>
         <dt>Latest tracked evidence</dt>
@@ -74,143 +62,77 @@ const sourceHost = (url: string) => {
       </div>
     </dl>
 
-    <section class="recent-section" aria-labelledby="recent-title">
-      <header class="section-heading">
-        <div>
-          <p class="eyebrow">Recent evidence</p>
-          <h2 id="recent-title">What has moved lately</h2>
-        </div>
-        <p>Newest dated public sources, not a ranking of importance or effectiveness.</p>
-      </header>
-
-      <div class="recent-grid">
-        {recentlyActiveItems.map((item) => (
-          <article class="recent-item">
-            <div class="recent-meta">
-              <span>{item.latestUpdate ? formatDate(item.latestUpdate) : 'No date'}</span>
-              <span>{formatApproachLabel(item.primaryApproachType)}</span>
-            </div>
-            <h3><a href={`/initiatives/${item.slug}`}>{item.title}</a></h3>
-            <p>{item.summary}</p>
-            {item.latestEvidenceLink && (
-              <a class="recent-source" href={item.latestEvidenceLink.url} target="_blank" rel="noopener" title={item.latestEvidenceLink.label}>
-                {sourceHost(item.latestEvidenceLink.url)}
-              </a>
-            )}
-          </article>
-        ))}
-      </div>
-    </section>
-
     <CatalogExplorer items={items} />
   </main>
 </Layout>
 
 <style>
-  :global(body) {
-    background: var(--bg);
-  }
-
   .home-page {
-    max-width: 1180px;
+    max-width: 1120px;
     display: grid;
-    gap: clamp(34px, 5vw, 70px);
-    padding-top: clamp(26px, 5vw, 62px);
+    gap: 38px;
+    padding-top: 38px;
     padding-bottom: 56px;
   }
 
   .home-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.75fr);
-    gap: clamp(34px, 7vw, 86px);
-    align-items: start;
+    grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.72fr);
+    gap: 36px;
+    align-items: end;
   }
 
   .hero-copy {
     display: grid;
-    gap: 18px;
+    gap: 13px;
     align-content: start;
   }
 
-  .eyebrow {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 750;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
   .hero-copy h1 {
-    max-width: 820px;
-    margin: 0;
-    font-size: clamp(3rem, 7vw, 6.35rem);
-    font-weight: 450;
-    letter-spacing: -0.045em;
-    line-height: 0.94;
+    max-width: 800px;
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.08;
   }
 
   .hero-lede {
-    max-width: 710px;
+    max-width: 760px;
     margin: 0;
-    font-size: clamp(1.08rem, 2vw, 1.35rem);
-    line-height: 1.5;
-    color: var(--muted);
-  }
-
-  .hero-actions {
-    display: flex;
-    gap: 11px 18px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-top: 5px;
-  }
-
-  .hero-actions a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
     color: var(--text);
-    font-weight: 700;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.5;
   }
 
-  .hero-actions .hero-primary {
-    padding: 10px 15px;
-    border: 1px solid var(--text);
-    background: var(--text);
-    color: var(--bg);
-    text-decoration: none;
-  }
-
-  .emerging-panel {
-    display: grid;
-    gap: 13px;
-    padding: 22px;
-    border-top: 3px solid var(--accent);
-    background: var(--card);
-  }
-
-  .emerging-panel h2 {
-    margin: 0;
-    font-size: clamp(1.65rem, 3vw, 2.15rem);
-    line-height: 1.05;
-  }
-
-  .emerging-panel p:not(.eyebrow),
-  .emerging-panel ul {
+  .hero-scope {
+    max-width: 730px;
     margin: 0;
     color: var(--muted);
   }
 
-  .emerging-panel ul {
-    display: grid;
-    gap: 9px;
-    padding-left: 1.1rem;
+  .hero-primary {
+    justify-self: start;
+    margin-top: 3px;
+    font-weight: 600;
   }
 
-  .emerging-panel a {
+  .boundary-note {
+    display: grid;
+    gap: 10px;
+    padding-left: 20px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .boundary-note h2 {
+    font-size: 1.15rem;
+  }
+
+  .boundary-note p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .boundary-note a {
     justify-self: start;
-    margin-top: 2px;
     font-size: 0.9rem;
   }
 
@@ -224,13 +146,10 @@ const sourceHost = (url: string) => {
 
   .catalog-snapshot div {
     display: grid;
-    gap: 7px;
-    padding: 15px 18px 17px;
+    gap: 5px;
+    min-width: 0;
+    padding: 15px 16px;
     border-right: 1px solid var(--border);
-  }
-
-  .catalog-snapshot div:first-child {
-    padding-left: 0;
   }
 
   .catalog-snapshot div:last-child {
@@ -238,143 +157,60 @@ const sourceHost = (url: string) => {
   }
 
   .catalog-snapshot dt {
-    font-size: 0.76rem;
     color: var(--muted);
+    font-size: 0.78rem;
   }
 
   .catalog-snapshot dd {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    line-height: 1;
+    font-size: 1.45rem;
+    font-weight: 600;
   }
 
   .catalog-snapshot .snapshot-date {
-    font-family: var(--font-ui);
     font-size: 1rem;
-    font-weight: 700;
+    line-height: 1.5;
   }
 
-  .recent-section {
-    display: grid;
-    gap: 18px;
-  }
-
-  .section-heading {
-    display: flex;
-    justify-content: space-between;
-    gap: 24px;
-    align-items: end;
-  }
-
-  .section-heading h2 {
-    margin: 3px 0 0;
-    font-size: clamp(2rem, 4vw, 3.25rem);
-  }
-
-  .section-heading > p {
-    max-width: 360px;
-    margin: 0 0 4px;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-
-  .recent-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    border-top: 1px solid var(--border-strong);
-    border-left: 1px solid var(--border-strong);
-  }
-
-  .recent-item {
-    min-width: 0;
-    display: grid;
-    align-content: start;
-    gap: 9px;
-    padding: 17px 18px 19px;
-    border-right: 1px solid var(--border-strong);
-    border-bottom: 1px solid var(--border-strong);
-  }
-
-  .recent-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    color: var(--muted);
-    font-size: 0.74rem;
-  }
-
-  .recent-meta span:last-child {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .recent-item h3 {
-    margin: 0;
-    font-size: 1.15rem;
-    line-height: 1.15;
-  }
-
-  .recent-item h3 a {
-    color: var(--text);
-    text-decoration-color: transparent;
-  }
-
-  .recent-item h3 a:hover {
-    text-decoration-color: currentColor;
-  }
-
-  .recent-item p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.88rem;
-  }
-
-  .recent-source {
-    justify-self: start;
-    margin-top: auto;
-    font-size: 0.82rem;
-  }
-
-  @media (max-width: 900px) {
+  @media (max-width: 780px) {
     .home-hero {
       grid-template-columns: 1fr;
+      align-items: start;
     }
 
-    .recent-grid {
+    .boundary-note {
+      max-width: 600px;
+    }
+
+    .catalog-snapshot {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .catalog-snapshot div:nth-child(2) {
+      border-right: 0;
+    }
+
+    .catalog-snapshot div:nth-child(-n + 2) {
+      border-bottom: 1px solid var(--border);
     }
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: 480px) {
     .home-page {
-      padding-top: 30px;
+      padding-top: 28px;
     }
 
-    .hero-copy h1 {
-      font-size: clamp(2.75rem, 14vw, 4.6rem);
-    }
-
-    .catalog-snapshot,
-    .recent-grid {
+    .catalog-snapshot {
       grid-template-columns: 1fr;
     }
 
-    .catalog-snapshot div,
-    .catalog-snapshot div:first-child {
-      padding: 12px 0;
+    .catalog-snapshot div {
       border-right: 0;
       border-bottom: 1px solid var(--border);
     }
 
     .catalog-snapshot div:last-child {
       border-bottom: 0;
-    }
-
-    .section-heading {
-      display: grid;
-      align-items: start;
     }
   }
 </style>

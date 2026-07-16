@@ -10,6 +10,10 @@ website: 'https://developers.openai.com/api/docs/bots'
 actionsSupported:
   - attach-preference-signal
 primaryApproachType: attach-preference-signal
+pipelineStages:
+  - collect
+  - train
+  - retrieve
 dataTypes:
   - web-content
 evidenceLinks:

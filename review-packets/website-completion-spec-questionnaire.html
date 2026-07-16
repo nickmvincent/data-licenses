@@ -1,0 +1,2839 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>DataLicenses.org Website Completion Specification</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f5f3;
+        --surface: #ffffff;
+        --surface-muted: #f0f1ef;
+        --text: #171817;
+        --muted: #62655f;
+        --border: #d4d7d1;
+        --border-strong: #8f958b;
+        --accent: #0645ad;
+        --accent-dark: #043278;
+        --accent-soft: #edf3ff;
+        --warning: #8a4b00;
+        --warning-soft: #fff4df;
+        --success: #236a3b;
+        --success-soft: #eaf6ed;
+        --danger: #9c2b2b;
+        --shadow: 0 10px 28px rgb(25 31 22 / 8%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Arial, Helvetica, ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button,
+      input[type="checkbox"],
+      input[type="radio"],
+      select {
+        cursor: pointer;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      a:hover {
+        color: var(--accent-dark);
+      }
+
+      .skip-link {
+        position: absolute;
+        left: 1rem;
+        top: 0.75rem;
+        z-index: 20;
+        padding: 0.6rem 0.8rem;
+        background: var(--text);
+        color: var(--surface);
+        transform: translateY(-180%);
+      }
+
+      .skip-link:focus {
+        transform: none;
+      }
+
+      .page-header {
+        border-bottom: 1px solid var(--border);
+        background: var(--surface);
+      }
+
+      .page-header-inner,
+      .page-shell {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .page-header-inner {
+        padding: 38px 0 30px;
+      }
+
+      .eyebrow {
+        margin: 0 0 0.45rem;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.2;
+      }
+
+      h1 {
+        max-width: 900px;
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        letter-spacing: -0.035em;
+      }
+
+      .lede {
+        max-width: 820px;
+        margin: 1rem 0 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .page-shell {
+        padding: 26px 0 80px;
+      }
+
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+        margin-bottom: 22px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .progress-copy {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 5px;
+      }
+
+      .progress-copy strong {
+        font-size: 0.92rem;
+      }
+
+      .progress-copy span {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .progress-track {
+        height: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--surface-muted);
+      }
+
+      .progress-bar {
+        width: 0;
+        height: 100%;
+        background: var(--accent);
+        transition: width 120ms ease-out;
+      }
+
+      .toolbar-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 7px;
+      }
+
+      .button {
+        min-height: 36px;
+        padding: 0.4rem 0.7rem;
+        border: 1px solid var(--border-strong);
+        border-radius: 0;
+        background: var(--surface);
+        color: var(--text);
+      }
+
+      .button:hover,
+      .button:focus-visible {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+      }
+
+      .button-primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #ffffff;
+      }
+
+      .button-primary:hover,
+      .button-primary:focus-visible {
+        background: var(--accent-dark);
+        color: #ffffff;
+      }
+
+      .button-danger {
+        color: var(--danger);
+      }
+
+      .button-small {
+        min-height: 30px;
+        padding: 0.25rem 0.55rem;
+        font-size: 0.82rem;
+      }
+
+      .intro-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-bottom: 24px;
+      }
+
+      .panel {
+        padding: 20px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+
+      .panel h2 {
+        margin: 0 0 0.65rem;
+        font-size: 1.15rem;
+      }
+
+      .panel p {
+        margin: 0.45rem 0;
+      }
+
+      .panel ul,
+      .panel ol {
+        margin: 0.65rem 0 0;
+        padding-left: 1.2rem;
+      }
+
+      .panel li + li {
+        margin-top: 0.35rem;
+      }
+
+      .audit-alert {
+        grid-column: 1 / -1;
+        border-color: #d9b36d;
+        background: var(--warning-soft);
+      }
+
+      .snapshot-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        margin-top: 1rem;
+        border: 1px solid var(--border);
+        background: var(--border);
+      }
+
+      .snapshot-item {
+        padding: 13px;
+        background: var(--surface);
+      }
+
+      .snapshot-item strong,
+      .snapshot-item span {
+        display: block;
+      }
+
+      .snapshot-item strong {
+        font-size: 1.25rem;
+      }
+
+      .snapshot-item span {
+        margin-top: 0.15rem;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .form-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 0 0 14px;
+      }
+
+      .filter-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .autosave-status {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .spec-section {
+        margin: 0 0 14px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+
+      .spec-section > summary {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 16px 18px;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .spec-section > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .spec-section > summary::before {
+        content: "+";
+        display: inline-grid;
+        width: 24px;
+        height: 24px;
+        place-items: center;
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+
+      .spec-section[open] > summary::before {
+        content: "−";
+      }
+
+      .section-title {
+        display: block;
+        font-size: 1.04rem;
+        font-weight: 700;
+      }
+
+      .section-description {
+        display: block;
+        margin-top: 0.18rem;
+        color: var(--muted);
+        font-size: 0.83rem;
+        font-weight: 400;
+      }
+
+      .section-count {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .section-body {
+        border-top: 1px solid var(--border);
+      }
+
+      .question {
+        display: grid;
+        grid-template-columns: minmax(190px, 0.34fr) minmax(0, 0.66fr);
+        gap: 24px;
+        padding: 20px 18px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .question:last-child {
+        border-bottom: 0;
+      }
+
+      .question.is-unanswered {
+        background: color-mix(in srgb, var(--warning-soft) 55%, var(--surface));
+      }
+
+      .question-heading {
+        margin: 0;
+        font-size: 0.94rem;
+      }
+
+      .question-id {
+        margin-right: 0.4rem;
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 400;
+      }
+
+      .priority {
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding: 0.12rem 0.38rem;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+
+      .priority-p0 {
+        border-color: #d9b36d;
+        background: var(--warning-soft);
+        color: var(--warning);
+      }
+
+      .priority-p1 {
+        border-color: #9eb6df;
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+      }
+
+      .question-help {
+        margin: 0.5rem 0 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .recommendation {
+        margin: 0.65rem 0 0;
+        padding: 0.55rem 0.65rem;
+        border-left: 3px solid var(--success);
+        background: var(--success-soft);
+        color: #214e2e;
+        font-size: 0.8rem;
+      }
+
+      .options {
+        display: grid;
+        gap: 8px;
+      }
+
+      .options-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .option {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 8px;
+        align-items: start;
+        padding: 9px 10px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+
+      .option:hover {
+        border-color: var(--border-strong);
+      }
+
+      .option input {
+        margin: 0.2rem 0 0;
+      }
+
+      .option span {
+        min-width: 0;
+      }
+
+      .option small {
+        display: block;
+        margin-top: 0.15rem;
+        color: var(--muted);
+        line-height: 1.35;
+      }
+
+      .field,
+      .field-row {
+        display: grid;
+        gap: 7px;
+      }
+
+      .field-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .field label {
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="url"],
+      input[type="date"],
+      input[type="number"],
+      select,
+      textarea {
+        width: 100%;
+        min-height: 40px;
+        padding: 0.55rem 0.65rem;
+        border: 1px solid var(--border-strong);
+        border-radius: 0;
+        background: var(--surface);
+        color: var(--text);
+      }
+
+      textarea {
+        min-height: 102px;
+        resize: vertical;
+      }
+
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible,
+      button:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent);
+        outline-offset: 2px;
+      }
+
+      .status-message {
+        min-height: 1.2rem;
+        margin: 14px 0 0;
+        color: var(--success);
+        font-size: 0.84rem;
+      }
+
+      .footer-note {
+        margin-top: 20px;
+        padding: 18px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      @media (max-width: 850px) {
+        .toolbar {
+          position: static;
+          grid-template-columns: 1fr;
+        }
+
+        .toolbar-actions {
+          justify-content: flex-start;
+        }
+
+        .intro-grid,
+        .question {
+          grid-template-columns: 1fr;
+        }
+
+        .question {
+          gap: 12px;
+        }
+
+        .snapshot-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 560px) {
+        .page-header-inner,
+        .page-shell {
+          width: min(100% - 22px, 1120px);
+        }
+
+        .page-header-inner {
+          padding: 28px 0 24px;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        .options-columns,
+        .field-row,
+        .snapshot-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .spec-section > summary {
+          grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        .section-count {
+          grid-column: 2;
+        }
+
+        .toolbar-actions .button {
+          flex: 1 1 calc(50% - 8px);
+        }
+      }
+
+      @media print {
+        body {
+          background: #ffffff;
+          font-size: 11pt;
+        }
+
+        .skip-link,
+        .toolbar,
+        .form-controls,
+        .status-message,
+        .footer-note {
+          display: none !important;
+        }
+
+        .page-header-inner,
+        .page-shell {
+          width: 100%;
+        }
+
+        .page-header-inner {
+          padding: 0 0 18px;
+        }
+
+        .intro-grid {
+          display: block;
+        }
+
+        .panel,
+        .spec-section {
+          break-inside: avoid;
+          box-shadow: none;
+        }
+
+        .panel {
+          margin-bottom: 12px;
+        }
+
+        .spec-section {
+          margin-bottom: 12px;
+        }
+
+        .spec-section:not([open]) > .section-body {
+          display: block;
+        }
+
+        .spec-section > summary::before {
+          display: none;
+        }
+
+        .question {
+          grid-template-columns: 34% 66%;
+          padding: 12px;
+        }
+
+        input,
+        select,
+        textarea {
+          border-color: #999999 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#questionnaire">Skip to questionnaire</a>
+
+    <header class="page-header">
+      <div class="page-header-inner">
+        <p class="eyebrow">Decision questionnaire</p>
+        <h1>DataLicenses.org website completion specification</h1>
+        <p class="lede">
+          Answer the questions that determine the product, content, design, governance, and launch requirements.
+          The form saves in this browser. When finished, export Markdown or JSON and return that file.
+        </p>
+      </div>
+    </header>
+
+    <main class="page-shell" id="questionnaire">
+      <div class="toolbar" aria-label="Questionnaire controls">
+        <div>
+          <div class="progress-copy">
+            <strong id="progress-label">0 of 0 questions answered</strong>
+            <span id="p0-label">0 P0 decisions remaining</span>
+          </div>
+          <div
+            class="progress-track"
+            role="progressbar"
+            aria-label="Questionnaire completion"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="toolbar-actions">
+          <button class="button button-primary" type="button" id="copy-markdown">Copy Markdown</button>
+          <button class="button" type="button" id="download-markdown">Download Markdown</button>
+          <button class="button" type="button" id="download-json">Download JSON</button>
+          <button class="button" type="button" id="import-json">Import JSON</button>
+          <button class="button" type="button" id="print-form">Print</button>
+          <button class="button button-danger" type="button" id="clear-form">Clear</button>
+          <input class="sr-only" type="file" id="json-file" accept="application/json,.json" />
+        </div>
+      </div>
+
+      <section class="intro-grid" aria-label="Audit summary and instructions">
+        <article class="panel">
+          <h2>How to use this</h2>
+          <ol>
+            <li>Answer P0 questions first. They block implementation or launch.</li>
+            <li>Choose “Use the recommended default” when you want the implementation recommendation.</li>
+            <li>Use the notes fields for exceptions, examples, URLs, or exact wording.</li>
+            <li>Export the completed form as Markdown or JSON and send it back.</li>
+          </ol>
+        </article>
+
+        <article class="panel">
+          <h2>Current repository snapshot</h2>
+          <p>This questionnaire reflects the current working tree, including its uncommitted design revisions.</p>
+          <div class="snapshot-grid" aria-label="Current site statistics">
+            <div class="snapshot-item">
+              <strong>60</strong>
+              <span>current public initiatives</span>
+            </div>
+            <div class="snapshot-item">
+              <strong>2</strong>
+              <span>archived public initiatives</span>
+            </div>
+            <div class="snapshot-item">
+              <strong>8</strong>
+              <span>approach categories</span>
+            </div>
+            <div class="snapshot-item">
+              <strong>4</strong>
+              <span>goal presets</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel audit-alert">
+          <h2>Open issue found during the audit</h2>
+          <p>
+            One initiative, <strong>Humpback</strong>, is marked <code>visibility: draft</code>, but the current build
+            still generates its profile and includes it in the sitemap and public JSON. The form asks whether all
+            non-public records should be excluded from every public surface; the recommended answer is yes.
+          </p>
+        </article>
+
+        <article class="panel">
+          <h2>What is already implemented</h2>
+          <ul>
+            <li>Static Astro site deployed through Cloudflare Pages.</li>
+            <li>Homepage catalog, initiative profiles, glossary, methodology, redirects, sitemap, and robots.txt.</li>
+            <li>Search, goal presets, filters, sorting, comparison, shareable URL state, JSON endpoints, and XLSX export.</li>
+            <li>Canonical URLs, social metadata, responsive navigation, light/dark themes, and basic keyboard support.</li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h2>What is not yet fully specified</h2>
+          <ul>
+            <li>Primary audience, success metrics, final information architecture, and launch definition.</li>
+            <li>Final taxonomy, freshness thresholds, archive reasons, evidence confidence, and required profile fields.</li>
+            <li>Contribution governance, content/data licensing, privacy, analytics, accessibility target, and operating policy.</li>
+            <li>Whether current uncommitted homepage, catalog, profile, and visual changes are the approved baseline.</li>
+          </ul>
+        </article>
+      </section>
+
+      <div class="form-controls">
+        <label class="filter-toggle">
+          <input type="checkbox" id="show-unanswered" />
+          Show unanswered questions only
+        </label>
+        <p class="autosave-status" id="autosave-status" aria-live="polite">Answers are saved in this browser.</p>
+      </div>
+
+      <form id="spec-form">
+        <details class="spec-section" data-section="1" open>
+          <summary>
+            <span>
+              <span class="section-title">1. Project frame and approval</span>
+              <span class="section-description">Define what “complete” means, who decides, and what constraints govern the work.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="1.1" data-priority="P0" data-label="What outcome should this website reach in the next release?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">1.1</span>What outcome should this website reach in the next release?</h3>
+                <p class="question-help">Choose the standard that determines when this project is finished.</p>
+                <p class="recommendation">Recommended: a production-ready public reference site with a documented maintenance workflow.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q1_1" value="Production-ready public reference site" /><span>Production-ready public reference site<small>Complete content, stable UX, launch checks, and operating documentation.</small></span></label>
+                <label class="option"><input type="radio" name="q1_1" value="Research prototype" /><span>Research prototype<small>Useful for exploration, with known gaps accepted.</small></span></label>
+                <label class="option"><input type="radio" name="q1_1" value="Portfolio or project showcase" /><span>Portfolio or project showcase<small>Emphasize the research contribution and author.</small></span></label>
+                <label class="option"><input type="radio" name="q1_1" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="1.2" data-priority="P0" data-label="Who has final approval authority?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">1.2</span>Who has final approval authority?</h3>
+                <p class="question-help">Name one person for final product, editorial, and launch decisions, or describe split authority.</p>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="q1_2_owner">Final approver</label><input id="q1_2_owner" name="q1_2_owner" type="text" placeholder="Name and role" /></div>
+                <div class="field"><label for="q1_2_reviewers">Required reviewers</label><input id="q1_2_reviewers" name="q1_2_reviewers" type="text" placeholder="Names or roles" /></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="1.3" data-priority="P0" data-label="What is the target date or launch trigger?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">1.3</span>What is the target date or launch trigger?</h3>
+                <p class="question-help">A trigger can be a conference, paper release, funding milestone, or completion of specific acceptance criteria.</p>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="q1_3_date">Target date</label><input id="q1_3_date" name="q1_3_date" type="date" /></div>
+                <div class="field"><label for="q1_3_trigger">Launch trigger</label><input id="q1_3_trigger" name="q1_3_trigger" type="text" placeholder="If date is flexible" /></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="1.4" data-priority="P0" data-label="Should the current uncommitted site changes be treated as the approved baseline?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">1.4</span>Should the current uncommitted site changes be treated as the approved baseline?</h3>
+                <p class="question-help">Those changes simplify the visual system, move the catalog earlier, add grouped browsing, and revise archive handling.</p>
+                <p class="recommendation">Recommended: use them as a review baseline, then revise according to this specification.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q1_4" value="Yes, treat current changes as approved baseline" /><span>Yes, approved baseline</span></label>
+                <label class="option"><input type="radio" name="q1_4" value="Use as review baseline, not final approval" /><span>Use as review baseline, not final approval</span></label>
+                <label class="option"><input type="radio" name="q1_4" value="No, return to the committed version first" /><span>No, return to the committed version first</span></label>
+                <label class="option"><input type="radio" name="q1_4" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="1.5" data-priority="P1" data-label="Which existing assets and URLs are immutable?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">1.5</span>Which existing assets and URLs are immutable?</h3>
+                <p class="question-help">Examples: domain, profile slugs, JSON URLs, GitHub repository, Cloudflare project, social card, or public citations.</p>
+              </div>
+              <div class="field"><label for="q1_5">Constraints to preserve</label><textarea id="q1_5" name="q1_5" placeholder="List URLs, names, integrations, or commitments that cannot change."></textarea></div>
+            </div>
+
+            <div class="question" data-question="1.6" data-priority="P1" data-label="What budget, staffing, or maintenance constraints should shape the solution?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">1.6</span>What budget, staffing, or maintenance constraints should shape the solution?</h3>
+              </div>
+              <div class="field"><label for="q1_6">Constraints</label><textarea id="q1_6" name="q1_6" placeholder="For example: one maintainer, no paid SaaS, static hosting only, monthly maintenance limit."></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="2" open>
+          <summary>
+            <span>
+              <span class="section-title">2. Audience, jobs, and success</span>
+              <span class="section-description">Decide who the site is for, what they should accomplish, and how success will be measured.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="2.1" data-priority="P0" data-label="Who is the primary audience?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">2.1</span>Who is the primary audience?</h3>
+                <p class="recommendation">Recommended: rights holders, publishers, data stewards, and their advisors making practical AI-data decisions.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q2_1" value="Rights holders, publishers, and data stewards" /><span>Rights holders, publishers, and data stewards</span></label>
+                <label class="option"><input type="radio" name="q2_1" value="AI developers and data buyers" /><span>AI developers and data buyers</span></label>
+                <label class="option"><input type="radio" name="q2_1" value="Researchers, policymakers, and journalists" /><span>Researchers, policymakers, and journalists</span></label>
+                <label class="option"><input type="radio" name="q2_1" value="A deliberately equal multi-audience reference" /><span>Equal multi-audience reference</span></label>
+                <label class="option"><input type="radio" name="q2_1" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="2.2" data-priority="P1" data-label="Which secondary audiences must the site serve?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">2.2</span>Which secondary audiences must the site serve?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q2_2" value="Creators and independent rights holders" /><span>Creators and independent rights holders</span></label>
+                <label class="option"><input type="checkbox" name="q2_2" value="Publishers, archives, and platforms" /><span>Publishers, archives, and platforms</span></label>
+                <label class="option"><input type="checkbox" name="q2_2" value="AI labs and product teams" /><span>AI labs and product teams</span></label>
+                <label class="option"><input type="checkbox" name="q2_2" value="Dataset providers and marketplaces" /><span>Dataset providers and marketplaces</span></label>
+                <label class="option"><input type="checkbox" name="q2_2" value="Lawyers and policy professionals" /><span>Lawyers and policy professionals</span></label>
+                <label class="option"><input type="checkbox" name="q2_2" value="Researchers, students, and journalists" /><span>Researchers, students, and journalists</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="2.3" data-priority="P0" data-label="What is the single most important user job?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">2.3</span>What is the single most important user job?</h3>
+                <p class="recommendation">Recommended: find and compare credible options for a concrete AI-data rights, access, licensing, or sourcing goal.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q2_3" value="Find and compare options for a concrete goal" /><span>Find and compare options for a concrete goal</span></label>
+                <label class="option"><input type="radio" name="q2_3" value="Understand the landscape and terminology" /><span>Understand the landscape and terminology</span></label>
+                <label class="option"><input type="radio" name="q2_3" value="Evaluate one named initiative" /><span>Evaluate one named initiative</span></label>
+                <label class="option"><input type="radio" name="q2_3" value="Download or reuse the catalog data" /><span>Download or reuse the catalog data</span></label>
+                <label class="option"><input type="radio" name="q2_3" value="Submit a correction or new initiative" /><span>Submit a correction or new initiative</span></label>
+                <label class="option"><input type="radio" name="q2_3" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="2.4" data-priority="P0" data-label="What is the primary call to action on the homepage?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">2.4</span>What is the primary call to action on the homepage?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q2_4" value="Browse and compare initiatives" /><span>Browse and compare initiatives</span></label>
+                <label class="option"><input type="radio" name="q2_4" value="Choose a goal" /><span>Choose a goal</span></label>
+                <label class="option"><input type="radio" name="q2_4" value="Read the methodology first" /><span>Read the methodology first</span></label>
+                <label class="option"><input type="radio" name="q2_4" value="Download the catalog" /><span>Download the catalog</span></label>
+                <label class="option"><input type="radio" name="q2_4" value="Use the recommended default" /><span>Use the recommended default<small>Browse and compare initiatives.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="2.5" data-priority="P1" data-label="Which outcomes will define success after launch?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">2.5</span>Which outcomes will define success after launch?</h3>
+              </div>
+              <div>
+                <div class="options options-columns">
+                  <label class="option"><input type="checkbox" name="q2_5" value="Catalog searches or filter interactions" /><span>Catalog searches or filter interactions</span></label>
+                  <label class="option"><input type="checkbox" name="q2_5" value="Initiative profile visits" /><span>Initiative profile visits</span></label>
+                  <label class="option"><input type="checkbox" name="q2_5" value="Comparison use" /><span>Comparison use</span></label>
+                  <label class="option"><input type="checkbox" name="q2_5" value="External source click-throughs" /><span>External source click-throughs</span></label>
+                  <label class="option"><input type="checkbox" name="q2_5" value="Dataset or API downloads" /><span>Dataset or API downloads</span></label>
+                  <label class="option"><input type="checkbox" name="q2_5" value="Corrections and contributions" /><span>Corrections and contributions</span></label>
+                  <label class="option"><input type="checkbox" name="q2_5" value="Citations in research or policy work" /><span>Citations in research or policy work</span></label>
+                  <label class="option"><input type="checkbox" name="q2_5" value="No quantitative analytics required" /><span>No quantitative analytics required</span></label>
+                </div>
+                <div class="field" style="margin-top: 10px;"><label for="q2_5_targets">Targets or qualitative signals</label><textarea id="q2_5_targets" name="q2_5_targets" placeholder="State targets, review period, or examples of meaningful use."></textarea></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="2.6" data-priority="P1" data-label="What should the homepage promise say?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">2.6</span>What should the homepage promise say?</h3>
+                <p class="question-help">Current wording: “Find ways to control, license, sell, or source data for AI.”</p>
+              </div>
+              <div class="field"><label for="q2_6">Approved headline or direction</label><textarea id="q2_6" name="q2_6" placeholder="Keep the current wording, edit it, or describe the promise the headline must make."></textarea></div>
+            </div>
+
+            <div class="question" data-question="2.7" data-priority="P2" data-label="Which audiences or use cases are explicitly out of scope?">
+              <div>
+                <span class="priority">P2</span>
+                <h3 class="question-heading"><span class="question-id">2.7</span>Which audiences or use cases are explicitly out of scope?</h3>
+              </div>
+              <div class="field"><label for="q2_7">Out-of-scope users or tasks</label><textarea id="q2_7" name="q2_7" placeholder="For example: consumer legal advice, vendor procurement recommendations, litigation tracking."></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="3">
+          <summary>
+            <span>
+              <span class="section-title">3. Catalog scope and editorial boundaries</span>
+              <span class="section-description">Set the inclusion rule, unit of analysis, geographic scope, and safety boundaries.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="3.1" data-priority="P0" data-label="Which initiative types belong in the catalog?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">3.1</span>Which initiative types belong in the catalog?</h3>
+                <p class="recommendation">Recommended: retain the current broad scope, but require a direct, public connection to AI data rights, access, licensing, sourcing, or enforcement.</p>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q3_1" value="Preference signals and machine-readable terms" /><span>Preference signals and machine-readable terms</span></label>
+                <label class="option"><input type="checkbox" name="q3_1" value="Formal licenses and licensing collectives" /><span>Formal licenses and licensing collectives</span></label>
+                <label class="option"><input type="checkbox" name="q3_1" value="Data marketplaces and brokers" /><span>Data marketplaces and brokers</span></label>
+                <label class="option"><input type="checkbox" name="q3_1" value="Technical access controls and tollgates" /><span>Technical access controls and tollgates</span></label>
+                <label class="option"><input type="checkbox" name="q3_1" value="Certification and provenance programs" /><span>Certification and provenance programs</span></label>
+                <label class="option"><input type="checkbox" name="q3_1" value="Governed data-sharing infrastructure" /><span>Governed data-sharing infrastructure</span></label>
+                <label class="option"><input type="checkbox" name="q3_1" value="Research proposals without a deployable product" /><span>Research proposals without a deployable product</span></label>
+                <label class="option"><input type="checkbox" name="q3_1" value="Coalitions and advocacy groups" /><span>Coalitions and advocacy groups</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="3.2" data-priority="P0" data-label="What minimum public evidence is required for inclusion?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">3.2</span>What minimum public evidence is required for inclusion?</h3>
+                <p class="recommendation">Recommended: a canonical public page plus at least one dated primary source supporting current status or a meaningful claim.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q3_2" value="Canonical page plus dated primary evidence" /><span>Canonical page plus dated primary evidence</span></label>
+                <label class="option"><input type="radio" name="q3_2" value="Canonical page is enough" /><span>Canonical page is enough</span></label>
+                <label class="option"><input type="radio" name="q3_2" value="Credible third-party reporting is enough" /><span>Credible third-party reporting is enough</span></label>
+                <label class="option"><input type="radio" name="q3_2" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="3.3" data-priority="P1" data-label="How should commercial products, standards, proposals, and organizations coexist?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">3.3</span>How should commercial products, standards, proposals, and organizations coexist?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q3_3" value="One catalog with clear type and status labels" /><span>One catalog with clear type and status labels</span></label>
+                <label class="option"><input type="radio" name="q3_3" value="Separate catalogs or tabs by type" /><span>Separate catalogs or tabs by type</span></label>
+                <label class="option"><input type="radio" name="q3_3" value="Current approach categories are sufficient" /><span>Current approach categories are sufficient</span></label>
+                <label class="option"><input type="radio" name="q3_3" value="Use the recommended default" /><span>Use the recommended default<small>One catalog with clear labels.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="3.4" data-priority="P1" data-label="What is the unit of analysis?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">3.4</span>What is the unit of analysis?</h3>
+                <p class="question-help">This determines whether one company with several products receives one profile or several.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q3_4" value="One profile per distinct public initiative or product" /><span>One profile per distinct public initiative or product</span></label>
+                <label class="option"><input type="radio" name="q3_4" value="One profile per organization" /><span>One profile per organization</span></label>
+                <label class="option"><input type="radio" name="q3_4" value="Use editorial judgment with documented merge/split rules" /><span>Editorial judgment with documented merge/split rules</span></label>
+                <label class="option"><input type="radio" name="q3_4" value="Use the recommended default" /><span>Use the recommended default<small>Distinct initiative or product.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="3.5" data-priority="P1" data-label="What geographic and language scope should apply?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">3.5</span>What geographic and language scope should apply?</h3>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="q3_5_geo">Geographic scope</label><input id="q3_5_geo" name="q3_5_geo" type="text" placeholder="Global, named jurisdictions, or English-language sources only" /></div>
+                <div class="field"><label for="q3_5_language">Site and source languages</label><input id="q3_5_language" name="q3_5_language" type="text" placeholder="English only, multilingual later, translations allowed" /></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="3.6" data-priority="P0" data-label="Which exclusions must be explicit?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">3.6</span>Which exclusions must be explicit?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q3_6" value="Pure commentary or advocacy without an initiative" /><span>Pure commentary or advocacy without an initiative</span></label>
+                <label class="option"><input type="checkbox" name="q3_6" value="Private offerings with no public documentation" /><span>Private offerings with no public documentation</span></label>
+                <label class="option"><input type="checkbox" name="q3_6" value="General AI governance unrelated to data rights or access" /><span>General AI governance unrelated to data rights or access</span></label>
+                <label class="option"><input type="checkbox" name="q3_6" value="Litigation trackers and legal case databases" /><span>Litigation trackers and legal case databases</span></label>
+                <label class="option"><input type="checkbox" name="q3_6" value="Unverified announcements or stealth projects" /><span>Unverified announcements or stealth projects</span></label>
+                <label class="option"><input type="checkbox" name="q3_6" value="Tools focused only on model outputs or synthetic-content detection" /><span>Tools focused only on model outputs or synthetic-content detection</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="3.7" data-priority="P0" data-label="What legal and recommendation boundary should the site state?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">3.7</span>What legal and recommendation boundary should the site state?</h3>
+                <p class="recommendation">Recommended: the catalog reports public claims and evidence; inclusion is not endorsement, legal advice, procurement advice, or proof of effectiveness.</p>
+              </div>
+              <div class="field"><label for="q3_7">Approved disclaimer or required points</label><textarea id="q3_7" name="q3_7" placeholder="Approve the recommendation or provide exact language and placement requirements."></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="4">
+          <summary>
+            <span>
+              <span class="section-title">4. Taxonomy, statuses, and terminology</span>
+              <span class="section-description">Approve the classification model users will browse and interpret.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="4.1" data-priority="P0" data-label="Should the four current goal presets remain?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">4.1</span>Should the four current goal presets remain?</h3>
+                <p class="question-help">Current goals: reduce automated access; state terms; license or monetize; source governed data.</p>
+                <p class="recommendation">Recommended: keep the four goals for launch, then revise only with user evidence.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q4_1" value="Keep all four as written" /><span>Keep all four as written</span></label>
+                <label class="option"><input type="radio" name="q4_1" value="Keep four but revise names or order" /><span>Keep four but revise names or order</span></label>
+                <label class="option"><input type="radio" name="q4_1" value="Replace with audience-specific paths" /><span>Replace with audience-specific paths</span></label>
+                <label class="option"><input type="radio" name="q4_1" value="Remove goal presets" /><span>Remove goal presets</span></label>
+                <label class="option"><input type="radio" name="q4_1" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="4.2" data-priority="P1" data-label="What should the final goal names, descriptions, and order be?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">4.2</span>What should the final goal names, descriptions, and order be?</h3>
+              </div>
+              <div class="field"><label for="q4_2">Approved goal language</label><textarea id="q4_2" name="q4_2" placeholder="List goals in order, or write “keep current.”"></textarea></div>
+            </div>
+
+            <div class="question" data-question="4.3" data-priority="P0" data-label="Should the eight current approach categories remain?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">4.3</span>Should the eight current approach categories remain?</h3>
+                <p class="question-help">Preference signal, formal license, licensing collective, marketplace, tollgate, technical blocking, new infrastructure, certification.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q4_3" value="Keep all eight" /><span>Keep all eight</span></label>
+                <label class="option"><input type="radio" name="q4_3" value="Keep but rename one or more" /><span>Keep but rename one or more</span></label>
+                <label class="option"><input type="radio" name="q4_3" value="Merge categories" /><span>Merge categories</span></label>
+                <label class="option"><input type="radio" name="q4_3" value="Add categories" /><span>Add categories</span></label>
+                <label class="option"><input type="radio" name="q4_3" value="Use the recommended default" /><span>Use the recommended default<small>Keep all eight for launch.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="4.4" data-priority="P1" data-label="Is “New infrastructure” too broad?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">4.4</span>Is “New infrastructure” too broad?</h3>
+                <p class="question-help">It currently contains registries, protocols, authentication, governed sharing, and coalitions.</p>
+                <p class="recommendation">Recommended: rename it “Governance infrastructure” now; split it only if the catalog grows enough to make the distinction useful.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q4_4" value="Keep New infrastructure" /><span>Keep “New infrastructure”</span></label>
+                <label class="option"><input type="radio" name="q4_4" value="Rename to Governance infrastructure" /><span>Rename to “Governance infrastructure”</span></label>
+                <label class="option"><input type="radio" name="q4_4" value="Split registries, protocols, and governed sharing" /><span>Split registries, protocols, and governed sharing</span></label>
+                <label class="option"><input type="radio" name="q4_4" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="4.5" data-priority="P0" data-label="Can an initiative have multiple approaches, and how is the primary one chosen?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">4.5</span>Can an initiative have multiple approaches, and how is the primary one chosen?</h3>
+              </div>
+              <div class="field"><label for="q4_5">Classification rule</label><textarea id="q4_5" name="q4_5" placeholder="For example: multiple allowed; primary = mechanism most central to the public offer, with editorial rationale when ambiguous."></textarea></div>
+            </div>
+
+            <div class="question" data-question="4.6" data-priority="P0" data-label="What should the public status model be?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">4.6</span>What should the public status model be?</h3>
+                <p class="recommendation">Recommended: keep Live, In progress, and Archived; add a separate archive reason and last-checked date.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q4_6" value="Keep Live, In progress, Archived" /><span>Keep Live, In progress, Archived</span></label>
+                <label class="option"><input type="radio" name="q4_6" value="Add Announced or Pilot" /><span>Add “Announced” or “Pilot”</span></label>
+                <label class="option"><input type="radio" name="q4_6" value="Replace with maturity levels" /><span>Replace with maturity levels</span></label>
+                <label class="option"><input type="radio" name="q4_6" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="4.7" data-priority="P0" data-label="Which archive reasons should be distinguished?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">4.7</span>Which archive reasons should be distinguished?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q4_7" value="Discontinued" /><span>Discontinued</span></label>
+                <label class="option"><input type="checkbox" name="q4_7" value="Acquired or absorbed" /><span>Acquired or absorbed</span></label>
+                <label class="option"><input type="checkbox" name="q4_7" value="Replaced or superseded" /><span>Replaced or superseded</span></label>
+                <label class="option"><input type="checkbox" name="q4_7" value="Dormant or no recent evidence" /><span>Dormant or no recent evidence</span></label>
+                <label class="option"><input type="checkbox" name="q4_7" value="No longer in scope" /><span>No longer in scope</span></label>
+                <label class="option"><input type="checkbox" name="q4_7" value="Status unknown" /><span>Status unknown</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="4.8" data-priority="P1" data-label="Should “Practical force” remain a derived label based on primary approach?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">4.8</span>Should “Practical force” remain a derived label based on primary approach?</h3>
+                <p class="question-help">Current labels include Voluntary signal, Legal terms, Contractual access, Technical control, and Emerging infrastructure.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q4_8" value="Keep derived practical-force labels" /><span>Keep derived practical-force labels</span></label>
+                <label class="option"><input type="radio" name="q4_8" value="Make practical force an editorial field per initiative" /><span>Make practical force an editorial field per initiative</span></label>
+                <label class="option"><input type="radio" name="q4_8" value="Remove practical force" /><span>Remove practical force</span></label>
+                <label class="option"><input type="radio" name="q4_8" value="Use the recommended default" /><span>Use the recommended default<small>Keep the derived baseline and allow an initiative-specific clarification.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="4.9" data-priority="P1" data-label="Are the pipeline stages and data types complete?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">4.9</span>Are the pipeline stages and data types complete?</h3>
+                <p class="question-help">Pipeline: collect, train, fine-tune, retrieve, generate. Data: web, text, images, video, audio, music, code, structured, multimodal.</p>
+              </div>
+              <div class="field"><label for="q4_9">Changes or approval</label><textarea id="q4_9" name="q4_9" placeholder="Write “keep current” or list additions, removals, and definitions."></textarea></div>
+            </div>
+
+            <div class="question" data-question="4.10" data-priority="P2" data-label="Who owns glossary definitions and how are they reviewed?">
+              <div>
+                <span class="priority">P2</span>
+                <h3 class="question-heading"><span class="question-id">4.10</span>Who owns glossary definitions and how are they reviewed?</h3>
+              </div>
+              <div class="field"><label for="q4_10">Glossary governance</label><textarea id="q4_10" name="q4_10" placeholder="Editorial owner, citation expectations, review cadence, and whether definitions may include contested legal claims."></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="5">
+          <summary>
+            <span>
+              <span class="section-title">5. Evidence, freshness, and confidence</span>
+              <span class="section-description">Specify what dates mean, how claims are sourced, and when records become stale.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="5.1" data-priority="P0" data-label="What should “Latest update” mean?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">5.1</span>What should “Latest update” mean?</h3>
+                <p class="question-help">It currently means the date of the newest tracked evidence link, which may not be the date the profile was verified.</p>
+                <p class="recommendation">Recommended: label it “Latest tracked evidence” and add a separate “Last checked” date.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q5_1" value="Newest tracked evidence date" /><span>Newest tracked evidence date</span></label>
+                <label class="option"><input type="radio" name="q5_1" value="Last full editorial verification date" /><span>Last full editorial verification date</span></label>
+                <label class="option"><input type="radio" name="q5_1" value="Show both latest evidence and last checked" /><span>Show both latest evidence and last checked</span></label>
+                <label class="option"><input type="radio" name="q5_1" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="5.2" data-priority="P0" data-label="What sources count as acceptable evidence?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">5.2</span>What sources count as acceptable evidence?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q5_2" value="Official product or organization pages" /><span>Official product or organization pages</span></label>
+                <label class="option"><input type="checkbox" name="q5_2" value="Official documentation, standards, and repositories" /><span>Official documentation, standards, and repositories</span></label>
+                <label class="option"><input type="checkbox" name="q5_2" value="Official announcements and filings" /><span>Official announcements and filings</span></label>
+                <label class="option"><input type="checkbox" name="q5_2" value="Credible independent reporting" /><span>Credible independent reporting</span></label>
+                <label class="option"><input type="checkbox" name="q5_2" value="Partner or customer announcements" /><span>Partner or customer announcements</span></label>
+                <label class="option"><input type="checkbox" name="q5_2" value="Archived pages or web captures" /><span>Archived pages or web captures</span></label>
+                <label class="option"><input type="checkbox" name="q5_2" value="Social posts from official accounts" /><span>Social posts from official accounts</span></label>
+                <label class="option"><input type="checkbox" name="q5_2" value="Conference talks or recordings" /><span>Conference talks or recordings</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="5.3" data-priority="P0" data-label="How frequently must current profiles be checked?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">5.3</span>How frequently must current profiles be checked?</h3>
+                <p class="recommendation">Recommended: rolling review, with every current public record checked at least every six months and high-traffic or fast-moving records more often.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q5_3" value="Every 3 months" /><span>Every 3 months</span></label>
+                <label class="option"><input type="radio" name="q5_3" value="Every 6 months" /><span>Every 6 months</span></label>
+                <label class="option"><input type="radio" name="q5_3" value="Every 12 months" /><span>Every 12 months</span></label>
+                <label class="option"><input type="radio" name="q5_3" value="Event-driven only" /><span>Event-driven only</span></label>
+                <label class="option"><input type="radio" name="q5_3" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="5.4" data-priority="P0" data-label="When does a record become stale or archived?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">5.4</span>When does a record become stale or archived?</h3>
+              </div>
+              <div class="field"><label for="q5_4">Threshold and review rule</label><textarea id="q5_4" name="q5_4" placeholder="Specify time threshold, failed verification steps, evidence of discontinuation, and whether inactivity alone is enough."></textarea></div>
+            </div>
+
+            <div class="question" data-question="5.5" data-priority="P1" data-label="How should missing adoption metrics be shown?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">5.5</span>How should missing adoption metrics be shown?</h3>
+                <p class="question-help">Thirty-seven of 63 records currently have no users, data-volume, or payment metric.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q5_5" value="No public adoption figure found" /><span>“No public adoption figure found”</span></label>
+                <label class="option"><input type="radio" name="q5_5" value="Leave the field blank" /><span>Leave the field blank</span></label>
+                <label class="option"><input type="radio" name="q5_5" value="Show research status such as needs research or hard to quantify" /><span>Show research status</span></label>
+                <label class="option"><input type="radio" name="q5_5" value="Use the recommended default" /><span>Use the recommended default<small>Say no public figure found and keep research status editorial-only.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="5.6" data-priority="P1" data-label="Should evidence receive a confidence or source-quality label?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">5.6</span>Should evidence receive a confidence or source-quality label?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q5_6" value="No confidence label; explain caveats in text" /><span>No confidence label; explain caveats in text</span></label>
+                <label class="option"><input type="radio" name="q5_6" value="Label primary, partner, and independent sources" /><span>Label primary, partner, and independent sources</span></label>
+                <label class="option"><input type="radio" name="q5_6" value="Add an editorial confidence score" /><span>Add an editorial confidence score</span></label>
+                <label class="option"><input type="radio" name="q5_6" value="Use the recommended default" /><span>Use the recommended default<small>Label source type; avoid a numeric score.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="5.7" data-priority="P1" data-label="How should conflicting or corrected claims be handled?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">5.7</span>How should conflicting or corrected claims be handled?</h3>
+              </div>
+              <div class="field"><label for="q5_7">Conflict and correction policy</label><textarea id="q5_7" name="q5_7" placeholder="Describe precedence, notes, retained history, and when a claim is removed."></textarea></div>
+            </div>
+
+            <div class="question" data-question="5.8" data-priority="P1" data-label="Should important source pages be archived or snapshotted?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">5.8</span>Should important source pages be archived or snapshotted?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q5_8" value="Yes, archive key sources where legally and technically appropriate" /><span>Yes, archive key sources where appropriate</span></label>
+                <label class="option"><input type="radio" name="q5_8" value="No, link only to original sources" /><span>No, link only to original sources</span></label>
+                <label class="option"><input type="radio" name="q5_8" value="Only archive sources at risk of disappearing" /><span>Only archive sources at risk</span></label>
+                <label class="option"><input type="radio" name="q5_8" value="Use the recommended default" /><span>Use the recommended default<small>Archive high-value sources at risk of link rot.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="5.9" data-priority="P0" data-label="Who must review claims before publication?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">5.9</span>Who must review claims before publication?</h3>
+              </div>
+              <div class="field"><label for="q5_9">Editorial sign-off rule</label><textarea id="q5_9" name="q5_9" placeholder="For example: one human reviewer for routine updates; two reviewers for status, legal characterization, or disputed claims."></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="6">
+          <summary>
+            <span>
+              <span class="section-title">6. Initiative profiles and content model</span>
+              <span class="section-description">Define required fields, empty states, related content, and profile-level history.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="6.1" data-priority="P0" data-label="Which profile sections are required before publication?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">6.1</span>Which profile sections are required before publication?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q6_1" value="Title and neutral summary" /><span>Title and neutral summary</span></label>
+                <label class="option"><input type="checkbox" name="q6_1" value="Canonical website" /><span>Canonical website</span></label>
+                <label class="option"><input type="checkbox" name="q6_1" value="Status and status rationale" /><span>Status and status rationale</span></label>
+                <label class="option"><input type="checkbox" name="q6_1" value="Primary and secondary approaches" /><span>Primary and secondary approaches</span></label>
+                <label class="option"><input type="checkbox" name="q6_1" value="Practical force and caveat" /><span>Practical force and caveat</span></label>
+                <label class="option"><input type="checkbox" name="q6_1" value="At least one dated evidence link" /><span>At least one dated evidence link</span></label>
+                <label class="option"><input type="checkbox" name="q6_1" value="What it is body copy" /><span>“What it is” body copy</span></label>
+                <label class="option"><input type="checkbox" name="q6_1" value="Limitations or considerations" /><span>Limitations or considerations</span></label>
+                <label class="option"><input type="checkbox" name="q6_1" value="Pipeline stages and data types" /><span>Pipeline stages and data types</span></label>
+                <label class="option"><input type="checkbox" name="q6_1" value="Last checked date" /><span>Last checked date</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="6.2" data-priority="P0" data-label="What should happen when required or useful fields are missing?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">6.2</span>What should happen when required or useful fields are missing?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q6_2" value="Block publication if a required field is missing" /><span>Block publication if a required field is missing</span></label>
+                <label class="option"><input type="radio" name="q6_2" value="Publish with explicit unknown or not found labels" /><span>Publish with explicit “unknown” or “not found” labels</span></label>
+                <label class="option"><input type="radio" name="q6_2" value="Hide missing sections" /><span>Hide missing sections</span></label>
+                <label class="option"><input type="radio" name="q6_2" value="Use the recommended default" /><span>Use the recommended default<small>Block missing essentials; hide optional sections; state when important evidence was not found.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="6.3" data-priority="P1" data-label="Which additional structured fields should profiles include?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">6.3</span>Which additional structured fields should profiles include?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q6_3" value="Operating organization or owner" /><span>Operating organization or owner</span></label>
+                <label class="option"><input type="checkbox" name="q6_3" value="Launch date" /><span>Launch date</span></label>
+                <label class="option"><input type="checkbox" name="q6_3" value="Geographic availability or jurisdiction" /><span>Geographic availability or jurisdiction</span></label>
+                <label class="option"><input type="checkbox" name="q6_3" value="Pricing or commercial availability" /><span>Pricing or commercial availability</span></label>
+                <label class="option"><input type="checkbox" name="q6_3" value="Open-source status and software license" /><span>Open-source status and software license</span></label>
+                <label class="option"><input type="checkbox" name="q6_3" value="Rights or contact channel" /><span>Rights or contact channel</span></label>
+                <label class="option"><input type="checkbox" name="q6_3" value="Supported integrations or platforms" /><span>Supported integrations or platforms</span></label>
+                <label class="option"><input type="checkbox" name="q6_3" value="Archive reason and successor" /><span>Archive reason and successor</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="6.4" data-priority="P1" data-label="How long and detailed should profile prose be?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">6.4</span>How long and detailed should profile prose be?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q6_4" value="Short reference entry, approximately 100 to 250 words" /><span>Short reference entry, about 100–250 words</span></label>
+                <label class="option"><input type="radio" name="q6_4" value="Detailed brief, approximately 300 to 700 words" /><span>Detailed brief, about 300–700 words</span></label>
+                <label class="option"><input type="radio" name="q6_4" value="Variable length based on evidence and importance" /><span>Variable length based on evidence and importance</span></label>
+                <label class="option"><input type="radio" name="q6_4" value="Use the recommended default" /><span>Use the recommended default<small>Short reference entry, with evidence carrying the detail.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="6.5" data-priority="P1" data-label="How should evidence be ordered and labeled on profiles?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">6.5</span>How should evidence be ordered and labeled on profiles?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q6_5" value="Newest first with date, label, domain, and source type" /><span>Newest first with date, label, domain, and source type</span></label>
+                <label class="option"><input type="radio" name="q6_5" value="Grouped by claim or topic" /><span>Grouped by claim or topic</span></label>
+                <label class="option"><input type="radio" name="q6_5" value="Curated highlights plus full evidence list" /><span>Curated highlights plus full evidence list</span></label>
+                <label class="option"><input type="radio" name="q6_5" value="Use the recommended default" /><span>Use the recommended default<small>Newest first with source type.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="6.6" data-priority="P1" data-label="What should “Related in catalog” mean?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">6.6</span>What should “Related in catalog” mean?</h3>
+                <p class="question-help">It currently ranks profiles by shared approach categories and recency.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q6_6" value="Algorithmic similarity based on taxonomy" /><span>Algorithmic similarity based on taxonomy</span></label>
+                <label class="option"><input type="radio" name="q6_6" value="Editorially curated relationships" /><span>Editorially curated relationships</span></label>
+                <label class="option"><input type="radio" name="q6_6" value="Hybrid algorithmic suggestions with editorial overrides" /><span>Hybrid with editorial overrides</span></label>
+                <label class="option"><input type="radio" name="q6_6" value="Remove related profiles" /><span>Remove related profiles</span></label>
+                <label class="option"><input type="radio" name="q6_6" value="Use the recommended default" /><span>Use the recommended default<small>Hybrid with editorial overrides.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="6.7" data-priority="P1" data-label="What does a dependency relationship mean?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">6.7</span>What does a dependency relationship mean?</h3>
+                <p class="question-help">Only three records currently declare dependencies.</p>
+              </div>
+              <div class="field"><label for="q6_7">Dependency rule and label</label><textarea id="q6_7" name="q6_7" placeholder="Define whether it means implements, relies on, incorporates, is built on, or partners with."></textarea></div>
+            </div>
+
+            <div class="question" data-question="6.8" data-priority="P1" data-label="Which initiatives should include implementation examples or code snippets?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">6.8</span>Which initiatives should include implementation examples or code snippets?</h3>
+                <p class="question-help">Ten of 63 records currently include snippets.</p>
+              </div>
+              <div class="field"><label for="q6_8">Snippet inclusion rule</label><textarea id="q6_8" name="q6_8" placeholder="For example: only open standards and deployable technical mechanisms with a primary source."></textarea></div>
+            </div>
+
+            <div class="question" data-question="6.9" data-priority="P2" data-label="Should each profile show an edit history or permanent citation information?">
+              <div>
+                <span class="priority">P2</span>
+                <h3 class="question-heading"><span class="question-id">6.9</span>Should each profile show an edit history or permanent citation information?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="checkbox" name="q6_9" value="Last modified date" /><span>Last modified date</span></label>
+                <label class="option"><input type="checkbox" name="q6_9" value="Last checked date" /><span>Last checked date</span></label>
+                <label class="option"><input type="checkbox" name="q6_9" value="Link to source file or Git history" /><span>Link to source file or Git history</span></label>
+                <label class="option"><input type="checkbox" name="q6_9" value="Suggested citation" /><span>Suggested citation</span></label>
+                <label class="option"><input type="checkbox" name="q6_9" value="No public history metadata" /><span>No public history metadata</span></label>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="7">
+          <summary>
+            <span>
+              <span class="section-title">7. Homepage, catalog, search, and comparison</span>
+              <span class="section-description">Approve the main browsing flow, defaults, mobile behavior, and shareable state.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="7.1" data-priority="P0" data-label="What should the homepage content order be?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">7.1</span>What should the homepage content order be?</h3>
+                <p class="question-help">Current uncommitted work moves the catalog above recent evidence.</p>
+                <p class="recommendation">Recommended: concise hero and context, catalog, recent evidence, then archived records.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q7_1" value="Hero, catalog, recent evidence, archived" /><span>Hero → catalog → recent evidence → archived</span></label>
+                <label class="option"><input type="radio" name="q7_1" value="Hero, recent evidence, catalog, archived" /><span>Hero → recent evidence → catalog → archived</span></label>
+                <label class="option"><input type="radio" name="q7_1" value="Catalog first with minimal hero" /><span>Catalog first with minimal hero</span></label>
+                <label class="option"><input type="radio" name="q7_1" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.2" data-priority="P0" data-label="What should the default catalog sort be?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">7.2</span>What should the default catalog sort be?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="radio" name="q7_2" value="Latest tracked evidence" /><span>Latest tracked evidence</span></label>
+                <label class="option"><input type="radio" name="q7_2" value="Alphabetical" /><span>Alphabetical</span></label>
+                <label class="option"><input type="radio" name="q7_2" value="Status then recency" /><span>Status then recency</span></label>
+                <label class="option"><input type="radio" name="q7_2" value="Editorially featured order" /><span>Editorially featured order</span></label>
+                <label class="option"><input type="radio" name="q7_2" value="Use the recommended default" /><span>Use the recommended default<small>Latest tracked evidence.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.3" data-priority="P0" data-label="What should the default catalog layout be?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">7.3</span>What should the default catalog layout be?</h3>
+                <p class="question-help">The current working version offers “One table” and “By category.”</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q7_3" value="One table by default with grouped option" /><span>One table by default, with grouped option</span></label>
+                <label class="option"><input type="radio" name="q7_3" value="Grouped by category by default" /><span>Grouped by category by default</span></label>
+                <label class="option"><input type="radio" name="q7_3" value="Cards rather than table rows" /><span>Cards rather than table rows</span></label>
+                <label class="option"><input type="radio" name="q7_3" value="Use the recommended default" /><span>Use the recommended default<small>One table, grouped optional.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.4" data-priority="P0" data-label="How should archived initiatives appear in browsing?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">7.4</span>How should archived initiatives appear in browsing?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q7_4" value="Separate homepage table, excluded from catalog filters" /><span>Separate homepage table, excluded from catalog filters</span></label>
+                <label class="option"><input type="radio" name="q7_4" value="Hidden by default with an Include archived filter" /><span>Hidden by default with “Include archived” filter</span></label>
+                <label class="option"><input type="radio" name="q7_4" value="Dedicated archive page" /><span>Dedicated archive page</span></label>
+                <label class="option"><input type="radio" name="q7_4" value="Do not publish archived profiles" /><span>Do not publish archived profiles</span></label>
+                <label class="option"><input type="radio" name="q7_4" value="Use the recommended default" /><span>Use the recommended default<small>Dedicated archive section or page, excluded from default results.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.5" data-priority="P1" data-label="Which filters must be available at launch?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">7.5</span>Which filters must be available at launch?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q7_5" value="Status" /><span>Status</span></label>
+                <label class="option"><input type="checkbox" name="q7_5" value="Approach" /><span>Approach</span></label>
+                <label class="option"><input type="checkbox" name="q7_5" value="Data type" /><span>Data type</span></label>
+                <label class="option"><input type="checkbox" name="q7_5" value="Pipeline stage" /><span>Pipeline stage</span></label>
+                <label class="option"><input type="checkbox" name="q7_5" value="Adoption evidence available" /><span>Adoption evidence available</span></label>
+                <label class="option"><input type="checkbox" name="q7_5" value="Implementation example available" /><span>Implementation example available</span></label>
+                <label class="option"><input type="checkbox" name="q7_5" value="Jurisdiction" /><span>Jurisdiction</span></label>
+                <label class="option"><input type="checkbox" name="q7_5" value="Commercial versus noncommercial" /><span>Commercial vs. noncommercial</span></label>
+                <label class="option"><input type="checkbox" name="q7_5" value="Open source or open standard" /><span>Open source or open standard</span></label>
+                <label class="option"><input type="checkbox" name="q7_5" value="Archive reason" /><span>Archive reason</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.6" data-priority="P1" data-label="What should free-text search cover?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">7.6</span>What should free-text search cover?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q7_6" value="Title and summary" /><span>Title and summary</span></label>
+                <label class="option"><input type="checkbox" name="q7_6" value="Tags and taxonomy labels" /><span>Tags and taxonomy labels</span></label>
+                <label class="option"><input type="checkbox" name="q7_6" value="Body copy" /><span>Body copy</span></label>
+                <label class="option"><input type="checkbox" name="q7_6" value="Evidence labels and source domains" /><span>Evidence labels and source domains</span></label>
+                <label class="option"><input type="checkbox" name="q7_6" value="Glossary terms" /><span>Glossary terms</span></label>
+                <label class="option"><input type="checkbox" name="q7_6" value="Aliases and former names" /><span>Aliases and former names</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.7" data-priority="P1" data-label="What should comparison support?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">7.7</span>What should comparison support?</h3>
+              </div>
+              <div>
+                <div class="options">
+                  <label class="option"><input type="radio" name="q7_7" value="Compare 2 to 3 initiatives with current fields" /><span>Compare 2–3 initiatives with current fields</span></label>
+                  <label class="option"><input type="radio" name="q7_7" value="Compare up to 5 initiatives" /><span>Compare up to 5 initiatives</span></label>
+                  <label class="option"><input type="radio" name="q7_7" value="Add a persistent comparison page with shareable URL" /><span>Add a persistent comparison page with shareable URL</span></label>
+                  <label class="option"><input type="radio" name="q7_7" value="Remove comparison" /><span>Remove comparison</span></label>
+                  <label class="option"><input type="radio" name="q7_7" value="Use the recommended default" /><span>Use the recommended default<small>Keep 2–3 and make the comparison state shareable.</small></span></label>
+                </div>
+                <div class="field" style="margin-top: 10px;"><label for="q7_7_fields">Required comparison rows</label><textarea id="q7_7_fields" name="q7_7_fields" placeholder="List the fields that matter most side by side."></textarea></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.8" data-priority="P1" data-label="Which catalog state should be encoded in the URL?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">7.8</span>Which catalog state should be encoded in the URL?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q7_8" value="Search query" /><span>Search query</span></label>
+                <label class="option"><input type="checkbox" name="q7_8" value="Goal selection" /><span>Goal selection</span></label>
+                <label class="option"><input type="checkbox" name="q7_8" value="Filters" /><span>Filters</span></label>
+                <label class="option"><input type="checkbox" name="q7_8" value="Sort" /><span>Sort</span></label>
+                <label class="option"><input type="checkbox" name="q7_8" value="View mode" /><span>View mode</span></label>
+                <label class="option"><input type="checkbox" name="q7_8" value="Comparison selection" /><span>Comparison selection</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.9" data-priority="P1" data-label="How should recent evidence be presented?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">7.9</span>How should recent evidence be presented?</h3>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="q7_9_count">Number of items</label><input id="q7_9_count" name="q7_9_count" type="number" min="0" max="30" placeholder="5" /></div>
+                <div class="field"><label for="q7_9_format">Format and selection rule</label><input id="q7_9_format" name="q7_9_format" type="text" placeholder="Table, cards, feed; newest evidence vs editorial highlights" /></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.10" data-priority="P0" data-label="How should wide catalog tables behave on phones?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">7.10</span>How should wide catalog tables behave on phones?</h3>
+                <p class="recommendation">Recommended: transform each row into a readable stacked record rather than requiring horizontal scrolling for the primary catalog.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q7_10" value="Stack each result into a mobile record" /><span>Stack each result into a mobile record</span></label>
+                <label class="option"><input type="radio" name="q7_10" value="Allow horizontal scrolling" /><span>Allow horizontal scrolling</span></label>
+                <label class="option"><input type="radio" name="q7_10" value="Show a reduced set of columns" /><span>Show a reduced set of columns</span></label>
+                <label class="option"><input type="radio" name="q7_10" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="7.11" data-priority="P1" data-label="What must work without JavaScript?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">7.11</span>What must work without JavaScript?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q7_11" value="Read all current catalog rows" /><span>Read all current catalog rows</span></label>
+                <label class="option"><input type="checkbox" name="q7_11" value="Open initiative profiles" /><span>Open initiative profiles</span></label>
+                <label class="option"><input type="checkbox" name="q7_11" value="Read glossary and methodology" /><span>Read glossary and methodology</span></label>
+                <label class="option"><input type="checkbox" name="q7_11" value="Filter or search" /><span>Filter or search</span></label>
+                <label class="option"><input type="checkbox" name="q7_11" value="Compare initiatives" /><span>Compare initiatives</span></label>
+                <label class="option"><input type="checkbox" name="q7_11" value="No no-JavaScript requirement" /><span>No no-JavaScript requirement</span></label>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="8">
+          <summary>
+            <span>
+              <span class="section-title">8. Information architecture and navigation</span>
+              <span class="section-description">Decide the final pages, navigation labels, footer, and content that remains unpublished.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="8.1" data-priority="P0" data-label="Which pages belong in the primary navigation?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">8.1</span>Which pages belong in the primary navigation?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q8_1" value="Browse" /><span>Browse</span></label>
+                <label class="option"><input type="checkbox" name="q8_1" value="Glossary" /><span>Glossary</span></label>
+                <label class="option"><input type="checkbox" name="q8_1" value="Methodology" /><span>Methodology</span></label>
+                <label class="option"><input type="checkbox" name="q8_1" value="Contribute" /><span>Contribute</span></label>
+                <label class="option"><input type="checkbox" name="q8_1" value="About" /><span>About</span></label>
+                <label class="option"><input type="checkbox" name="q8_1" value="Updates" /><span>Updates</span></label>
+                <label class="option"><input type="checkbox" name="q8_1" value="Downloads or API" /><span>Downloads or API</span></label>
+                <label class="option"><input type="checkbox" name="q8_1" value="Contact" /><span>Contact</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="8.2" data-priority="P0" data-label="Should the site have a dedicated About page?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">8.2</span>Should the site have a dedicated About page?</h3>
+                <p class="recommendation">Recommended: yes—state purpose, maintainer, contributors, funding, conflicts, and relationship to adjacent projects.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q8_2" value="Yes, dedicated About page" /><span>Yes, dedicated About page</span></label>
+                <label class="option"><input type="radio" name="q8_2" value="No, include this in Methodology" /><span>No, include this in Methodology</span></label>
+                <label class="option"><input type="radio" name="q8_2" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="8.3" data-priority="P1" data-label="Should Contribute remain a compatibility page or become a complete page?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">8.3</span>Should Contribute remain a compatibility page or become a complete page?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q8_3" value="Complete contribution page with forms and workflow" /><span>Complete contribution page with forms and workflow</span></label>
+                <label class="option"><input type="radio" name="q8_3" value="Keep contribution instructions inside Methodology" /><span>Keep instructions inside Methodology</span></label>
+                <label class="option"><input type="radio" name="q8_3" value="Redirect Contribute to Methodology" /><span>Redirect Contribute to Methodology</span></label>
+                <label class="option"><input type="radio" name="q8_3" value="Use the recommended default" /><span>Use the recommended default<small>Make it a concise complete page with links to detailed methodology.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="8.4" data-priority="P0" data-label="How should data access be labeled and organized?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">8.4</span>How should data access be labeled and organized?</h3>
+                <p class="question-help">The current working nav says “All site data as JSON”; the deployed site says “API.”</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q8_4" value="API" /><span>API</span></label>
+                <label class="option"><input type="radio" name="q8_4" value="Data" /><span>Data</span></label>
+                <label class="option"><input type="radio" name="q8_4" value="Download" /><span>Download</span></label>
+                <label class="option"><input type="radio" name="q8_4" value="All site data as JSON" /><span>All site data as JSON</span></label>
+                <label class="option"><input type="radio" name="q8_4" value="Dedicated Data and downloads page" /><span>Dedicated data and downloads page</span></label>
+                <label class="option"><input type="radio" name="q8_4" value="Use the recommended default" /><span>Use the recommended default<small>Use “Data” and link to a page explaining JSON, XLSX, schema, and license.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="8.5" data-priority="P1" data-label="Should the site publish an updates or changelog page?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">8.5</span>Should the site publish an updates or changelog page?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q8_5" value="Yes, editorial update log" /><span>Yes, editorial update log</span></label>
+                <label class="option"><input type="radio" name="q8_5" value="Yes, automatically generated from Git history or evidence dates" /><span>Yes, automatically generated</span></label>
+                <label class="option"><input type="radio" name="q8_5" value="No separate updates page" /><span>No separate updates page</span></label>
+                <label class="option"><input type="radio" name="q8_5" value="Use the recommended default" /><span>Use the recommended default<small>Publish a lightweight editorial update log.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="8.6" data-priority="P1" data-label="What should happen to the existing memo content?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">8.6</span>What should happen to the existing memo content?</h3>
+                <p class="question-help">A longer memo exists in the repository but is not publicly routed.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q8_6" value="Keep unpublished and internal" /><span>Keep unpublished and internal</span></label>
+                <label class="option"><input type="radio" name="q8_6" value="Publish as a dated essay or guide" /><span>Publish as a dated essay or guide</span></label>
+                <label class="option"><input type="radio" name="q8_6" value="Retire and remove it" /><span>Retire and remove it</span></label>
+                <label class="option"><input type="radio" name="q8_6" value="Use the recommended default" /><span>Use the recommended default<small>Keep unpublished unless it receives a dedicated editorial refresh.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="8.7" data-priority="P1" data-label="How should related projects in the footer be selected and described?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">8.7</span>How should related projects in the footer be selected and described?</h3>
+              </div>
+              <div class="field"><label for="q8_7">Footer policy and approved links</label><textarea id="q8_7" name="q8_7" placeholder="State inclusion criteria, relationship disclosure, ordering, and the exact projects to include."></textarea></div>
+            </div>
+
+            <div class="question" data-question="8.8" data-priority="P1" data-label="What contact path should be visible on the site?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">8.8</span>What contact path should be visible on the site?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q8_8" value="GitHub issues only" /><span>GitHub issues only</span></label>
+                <label class="option"><input type="radio" name="q8_8" value="Public email address" /><span>Public email address</span></label>
+                <label class="option"><input type="radio" name="q8_8" value="Contact form" /><span>Contact form</span></label>
+                <label class="option"><input type="radio" name="q8_8" value="Personal website contact page" /><span>Personal website contact page</span></label>
+                <label class="option"><input type="radio" name="q8_8" value="Use the recommended default" /><span>Use the recommended default<small>GitHub for corrections plus a project email for private or sensitive contact.</small></span></label>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="9">
+          <summary>
+            <span>
+              <span class="section-title">9. Contributions, governance, and accountability</span>
+              <span class="section-description">Define how changes enter the catalog and how disputes, conflicts, and takedowns are handled.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="9.1" data-priority="P0" data-label="Which submission channels should be supported?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">9.1</span>Which submission channels should be supported?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q9_1" value="GitHub issue" /><span>GitHub issue</span></label>
+                <label class="option"><input type="checkbox" name="q9_1" value="GitHub pull request" /><span>GitHub pull request</span></label>
+                <label class="option"><input type="checkbox" name="q9_1" value="Structured web form" /><span>Structured web form</span></label>
+                <label class="option"><input type="checkbox" name="q9_1" value="Project email" /><span>Project email</span></label>
+                <label class="option"><input type="checkbox" name="q9_1" value="Private correction or takedown channel" /><span>Private correction or takedown channel</span></label>
+                <label class="option"><input type="checkbox" name="q9_1" value="No public submissions" /><span>No public submissions</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="9.2" data-priority="P0" data-label="What is the review workflow for a new record or material correction?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">9.2</span>What is the review workflow for a new record or material correction?</h3>
+              </div>
+              <div class="field"><label for="q9_2">Workflow</label><textarea id="q9_2" name="q9_2" placeholder="Submission → source review → classification → copy edit → approval → publication → follow-up. Include who performs each step."></textarea></div>
+            </div>
+
+            <div class="question" data-question="9.3" data-priority="P1" data-label="What response or review time should contributors expect?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">9.3</span>What response or review time should contributors expect?</h3>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="q9_3_ack">Acknowledgment target</label><input id="q9_3_ack" name="q9_3_ack" type="text" placeholder="For example: 7 days" /></div>
+                <div class="field"><label for="q9_3_review">Review target</label><input id="q9_3_review" name="q9_3_review" type="text" placeholder="For example: 30 days or no guaranteed SLA" /></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="9.4" data-priority="P1" data-label="How should contributors be credited?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">9.4</span>How should contributors be credited?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q9_4" value="Git history and pull requests only" /><span>Git history and pull requests only</span></label>
+                <label class="option"><input type="radio" name="q9_4" value="Public contributors page" /><span>Public contributors page</span></label>
+                <label class="option"><input type="radio" name="q9_4" value="Profile-level source or contributor credit" /><span>Profile-level contributor credit</span></label>
+                <label class="option"><input type="radio" name="q9_4" value="No individual credit" /><span>No individual credit</span></label>
+                <label class="option"><input type="radio" name="q9_4" value="Use the recommended default" /><span>Use the recommended default<small>Git history plus an optional contributors page.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="9.5" data-priority="P0" data-label="How should conflicts of interest, funding, sponsorship, or affiliate relationships be disclosed?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">9.5</span>How should conflicts of interest, funding, sponsorship, or affiliate relationships be disclosed?</h3>
+              </div>
+              <div class="field"><label for="q9_5">Disclosure policy</label><textarea id="q9_5" name="q9_5" placeholder="State current relationships and the rule for future funding, sponsored research, or vendor involvement."></textarea></div>
+            </div>
+
+            <div class="question" data-question="9.6" data-priority="P0" data-label="What is the correction, dispute, and takedown policy?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">9.6</span>What is the correction, dispute, and takedown policy?</h3>
+              </div>
+              <div class="field"><label for="q9_6">Policy</label><textarea id="q9_6" name="q9_6" placeholder="Cover factual corrections, disputed characterizations, legal requests, privacy concerns, source removal, and retained history."></textarea></div>
+            </div>
+
+            <div class="question" data-question="9.7" data-priority="P1" data-label="What maintenance cadence is realistic?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">9.7</span>What maintenance cadence is realistic?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q9_7" value="Continuous rolling updates" /><span>Continuous rolling updates</span></label>
+                <label class="option"><input type="radio" name="q9_7" value="Monthly review pass" /><span>Monthly review pass</span></label>
+                <label class="option"><input type="radio" name="q9_7" value="Quarterly review pass" /><span>Quarterly review pass</span></label>
+                <label class="option"><input type="radio" name="q9_7" value="Periodic project-based refreshes" /><span>Periodic project-based refreshes</span></label>
+                <label class="option"><input type="radio" name="q9_7" value="Use the recommended default" /><span>Use the recommended default<small>Rolling updates plus a quarterly completeness review.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="9.8" data-priority="P1" data-label="Should vendors or initiative owners be invited to review their profiles?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">9.8</span>Should vendors or initiative owners be invited to review their profiles?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q9_8" value="Yes before first publication when practical" /><span>Yes, before first publication when practical</span></label>
+                <label class="option"><input type="radio" name="q9_8" value="Yes after publication through a correction channel" /><span>Yes, after publication through a correction channel</span></label>
+                <label class="option"><input type="radio" name="q9_8" value="No formal vendor review" /><span>No formal vendor review</span></label>
+                <label class="option"><input type="radio" name="q9_8" value="Use the recommended default" /><span>Use the recommended default<small>Publish independently, then provide a clear correction channel.</small></span></label>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="10">
+          <summary>
+            <span>
+              <span class="section-title">10. Brand, visual system, and editorial voice</span>
+              <span class="section-description">Approve the site's identity, visual density, theme behavior, and tone.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="10.1" data-priority="P0" data-label="Which qualities should the visual design communicate?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">10.1</span>Which qualities should the visual design communicate?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q10_1" value="Reference-like" /><span>Reference-like</span></label>
+                <label class="option"><input type="checkbox" name="q10_1" value="Academic or research-oriented" /><span>Academic or research-oriented</span></label>
+                <label class="option"><input type="checkbox" name="q10_1" value="Neutral and institutional" /><span>Neutral and institutional</span></label>
+                <label class="option"><input type="checkbox" name="q10_1" value="Technical and developer-oriented" /><span>Technical and developer-oriented</span></label>
+                <label class="option"><input type="checkbox" name="q10_1" value="Editorial or magazine-like" /><span>Editorial or magazine-like</span></label>
+                <label class="option"><input type="checkbox" name="q10_1" value="Approachable for nonexperts" /><span>Approachable for nonexperts</span></label>
+                <label class="option"><input type="checkbox" name="q10_1" value="Minimal" /><span>Minimal</span></label>
+                <label class="option"><input type="checkbox" name="q10_1" value="Distinctive and branded" /><span>Distinctive and branded</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="10.2" data-priority="P0" data-label="Is DataLicenses.org the final public name and capitalization?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">10.2</span>Is “DataLicenses.org” the final public name and capitalization?</h3>
+              </div>
+              <div class="field"><label for="q10_2">Approved name and short descriptor</label><input id="q10_2" name="q10_2" type="text" placeholder="For example: DataLicenses.org — AI data rights and access catalog" /></div>
+            </div>
+
+            <div class="question" data-question="10.3" data-priority="P1" data-label="What kind of wordmark or logo is required?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">10.3</span>What kind of wordmark or logo is required?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q10_3" value="Text wordmark only" /><span>Text wordmark only</span></label>
+                <label class="option"><input type="radio" name="q10_3" value="Simple symbol plus wordmark" /><span>Simple symbol plus wordmark</span></label>
+                <label class="option"><input type="radio" name="q10_3" value="Full visual identity project" /><span>Full visual identity project</span></label>
+                <label class="option"><input type="radio" name="q10_3" value="Use the recommended default" /><span>Use the recommended default<small>Text wordmark plus a simple favicon/social mark.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="10.4" data-priority="P1" data-label="What typography direction should the site use?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">10.4</span>What typography direction should the site use?</h3>
+                <p class="question-help">The current working version uses Arial/system sans throughout.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q10_4" value="System sans only" /><span>System sans only</span></label>
+                <label class="option"><input type="radio" name="q10_4" value="Serif headings and sans-serif interface" /><span>Serif headings and sans-serif interface</span></label>
+                <label class="option"><input type="radio" name="q10_4" value="Open-source webfont family" /><span>Open-source webfont family</span></label>
+                <label class="option"><input type="radio" name="q10_4" value="Use the recommended default" /><span>Use the recommended default<small>System sans for speed and reference-like clarity.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="10.5" data-priority="P1" data-label="What color direction and constraints apply?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">10.5</span>What color direction and constraints apply?</h3>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="q10_5_palette">Approved colors or references</label><input id="q10_5_palette" name="q10_5_palette" type="text" placeholder="Current: white/gray with link blue" /></div>
+                <div class="field"><label for="q10_5_avoid">Colors or associations to avoid</label><input id="q10_5_avoid" name="q10_5_avoid" type="text" placeholder="Brand conflicts, political associations, low contrast" /></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="10.6" data-priority="P0" data-label="Should the light and dark theme toggle remain?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">10.6</span>Should the light and dark theme toggle remain?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q10_6" value="Keep system default plus manual toggle" /><span>Keep system default plus manual toggle</span></label>
+                <label class="option"><input type="radio" name="q10_6" value="Follow system preference only" /><span>Follow system preference only</span></label>
+                <label class="option"><input type="radio" name="q10_6" value="Light theme only" /><span>Light theme only</span></label>
+                <label class="option"><input type="radio" name="q10_6" value="Use the recommended default" /><span>Use the recommended default<small>Keep system default plus manual toggle.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="10.7" data-priority="P1" data-label="How dense should catalog and profile pages feel?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">10.7</span>How dense should catalog and profile pages feel?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q10_7" value="Compact reference table" /><span>Compact reference table</span></label>
+                <label class="option"><input type="radio" name="q10_7" value="Balanced reference and editorial spacing" /><span>Balanced reference and editorial spacing</span></label>
+                <label class="option"><input type="radio" name="q10_7" value="Spacious card-oriented interface" /><span>Spacious card-oriented interface</span></label>
+                <label class="option"><input type="radio" name="q10_7" value="Use the recommended default" /><span>Use the recommended default<small>Compact but readable reference layout.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="10.8" data-priority="P1" data-label="Should the site use illustration, photography, or data visualization?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">10.8</span>Should the site use illustration, photography, or data visualization?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q10_8" value="No decorative imagery" /><span>No decorative imagery</span></label>
+                <label class="option"><input type="checkbox" name="q10_8" value="Simple diagrams that explain taxonomy or pipeline" /><span>Simple explanatory diagrams</span></label>
+                <label class="option"><input type="checkbox" name="q10_8" value="Charts showing catalog composition or trends" /><span>Catalog composition or trend charts</span></label>
+                <label class="option"><input type="checkbox" name="q10_8" value="Initiative logos" /><span>Initiative logos</span></label>
+                <label class="option"><input type="checkbox" name="q10_8" value="Editorial illustrations" /><span>Editorial illustrations</span></label>
+                <label class="option"><input type="checkbox" name="q10_8" value="Photography" /><span>Photography</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="10.9" data-priority="P0" data-label="What editorial voice should visible site copy use?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">10.9</span>What editorial voice should visible site copy use?</h3>
+                <p class="recommendation">Recommended: concise, neutral, concrete, source-aware, and candid about uncertainty; no marketing superlatives or legal conclusions.</p>
+              </div>
+              <div class="field"><label for="q10_9">Voice rules and examples</label><textarea id="q10_9" name="q10_9" placeholder="Approve the recommendation and add words, tones, or claims to use or avoid."></textarea></div>
+            </div>
+
+            <div class="question" data-question="10.10" data-priority="P1" data-label="What social-card treatment is required?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">10.10</span>What social-card treatment is required?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q10_10" value="One generic site card" /><span>One generic site card</span></label>
+                <label class="option"><input type="radio" name="q10_10" value="Generated card per initiative and major page" /><span>Generated card per initiative and major page</span></label>
+                <label class="option"><input type="radio" name="q10_10" value="No social-card work beyond current metadata" /><span>No work beyond current metadata</span></label>
+                <label class="option"><input type="radio" name="q10_10" value="Use the recommended default" /><span>Use the recommended default<small>Generate profile-specific cards if sharing and citation are priorities.</small></span></label>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="11">
+          <summary>
+            <span>
+              <span class="section-title">11. Accessibility, responsive behavior, and performance</span>
+              <span class="section-description">Set measurable quality targets for inclusive use and fast delivery.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="11.1" data-priority="P0" data-label="What accessibility standard must the site meet?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">11.1</span>What accessibility standard must the site meet?</h3>
+                <p class="recommendation">Recommended: WCAG 2.2 AA for public pages and interactive catalog controls.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q11_1" value="WCAG 2.2 AA" /><span>WCAG 2.2 AA</span></label>
+                <label class="option"><input type="radio" name="q11_1" value="WCAG 2.1 AA" /><span>WCAG 2.1 AA</span></label>
+                <label class="option"><input type="radio" name="q11_1" value="Best effort without formal conformance" /><span>Best effort without formal conformance</span></label>
+                <label class="option"><input type="radio" name="q11_1" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="11.2" data-priority="P0" data-label="Which accessibility checks are required before launch?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">11.2</span>Which accessibility checks are required before launch?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q11_2" value="Full keyboard navigation" /><span>Full keyboard navigation</span></label>
+                <label class="option"><input type="checkbox" name="q11_2" value="Visible focus and logical focus order" /><span>Visible focus and logical focus order</span></label>
+                <label class="option"><input type="checkbox" name="q11_2" value="Screen-reader test on one desktop and one mobile platform" /><span>Screen-reader test on desktop and mobile</span></label>
+                <label class="option"><input type="checkbox" name="q11_2" value="Color contrast audit in both themes" /><span>Color contrast audit in both themes</span></label>
+                <label class="option"><input type="checkbox" name="q11_2" value="Zoom and reflow at 200 to 400 percent" /><span>Zoom and reflow at 200–400%</span></label>
+                <label class="option"><input type="checkbox" name="q11_2" value="Reduced motion support" /><span>Reduced motion support</span></label>
+                <label class="option"><input type="checkbox" name="q11_2" value="Automated accessibility scan" /><span>Automated accessibility scan</span></label>
+                <label class="option"><input type="checkbox" name="q11_2" value="Accessible comparison dialog and announcements" /><span>Accessible comparison dialog and announcements</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="11.3" data-priority="P0" data-label="Which browsers and devices must be supported?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">11.3</span>Which browsers and devices must be supported?</h3>
+              </div>
+              <div class="field"><label for="q11_3">Support matrix</label><textarea id="q11_3" name="q11_3" placeholder="For example: current and previous Chrome, Safari, Firefox, Edge; iOS Safari and Android Chrome; minimum width 320px."></textarea></div>
+            </div>
+
+            <div class="question" data-question="11.4" data-priority="P1" data-label="What performance targets apply?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">11.4</span>What performance targets apply?</h3>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="q11_4_vitals">Core Web Vitals target</label><input id="q11_4_vitals" name="q11_4_vitals" type="text" placeholder="Good thresholds at p75" /></div>
+                <div class="field"><label for="q11_4_weight">Page-weight or JS budget</label><input id="q11_4_weight" name="q11_4_weight" type="text" placeholder="For example: under 250 KB transferred JS" /></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="11.5" data-priority="P1" data-label="What responsive breakpoints or device classes matter most?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">11.5</span>What responsive breakpoints or device classes matter most?</h3>
+              </div>
+              <div class="field"><label for="q11_5">Responsive priorities</label><textarea id="q11_5" name="q11_5" placeholder="Phone, tablet, laptop, large desktop, print, embedded webview, or other contexts."></textarea></div>
+            </div>
+
+            <div class="question" data-question="11.6" data-priority="P1" data-label="How much client-side JavaScript is acceptable?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">11.6</span>How much client-side JavaScript is acceptable?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q11_6" value="Minimal vanilla JavaScript for catalog interactions" /><span>Minimal vanilla JavaScript for catalog interactions</span></label>
+                <label class="option"><input type="radio" name="q11_6" value="Use a client framework if it improves maintainability" /><span>Use a client framework if it improves maintainability</span></label>
+                <label class="option"><input type="radio" name="q11_6" value="No strict JavaScript budget" /><span>No strict JavaScript budget</span></label>
+                <label class="option"><input type="radio" name="q11_6" value="Use the recommended default" /><span>Use the recommended default<small>Keep minimal vanilla JavaScript and static HTML.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="11.7" data-priority="P0" data-label="What testing is required for the catalog interactions?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">11.7</span>What testing is required for the catalog interactions?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q11_7" value="Unit tests for filtering and sorting logic" /><span>Unit tests for filtering and sorting logic</span></label>
+                <label class="option"><input type="checkbox" name="q11_7" value="End-to-end tests for search and filters" /><span>End-to-end tests for search and filters</span></label>
+                <label class="option"><input type="checkbox" name="q11_7" value="End-to-end test for comparison" /><span>End-to-end test for comparison</span></label>
+                <label class="option"><input type="checkbox" name="q11_7" value="URL state round-trip tests" /><span>URL state round-trip tests</span></label>
+                <label class="option"><input type="checkbox" name="q11_7" value="Mobile viewport tests" /><span>Mobile viewport tests</span></label>
+                <label class="option"><input type="checkbox" name="q11_7" value="Manual exploratory QA only" /><span>Manual exploratory QA only</span></label>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="12" open>
+          <summary>
+            <span>
+              <span class="section-title">12. Public data, licensing, legal, privacy, and security</span>
+              <span class="section-description">Resolve visibility, API stability, reuse rights, privacy disclosures, and security contact.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="12.1" data-priority="P0" data-label="Should draft and private records be excluded from every public surface?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">12.1</span>Should draft and private records be excluded from every public surface?</h3>
+                <p class="question-help">This includes profile generation, homepage, JSON, curation JSON, sitemap, exports, related-item links, and glossary lookups.</p>
+                <p class="recommendation">Recommended: yes. Fail the production build if a non-public record leaks into a public artifact.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q12_1" value="Yes, exclude non-public records everywhere" /><span>Yes, exclude non-public records everywhere</span></label>
+                <label class="option"><input type="radio" name="q12_1" value="Allow unlisted profile URLs but exclude from indexes and data" /><span>Allow unlisted profile URLs only</span></label>
+                <label class="option"><input type="radio" name="q12_1" value="Current behavior is acceptable" /><span>Current behavior is acceptable</span></label>
+                <label class="option"><input type="radio" name="q12_1" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="12.2" data-priority="P0" data-label="Who is the public data endpoint for?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">12.2</span>Who is the public data endpoint for?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q12_2" value="Human download convenience only" /><span>Human download convenience only</span></label>
+                <label class="option"><input type="radio" name="q12_2" value="Supported machine-readable public API" /><span>Supported machine-readable public API</span></label>
+                <label class="option"><input type="radio" name="q12_2" value="Research data release with versioned snapshots" /><span>Research data release with versioned snapshots</span></label>
+                <label class="option"><input type="radio" name="q12_2" value="Use the recommended default" /><span>Use the recommended default<small>Supported public dataset with documented, versioned schema rather than a service-level API.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="12.3" data-priority="P0" data-label="What compatibility and versioning promise should the JSON make?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">12.3</span>What compatibility and versioning promise should the JSON make?</h3>
+              </div>
+              <div class="field"><label for="q12_3">Versioning policy</label><textarea id="q12_3" name="q12_3" placeholder="Schema version field, breaking-change process, deprecation period, snapshot URLs, and whether field names are stable."></textarea></div>
+            </div>
+
+            <div class="question" data-question="12.4" data-priority="P1" data-label="Which download formats should be first-class?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">12.4</span>Which download formats should be first-class?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q12_4" value="JSON" /><span>JSON</span></label>
+                <label class="option"><input type="checkbox" name="q12_4" value="XLSX" /><span>XLSX</span></label>
+                <label class="option"><input type="checkbox" name="q12_4" value="CSV" /><span>CSV</span></label>
+                <label class="option"><input type="checkbox" name="q12_4" value="Markdown or repository source" /><span>Markdown/repository source</span></label>
+                <label class="option"><input type="checkbox" name="q12_4" value="Versioned release archive" /><span>Versioned release archive</span></label>
+                <label class="option"><input type="checkbox" name="q12_4" value="No promoted download format" /><span>No promoted download format</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="12.5" data-priority="P0" data-label="Under what license may people reuse the catalog data?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">12.5</span>Under what license may people reuse the catalog data?</h3>
+                <p class="question-help">No repository-level license is currently present.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q12_5" value="CC BY 4.0" /><span>CC BY 4.0</span></label>
+                <label class="option"><input type="radio" name="q12_5" value="CC0 1.0" /><span>CC0 1.0</span></label>
+                <label class="option"><input type="radio" name="q12_5" value="ODC-BY or ODbL" /><span>ODC-BY or ODbL</span></label>
+                <label class="option"><input type="radio" name="q12_5" value="Custom terms" /><span>Custom terms</span></label>
+                <label class="option"><input type="radio" name="q12_5" value="No permission beyond applicable law" /><span>No permission beyond applicable law</span></label>
+                <label class="option"><input type="radio" name="q12_5" value="Obtain legal advice before choosing" /><span>Obtain legal advice before choosing</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="12.6" data-priority="P0" data-label="Under what license should the site code and written content be released?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">12.6</span>Under what license should the site code and written content be released?</h3>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="q12_6_code">Code license</label><input id="q12_6_code" name="q12_6_code" type="text" placeholder="MIT, Apache-2.0, other, or no license" /></div>
+                <div class="field"><label for="q12_6_content">Written content license</label><input id="q12_6_content" name="q12_6_content" type="text" placeholder="CC BY 4.0, other, or no license" /></div>
+              </div>
+            </div>
+
+            <div class="question" data-question="12.7" data-priority="P0" data-label="Which legal pages or notices are required?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">12.7</span>Which legal pages or notices are required?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q12_7" value="Disclaimer and no legal advice notice" /><span>Disclaimer/no legal advice</span></label>
+                <label class="option"><input type="checkbox" name="q12_7" value="Privacy notice" /><span>Privacy notice</span></label>
+                <label class="option"><input type="checkbox" name="q12_7" value="Terms of use" /><span>Terms of use</span></label>
+                <label class="option"><input type="checkbox" name="q12_7" value="Copyright and licensing notice" /><span>Copyright/licensing notice</span></label>
+                <label class="option"><input type="checkbox" name="q12_7" value="Accessibility statement" /><span>Accessibility statement</span></label>
+                <label class="option"><input type="checkbox" name="q12_7" value="Funding and conflict disclosure" /><span>Funding/conflict disclosure</span></label>
+                <label class="option"><input type="checkbox" name="q12_7" value="Security policy" /><span>Security policy</span></label>
+                <label class="option"><input type="checkbox" name="q12_7" value="No separate legal pages" /><span>No separate legal pages</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="12.8" data-priority="P0" data-label="What analytics, telemetry, or logging should be used?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">12.8</span>What analytics, telemetry, or logging should be used?</h3>
+                <p class="recommendation">Recommended: no third-party behavioral analytics at launch, or a privacy-preserving aggregate tool with no cross-site tracking and a clear privacy notice.</p>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q12_8" value="No analytics" /><span>No analytics</span></label>
+                <label class="option"><input type="radio" name="q12_8" value="Privacy-preserving aggregate analytics" /><span>Privacy-preserving aggregate analytics</span></label>
+                <label class="option"><input type="radio" name="q12_8" value="Full product analytics" /><span>Full product analytics</span></label>
+                <label class="option"><input type="radio" name="q12_8" value="Server or CDN logs only" /><span>Server/CDN logs only</span></label>
+                <label class="option"><input type="radio" name="q12_8" value="Use the recommended default" /><span>Use the recommended default</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="12.9" data-priority="P1" data-label="What client-side storage is acceptable?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">12.9</span>What client-side storage is acceptable?</h3>
+                <p class="question-help">The site currently stores the theme preference in localStorage.</p>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q12_9" value="Theme preference" /><span>Theme preference</span></label>
+                <label class="option"><input type="checkbox" name="q12_9" value="Catalog filters or comparison state" /><span>Catalog filters/comparison state</span></label>
+                <label class="option"><input type="checkbox" name="q12_9" value="Consent preferences" /><span>Consent preferences</span></label>
+                <label class="option"><input type="checkbox" name="q12_9" value="No client-side storage" /><span>No client-side storage</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="12.10" data-priority="P0" data-label="What security contact and vulnerability process should exist?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">12.10</span>What security contact and vulnerability process should exist?</h3>
+              </div>
+              <div class="field-row">
+                <div class="field"><label for="q12_10_contact">Security contact</label><input id="q12_10_contact" name="q12_10_contact" type="text" placeholder="Email, GitHub security advisory, or other channel" /></div>
+                <div class="field"><label for="q12_10_process">Response process</label><input id="q12_10_process" name="q12_10_process" type="text" placeholder="Acknowledgment target and disclosure policy" /></div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="13">
+          <summary>
+            <span>
+              <span class="section-title">13. SEO, distribution, and discoverability</span>
+              <span class="section-description">Define search visibility, social sharing, feeds, citations, and outreach.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="13.1" data-priority="P1" data-label="Which search queries or topics should the site be discoverable for?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">13.1</span>Which search queries or topics should the site be discoverable for?</h3>
+              </div>
+              <div class="field"><label for="q13_1">Priority queries and audiences</label><textarea id="q13_1" name="q13_1" placeholder="List terms such as AI data licensing, AI crawler controls, training-data marketplaces, preference signals, rights-cleared datasets."></textarea></div>
+            </div>
+
+            <div class="question" data-question="13.2" data-priority="P1" data-label="Which structured data should pages expose?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">13.2</span>Which structured data should pages expose?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q13_2" value="WebSite and Organization" /><span>WebSite and Organization</span></label>
+                <label class="option"><input type="checkbox" name="q13_2" value="Dataset" /><span>Dataset</span></label>
+                <label class="option"><input type="checkbox" name="q13_2" value="BreadcrumbList" /><span>BreadcrumbList</span></label>
+                <label class="option"><input type="checkbox" name="q13_2" value="DefinedTermSet for glossary" /><span>DefinedTermSet for glossary</span></label>
+                <label class="option"><input type="checkbox" name="q13_2" value="Article or CreativeWork for profiles" /><span>Article/CreativeWork for profiles</span></label>
+                <label class="option"><input type="checkbox" name="q13_2" value="No structured data requirement" /><span>No structured data requirement</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="13.3" data-priority="P1" data-label="How should archived profiles be indexed by search engines?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">13.3</span>How should archived profiles be indexed by search engines?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q13_3" value="Index with clear archive status and successor links" /><span>Index with clear archive status and successor links</span></label>
+                <label class="option"><input type="radio" name="q13_3" value="Noindex archived profiles" /><span>Noindex archived profiles</span></label>
+                <label class="option"><input type="radio" name="q13_3" value="Redirect to successor when one exists" /><span>Redirect to successor when one exists</span></label>
+                <label class="option"><input type="radio" name="q13_3" value="Use the recommended default" /><span>Use the recommended default<small>Index historical profiles; link to successors without erasing history.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="13.4" data-priority="P1" data-label="Should the site publish a feed or subscription channel?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">13.4</span>Should the site publish a feed or subscription channel?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q13_4" value="RSS or Atom feed for updates" /><span>RSS/Atom feed</span></label>
+                <label class="option"><input type="checkbox" name="q13_4" value="Email newsletter" /><span>Email newsletter</span></label>
+                <label class="option"><input type="checkbox" name="q13_4" value="GitHub releases" /><span>GitHub releases</span></label>
+                <label class="option"><input type="checkbox" name="q13_4" value="Social media account" /><span>Social media account</span></label>
+                <label class="option"><input type="checkbox" name="q13_4" value="No subscription channel" /><span>No subscription channel</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="13.5" data-priority="P1" data-label="Should the site provide a recommended citation?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">13.5</span>Should the site provide a recommended citation?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q13_5" value="Site-level citation only" /><span>Site-level citation only</span></label>
+                <label class="option"><input type="radio" name="q13_5" value="Site-level and per-profile citation" /><span>Site-level and per-profile citation</span></label>
+                <label class="option"><input type="radio" name="q13_5" value="Versioned dataset DOI or archival identifier" /><span>Versioned dataset DOI or archival identifier</span></label>
+                <label class="option"><input type="radio" name="q13_5" value="No formal citation guidance" /><span>No formal citation guidance</span></label>
+                <label class="option"><input type="radio" name="q13_5" value="Use the recommended default" /><span>Use the recommended default<small>Site-level and per-profile citation, with versioned releases later.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="13.6" data-priority="P2" data-label="Which launch and outreach channels matter?">
+              <div>
+                <span class="priority">P2</span>
+                <h3 class="question-heading"><span class="question-id">13.6</span>Which launch and outreach channels matter?</h3>
+              </div>
+              <div class="field"><label for="q13_6">Channels, partners, and launch materials</label><textarea id="q13_6" name="q13_6" placeholder="Research community, policy groups, publishers, developer communities, press, social posts, conference demos, or partner outreach."></textarea></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="spec-section" data-section="14" open>
+          <summary>
+            <span>
+              <span class="section-title">14. Operations, release process, and definition of done</span>
+              <span class="section-description">Specify deployment controls, monitoring, recovery, acceptance tests, and post-launch ownership.</span>
+            </span>
+            <span class="section-count"></span>
+          </summary>
+          <div class="section-body">
+            <div class="question" data-question="14.1" data-priority="P0" data-label="Should Cloudflare Pages remain the production host?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">14.1</span>Should Cloudflare Pages remain the production host?</h3>
+              </div>
+              <div class="options">
+                <label class="option"><input type="radio" name="q14_1" value="Yes, keep Cloudflare Pages" /><span>Yes, keep Cloudflare Pages</span></label>
+                <label class="option"><input type="radio" name="q14_1" value="Move to another static host" /><span>Move to another static host</span></label>
+                <label class="option"><input type="radio" name="q14_1" value="Hosting decision is open" /><span>Hosting decision is open</span></label>
+                <label class="option"><input type="radio" name="q14_1" value="Use the recommended default" /><span>Use the recommended default<small>Keep Cloudflare Pages unless a concrete requirement demands a move.</small></span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="14.2" data-priority="P0" data-label="Which checks must pass before a production deploy?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">14.2</span>Which checks must pass before a production deploy?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q14_2" value="Content lint" /><span>Content lint</span></label>
+                <label class="option"><input type="checkbox" name="q14_2" value="Astro type check" /><span>Astro type check</span></label>
+                <label class="option"><input type="checkbox" name="q14_2" value="Production build" /><span>Production build</span></label>
+                <label class="option"><input type="checkbox" name="q14_2" value="Automated tests" /><span>Automated tests</span></label>
+                <label class="option"><input type="checkbox" name="q14_2" value="Broken-link check" /><span>Broken-link check</span></label>
+                <label class="option"><input type="checkbox" name="q14_2" value="Accessibility scan" /><span>Accessibility scan</span></label>
+                <label class="option"><input type="checkbox" name="q14_2" value="Performance check" /><span>Performance check</span></label>
+                <label class="option"><input type="checkbox" name="q14_2" value="Visibility leak check" /><span>Visibility leak check</span></label>
+                <label class="option"><input type="checkbox" name="q14_2" value="Manual content review" /><span>Manual content review</span></label>
+                <label class="option"><input type="checkbox" name="q14_2" value="Manual responsive visual QA" /><span>Manual responsive visual QA</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="14.3" data-priority="P0" data-label="Who may deploy, and what approval is required?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">14.3</span>Who may deploy, and what approval is required?</h3>
+              </div>
+              <div class="field"><label for="q14_3">Deploy authority and workflow</label><textarea id="q14_3" name="q14_3" placeholder="Automatic on merge, manual command, required branch protection, named approver, and emergency deploy policy."></textarea></div>
+            </div>
+
+            <div class="question" data-question="14.4" data-priority="P0" data-label="What rollback and recovery process is required?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">14.4</span>What rollback and recovery process is required?</h3>
+              </div>
+              <div class="field"><label for="q14_4">Rollback and backup policy</label><textarea id="q14_4" name="q14_4" placeholder="Cloudflare rollback, Git revert, data backup, domain recovery, expected recovery time, and responsible person."></textarea></div>
+            </div>
+
+            <div class="question" data-question="14.5" data-priority="P1" data-label="What production monitoring should exist?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">14.5</span>What production monitoring should exist?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q14_5" value="Uptime monitoring" /><span>Uptime monitoring</span></label>
+                <label class="option"><input type="checkbox" name="q14_5" value="Domain and TLS expiry monitoring" /><span>Domain/TLS expiry monitoring</span></label>
+                <label class="option"><input type="checkbox" name="q14_5" value="Broken external link monitoring" /><span>Broken external link monitoring</span></label>
+                <label class="option"><input type="checkbox" name="q14_5" value="Build or deploy failure alerts" /><span>Build/deploy failure alerts</span></label>
+                <label class="option"><input type="checkbox" name="q14_5" value="Client-side error monitoring" /><span>Client-side error monitoring</span></label>
+                <label class="option"><input type="checkbox" name="q14_5" value="No automated monitoring" /><span>No automated monitoring</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="14.6" data-priority="P1" data-label="How should dependencies and platform changes be maintained?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">14.6</span>How should dependencies and platform changes be maintained?</h3>
+              </div>
+              <div class="field"><label for="q14_6">Maintenance policy</label><textarea id="q14_6" name="q14_6" placeholder="Automated update PRs, monthly upgrades, security-only updates, Astro/Node support window, Cloudflare compatibility-date review."></textarea></div>
+            </div>
+
+            <div class="question" data-question="14.7" data-priority="P0" data-label="What must be true for the website to be considered complete?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">14.7</span>What must be true for the website to be considered complete?</h3>
+              </div>
+              <div class="options options-columns">
+                <label class="option"><input type="checkbox" name="q14_7" value="All P0 decisions are resolved" /><span>All P0 decisions resolved</span></label>
+                <label class="option"><input type="checkbox" name="q14_7" value="No draft or private content is public" /><span>No draft/private content public</span></label>
+                <label class="option"><input type="checkbox" name="q14_7" value="Every current public profile meets required content fields" /><span>Every current profile meets required fields</span></label>
+                <label class="option"><input type="checkbox" name="q14_7" value="Taxonomy and status definitions are approved" /><span>Taxonomy/status definitions approved</span></label>
+                <label class="option"><input type="checkbox" name="q14_7" value="All core interactions pass tests" /><span>Core interactions pass tests</span></label>
+                <label class="option"><input type="checkbox" name="q14_7" value="Accessibility target is verified" /><span>Accessibility target verified</span></label>
+                <label class="option"><input type="checkbox" name="q14_7" value="Responsive visual QA is approved" /><span>Responsive visual QA approved</span></label>
+                <label class="option"><input type="checkbox" name="q14_7" value="Legal, privacy, license, and governance pages are published" /><span>Legal/privacy/license/governance published</span></label>
+                <label class="option"><input type="checkbox" name="q14_7" value="Deploy, rollback, and maintenance documentation exists" /><span>Deploy/rollback/maintenance documented</span></label>
+                <label class="option"><input type="checkbox" name="q14_7" value="Final approver signs off on production" /><span>Final approver signs off</span></label>
+              </div>
+            </div>
+
+            <div class="question" data-question="14.8" data-priority="P0" data-label="What are the top five must-have outcomes for this release?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">14.8</span>What are the top five must-have outcomes for this release?</h3>
+              </div>
+              <div class="field"><label for="q14_8">Ranked must-haves</label><textarea id="q14_8" name="q14_8" placeholder="1. …&#10;2. …&#10;3. …&#10;4. …&#10;5. …"></textarea></div>
+            </div>
+
+            <div class="question" data-question="14.9" data-priority="P0" data-label="What is explicitly out of scope for this release?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">14.9</span>What is explicitly out of scope for this release?</h3>
+              </div>
+              <div class="field"><label for="q14_9">Deferred features and work</label><textarea id="q14_9" name="q14_9" placeholder="List work that should not block completion, such as accounts, newsletter, multilingual support, or advanced visualizations."></textarea></div>
+            </div>
+
+            <div class="question" data-question="14.10" data-priority="P0" data-label="Where may implementation judgment be used without another approval round?">
+              <div>
+                <span class="priority priority-p0">P0</span>
+                <h3 class="question-heading"><span class="question-id">14.10</span>Where may implementation judgment be used without another approval round?</h3>
+              </div>
+              <div class="field"><label for="q14_10">Delegated decisions and escalation threshold</label><textarea id="q14_10" name="q14_10" placeholder="For example: use recommendations for unanswered P1/P2 items; escalate any change to taxonomy, public claims, licensing, or data visibility."></textarea></div>
+            </div>
+
+            <div class="question" data-question="14.11" data-priority="P1" data-label="What should happen during the first 30 to 90 days after launch?">
+              <div>
+                <span class="priority priority-p1">P1</span>
+                <h3 class="question-heading"><span class="question-id">14.11</span>What should happen during the first 30–90 days after launch?</h3>
+              </div>
+              <div class="field"><label for="q14_11">Post-launch plan</label><textarea id="q14_11" name="q14_11" placeholder="Monitor, gather feedback, review analytics, update records, fix issues, conduct user interviews, or publish a release note."></textarea></div>
+            </div>
+
+            <div class="question" data-question="14.12" data-priority="P2" data-label="Anything else that should constrain or guide the finished site?">
+              <div>
+                <span class="priority">P2</span>
+                <h3 class="question-heading"><span class="question-id">14.12</span>Anything else that should constrain or guide the finished site?</h3>
+              </div>
+              <div class="field"><label for="q14_12">Final notes, examples, and references</label><textarea id="q14_12" name="q14_12" placeholder="Paste reference sites, exact copy, design examples, stakeholder comments, or unresolved questions."></textarea></div>
+            </div>
+          </div>
+        </details>
+      </form>
+
+      <p class="status-message" id="status-message" aria-live="polite"></p>
+
+      <footer class="footer-note">
+        This is a local decision artifact. It does not submit data to a server. Browser storage is used only to
+        preserve your answers on this device. Export a Markdown or JSON file before clearing browser data or moving
+        to another device.
+      </footer>
+    </main>
+
+    <script>
+      (() => {
+        const STORAGE_KEY = "datalicenses-website-completion-spec-v1";
+        const form = document.getElementById("spec-form");
+        const questions = Array.from(document.querySelectorAll("[data-question]"));
+        const sections = Array.from(document.querySelectorAll(".spec-section"));
+        const progressLabel = document.getElementById("progress-label");
+        const p0Label = document.getElementById("p0-label");
+        const progressBar = document.getElementById("progress-bar");
+        const progressTrack = document.querySelector(".progress-track");
+        const autosaveStatus = document.getElementById("autosave-status");
+        const statusMessage = document.getElementById("status-message");
+        const showUnanswered = document.getElementById("show-unanswered");
+        const jsonFile = document.getElementById("json-file");
+        let saveTimer;
+
+        const controls = () =>
+          Array.from(form.querySelectorAll("input, select, textarea")).filter(
+            (control) => control.type !== "button" && control.type !== "file"
+          );
+
+        function controlLabel(control) {
+          const explicit = control.id ? document.querySelector(`label[for="${CSS.escape(control.id)}"]`) : null;
+          const wrapped = control.closest("label");
+          const label = explicit || wrapped;
+          return label ? label.textContent.replace(/\s+/g, " ").trim() : control.name;
+        }
+
+        function answerForQuestion(question) {
+          const questionControls = Array.from(question.querySelectorAll("input, select, textarea")).filter(
+            (control) => control.type !== "button" && control.type !== "file"
+          );
+          const answers = [];
+          const groupedNames = new Set();
+
+          for (const control of questionControls) {
+            if (!control.name) continue;
+            if (groupedNames.has(control.name)) continue;
+
+            if (control.type === "radio") {
+              groupedNames.add(control.name);
+              const checked = questionControls.find(
+                (candidate) => candidate.name === control.name && candidate.type === "radio" && candidate.checked
+              );
+              if (checked) answers.push(checked.value);
+              continue;
+            }
+
+            if (control.type === "checkbox") {
+              groupedNames.add(control.name);
+              const checkedValues = questionControls
+                .filter(
+                  (candidate) =>
+                    candidate.name === control.name && candidate.type === "checkbox" && candidate.checked
+                )
+                .map((candidate) => candidate.value);
+              answers.push(...checkedValues);
+              continue;
+            }
+
+            const value = String(control.value || "").trim();
+            if (value) {
+              const multipleTextFields = questionControls.filter(
+                (candidate) =>
+                  !["radio", "checkbox", "button", "file"].includes(candidate.type) &&
+                  String(candidate.value || "").trim()
+              ).length > 1;
+              answers.push(multipleTextFields ? `${controlLabel(control)}: ${value}` : value);
+            }
+          }
+
+          return answers;
+        }
+
+        function questionIsAnswered(question) {
+          return answerForQuestion(question).length > 0;
+        }
+
+        function updateSectionCounts() {
+          for (const section of sections) {
+            const sectionQuestions = Array.from(section.querySelectorAll("[data-question]"));
+            const answered = sectionQuestions.filter(questionIsAnswered).length;
+            const count = section.querySelector(".section-count");
+            if (count) count.textContent = `${answered}/${sectionQuestions.length}`;
+          }
+        }
+
+        function applyUnansweredFilter() {
+          const onlyUnanswered = showUnanswered.checked;
+          for (const question of questions) {
+            const answered = questionIsAnswered(question);
+            question.classList.toggle("is-unanswered", !answered);
+            question.hidden = onlyUnanswered && answered;
+          }
+
+          for (const section of sections) {
+            const visibleQuestions = Array.from(section.querySelectorAll("[data-question]")).filter(
+              (question) => !question.hidden
+            );
+            section.hidden = onlyUnanswered && visibleQuestions.length === 0;
+            if (onlyUnanswered && visibleQuestions.length > 0) section.open = true;
+          }
+        }
+
+        function updateProgress() {
+          const answered = questions.filter(questionIsAnswered).length;
+          const percentage = questions.length ? Math.round((answered / questions.length) * 100) : 0;
+          const p0Questions = questions.filter((question) => question.dataset.priority === "P0");
+          const p0Remaining = p0Questions.filter((question) => !questionIsAnswered(question)).length;
+
+          progressLabel.textContent = `${answered} of ${questions.length} questions answered`;
+          p0Label.textContent = `${p0Remaining} P0 decision${p0Remaining === 1 ? "" : "s"} remaining`;
+          progressBar.style.width = `${percentage}%`;
+          progressTrack.setAttribute("aria-valuenow", String(percentage));
+          updateSectionCounts();
+          applyUnansweredFilter();
+        }
+
+        function serializeForm() {
+          const state = {};
+          const names = new Set(controls().map((control) => control.name).filter(Boolean));
+
+          for (const name of names) {
+            const named = controls().filter((control) => control.name === name);
+            const first = named[0];
+
+            if (first.type === "radio") {
+              state[name] = named.find((control) => control.checked)?.value || "";
+            } else if (first.type === "checkbox") {
+              state[name] = named.filter((control) => control.checked).map((control) => control.value);
+            } else {
+              state[name] = first.value;
+            }
+          }
+
+          return state;
+        }
+
+        function restoreForm(state) {
+          if (!state || typeof state !== "object") return;
+
+          for (const control of controls()) {
+            if (!control.name || !(control.name in state)) continue;
+            const value = state[control.name];
+
+            if (control.type === "radio") {
+              control.checked = control.value === value;
+            } else if (control.type === "checkbox") {
+              control.checked = Array.isArray(value) && value.includes(control.value);
+            } else {
+              control.value = value ?? "";
+            }
+          }
+
+          updateProgress();
+        }
+
+        function saveForm() {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeForm()));
+            autosaveStatus.textContent = `Saved locally at ${new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}.`;
+          } catch {
+            autosaveStatus.textContent = "Local saving is unavailable. Export your answers manually.";
+          }
+        }
+
+        function scheduleSave() {
+          window.clearTimeout(saveTimer);
+          autosaveStatus.textContent = "Saving…";
+          saveTimer = window.setTimeout(saveForm, 180);
+        }
+
+        function sectionTitle(question) {
+          return question.closest(".spec-section")?.querySelector(".section-title")?.textContent.trim() || "Section";
+        }
+
+        function buildExport() {
+          const answers = questions.map((question) => ({
+            id: question.dataset.question,
+            priority: question.dataset.priority || "P2",
+            section: sectionTitle(question),
+            question: question.dataset.label,
+            answers: answerForQuestion(question),
+          }));
+
+          const answeredCount = answers.filter((item) => item.answers.length > 0).length;
+
+          return {
+            schemaVersion: 1,
+            title: "DataLicenses.org Website Completion Specification",
+            exportedAt: new Date().toISOString(),
+            repositorySnapshot: {
+              currentPublicInitiatives: 60,
+              archivedPublicInitiatives: 2,
+              totalContentRecords: 63,
+              draftRecordsObserved: ["Humpback"],
+              approachCategories: 8,
+              goalPresets: 4,
+            },
+            progress: {
+              answered: answeredCount,
+              total: answers.length,
+            },
+            formState: serializeForm(),
+            answers,
+          };
+        }
+
+        function markdownExport() {
+          const data = buildExport();
+          const lines = [
+            "# DataLicenses.org Website Completion Specification",
+            "",
+            `Exported: ${new Date(data.exportedAt).toLocaleString()}`,
+            `Progress: ${data.progress.answered}/${data.progress.total} questions answered`,
+            "",
+            "> This specification reflects the repository state audited on July 16, 2026. Resolve any later code or content changes against these answers.",
+            "",
+          ];
+
+          let activeSection = "";
+          for (const item of data.answers) {
+            if (item.section !== activeSection) {
+              activeSection = item.section;
+              lines.push(`## ${activeSection}`, "");
+            }
+
+            lines.push(`### ${item.id} [${item.priority}] ${item.question}`, "");
+            if (item.answers.length === 0) {
+              lines.push("_Unanswered_", "");
+            } else {
+              for (const answer of item.answers) {
+                const normalized = String(answer).replace(/\r\n/g, "\n").trim();
+                if (normalized.includes("\n")) {
+                  lines.push("```text", normalized, "```", "");
+                } else {
+                  lines.push(`- ${normalized}`, "");
+                }
+              }
+            }
+          }
+
+          return lines.join("\n");
+        }
+
+        function download(filename, contents, type) {
+          const blob = new Blob([contents], { type });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+        }
+
+        function datedFilename(extension) {
+          const date = new Date().toISOString().slice(0, 10);
+          return `datalicenses-website-spec-${date}.${extension}`;
+        }
+
+        async function copyMarkdown() {
+          const markdown = markdownExport();
+          try {
+            await navigator.clipboard.writeText(markdown);
+            statusMessage.textContent = "Markdown copied to the clipboard.";
+          } catch {
+            const probe = document.createElement("textarea");
+            probe.value = markdown;
+            probe.setAttribute("readonly", "");
+            probe.style.position = "fixed";
+            probe.style.left = "-9999px";
+            document.body.appendChild(probe);
+            probe.select();
+            const copied = document.execCommand("copy");
+            probe.remove();
+            statusMessage.textContent = copied
+              ? "Markdown copied to the clipboard."
+              : "Copy failed. Use Download Markdown instead.";
+          }
+        }
+
+        form.addEventListener("input", () => {
+          updateProgress();
+          scheduleSave();
+        });
+
+        form.addEventListener("change", () => {
+          updateProgress();
+          scheduleSave();
+        });
+
+        showUnanswered.addEventListener("change", applyUnansweredFilter);
+
+        document.getElementById("copy-markdown").addEventListener("click", copyMarkdown);
+
+        document.getElementById("download-markdown").addEventListener("click", () => {
+          download(datedFilename("md"), markdownExport(), "text/markdown;charset=utf-8");
+          statusMessage.textContent = "Markdown export created.";
+        });
+
+        document.getElementById("download-json").addEventListener("click", () => {
+          download(
+            datedFilename("json"),
+            JSON.stringify(buildExport(), null, 2),
+            "application/json;charset=utf-8"
+          );
+          statusMessage.textContent = "JSON export created.";
+        });
+
+        document.getElementById("import-json").addEventListener("click", () => jsonFile.click());
+
+        jsonFile.addEventListener("change", async () => {
+          const file = jsonFile.files?.[0];
+          if (!file) return;
+
+          try {
+            const parsed = JSON.parse(await file.text());
+            const state = parsed.formState || parsed;
+            restoreForm(state);
+            saveForm();
+            statusMessage.textContent = `Imported answers from ${file.name}.`;
+          } catch {
+            statusMessage.textContent = "Could not import that JSON file.";
+          } finally {
+            jsonFile.value = "";
+          }
+        });
+
+        document.getElementById("print-form").addEventListener("click", () => window.print());
+
+        document.getElementById("clear-form").addEventListener("click", () => {
+          const confirmed = window.confirm(
+            "Clear every answer saved in this browser? Export first if you may need them."
+          );
+          if (!confirmed) return;
+          form.reset();
+          localStorage.removeItem(STORAGE_KEY);
+          updateProgress();
+          autosaveStatus.textContent = "Saved answers cleared.";
+          statusMessage.textContent = "The questionnaire has been cleared.";
+        });
+
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) restoreForm(JSON.parse(saved));
+        } catch {
+          autosaveStatus.textContent = "Local saving is unavailable. Export your answers manually.";
+        }
+
+        updateProgress();
+      })();
+    </script>
+  </body>
+</html>

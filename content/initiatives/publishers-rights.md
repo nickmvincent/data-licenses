@@ -29,3 +29,5 @@ type: data_license_initiative
 ---
 
 Publishers' Rights offers publishers an agreement under which the organization states that it plans to license participating content and pursue claims over unauthorized reuse. Its site describes proposed revenue shares for licensing and legal recoveries, but does not document completed deals or enforcement outcomes. It fits the collective-action side of the catalog, especially for news and magazine publishers.
+
+Publishers' Rights Organization coordinates licensing through a collective for text across the training and retrieval stages. Coverage depends on participation, the rights represented, and the agreements reached with users. Public materials describe a currently available initiative; the newest dated source in this profile is “Business model page describes enforcement and future AI licensing” (May 2, 2026). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

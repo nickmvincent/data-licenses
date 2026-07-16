@@ -27,3 +27,5 @@ type: data_license_initiative
 ---
 
 Dappier provides APIs and a marketplace layer for accessing publisher and brand content in AI products, with reporting and monetization for rights holders. Compared with pure crawl blocking, it focuses on paid, permissioned downstream use at inference time.
+
+Dappier organizes licensed access through a marketplace or exchange for text across the retrieval and generation stages. It also incorporates tollgate controls. Marketplace controls apply to transactions and copies served through the platform, not necessarily to copies obtained elsewhere. Public materials describe a currently available initiative; the newest dated source in this profile is “Licensing program launch announced” (August 18, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.

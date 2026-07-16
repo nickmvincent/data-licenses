@@ -1,0 +1,161 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { loadInitiatives } from '../lib/content-loader';
+import { APPROACH_DETAILS, APPROACH_KEYS } from '../lib/catalog';
+
+const items = await loadInitiatives();
+const currentItems = items.filter((item) => item.status !== 'archived');
+const counts = APPROACH_KEYS.map((key) => ({
+  key,
+  label: APPROACH_DETAILS[key].title,
+  count: currentItems.filter((item) => item.primaryApproachType === key).length,
+})).filter((entry) => entry.count > 0);
+const maxCount = Math.max(...counts.map((entry) => entry.count), 1);
+---
+
+<Layout
+  title="About"
+  description="Purpose, maintenance, disclosures, and catalog composition for DataLicenses.org."
+>
+  <main class="wrap narrow about-page">
+    <header class="page-header about-header">
+      <h1 class="page-title-sm">About DataLicenses.org</h1>
+      <p>
+        DataLicenses.org is a public reference catalog for understanding approaches that express,
+        negotiate, or enforce conditions on data use in AI pipelines.
+      </p>
+    </header>
+
+    <section class="box section">
+      <h2>Purpose</h2>
+      <p>
+        The catalog brings licenses and license-adjacent infrastructure into one evidence-based
+        view. It covers preference signals, formal terms, licensing collectives, markets, tollgates,
+        technical controls, registries, protocols, governed sharing, and certification.
+      </p>
+      <p>
+        It serves creators, rights holders, researchers, journalists, data stewards, AI developers,
+        policymakers, and others who need a shared map of the field and its terminology.
+      </p>
+    </section>
+
+    <section class="box section">
+      <h2>Maintenance</h2>
+      <p>
+        Nick Vincent maintains the catalog and has final editorial approval. Public profiles are
+        reviewed on a rolling basis, with current records scheduled for a source check at least once
+        every three months.
+      </p>
+      <p>
+        Corrections and additions are handled in the public
+        <a href="https://github.com/nickmvincent/data-licenses/issues" target="_blank" rel="noopener">
+          GitHub repository
+        </a>.
+      </p>
+    </section>
+
+    <section class="box section composition-section" aria-labelledby="composition-title">
+      <div>
+        <h2 id="composition-title">Current catalog composition</h2>
+        <p>{currentItems.length} current initiatives by primary approach.</p>
+      </div>
+      <div class="composition-chart">
+        {counts.map((entry) => (
+          <div class="composition-row">
+            <span>{entry.label}</span>
+            <div class="composition-track" aria-hidden="true">
+              <span style={`width: ${(entry.count / maxCount) * 100}%`}></span>
+            </div>
+            <strong>{entry.count}</strong>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section id="disclosures" class="box section">
+      <h2>Funding and conflicts</h2>
+      <p>
+        The repository does not currently record external funding for DataLicenses.org. Paid
+        placement, sponsored rankings, and affiliate links are not accepted.
+      </p>
+      <p>
+        Contributors must disclose material financial, employment, advisory, or organizational ties
+        to an initiative they propose or edit. Any material support for the site or maintainer will be
+        disclosed on this page.
+      </p>
+    </section>
+
+    <section class="box section">
+      <h2>Limits and disclaimer</h2>
+      <p>
+        The site reports public claims and sources. Inclusion is not endorsement, legal advice,
+        procurement advice, or proof of effectiveness. Laws, rights, contracts, and technical
+        behavior vary by jurisdiction and implementation.
+      </p>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .about-page,
+  .about-header {
+    display: grid;
+    gap: 16px;
+  }
+
+  .about-header p,
+  .composition-section > div:first-child p {
+    max-width: 690px;
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .section p:last-child {
+    margin-bottom: 0;
+  }
+
+  .composition-section {
+    display: grid;
+    gap: 20px;
+  }
+
+  .composition-chart {
+    display: grid;
+    gap: 10px;
+  }
+
+  .composition-row {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.8fr) minmax(140px, 1.4fr) 2rem;
+    gap: 12px;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  .composition-track {
+    height: 10px;
+    background: var(--surface-muted);
+  }
+
+  .composition-track span {
+    display: block;
+    height: 100%;
+    min-width: 4px;
+    background: var(--accent);
+  }
+
+  .composition-row strong {
+    text-align: right;
+  }
+
+  @media (max-width: 560px) {
+    .composition-row {
+      grid-template-columns: minmax(120px, 1fr) 2rem;
+    }
+
+    .composition-track {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+</style>

@@ -72,18 +72,10 @@ const guideBodyHtml = rendered.code.replace(/<h([23])([^>]*)>(.*?)<\/h\1>/g, (_m
         >
           Open a PR
         </a>
-        <a
-          class="btn btn-quiet"
-          href="https://nickmvincent.com"
-          target="_blank"
-          rel="noopener"
-        >
-          Contact
-        </a>
       </div>
     </header>
 
-    <article class="methodology-body memo box section" set:html={guideBodyHtml}></article>
+    <article class="methodology-body guide-content box section" set:html={guideBodyHtml}></article>
   </main>
 </Layout>
 

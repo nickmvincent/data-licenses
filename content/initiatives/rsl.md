@@ -9,6 +9,10 @@ actionsSupported:
   - attach-formal-license
   - attach-preference-signal
 primaryApproachType: attach-formal-license
+pipelineStages:
+  - collect
+  - train
+  - retrieve
 dataTypes:
   - web-content
 usersCount: '1,500+ endorsing organizations'
@@ -71,3 +75,5 @@ type: data_license_initiative
 ---
 
 RSL provides a structured way to express licensing terms in machine-readable form for clients that choose to support it. The standard combines rights expression, implementation guidance, and ecosystem backing from publishers and infrastructure providers.
+
+Really Simple Licensing (RSL) sets out formal reuse terms for web content across the collection, training, and retrieval stages. It also incorporates preference signaling. The terms can state permissions and restrictions, but their legal effect depends on applicable law, ownership, notice, and agreement formation. Public materials describe a currently available initiative; the newest dated source in this profile is “Technical standards released” (December 10, 2025). These details describe the published mechanism and evidence, not a finding about legal validity, adoption, or effectiveness.
