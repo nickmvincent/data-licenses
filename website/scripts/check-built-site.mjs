@@ -73,6 +73,7 @@ const htmlByFile = new Map(
 for (const requiredPath of [
   '/',
   '/about',
+  '/404.html',
   '/archive',
   '/contributing',
   '/data',
@@ -160,6 +161,10 @@ for (const record of nonPublicRecords) {
 }
 
 const homepage = await readFile(join(dist, 'index.html'), 'utf8');
+const notFound = await readFile(join(dist, '404.html'), 'utf8');
+if (!/<meta name="robots" content="noindex, follow"\s*\/?>/.test(notFound)) {
+  fail('404 page is missing noindex');
+}
 for (const record of currentRecords) {
   if (!homepage.includes(`/initiatives/${record.slug}`)) {
     fail(`current initiative is missing from server-rendered homepage catalog: ${record.slug}`);

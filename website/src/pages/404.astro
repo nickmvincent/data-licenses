@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Page not found"
+  description="The requested page could not be found on DataLicenses.org."
+  noindex={true}
+>
+  <main class="wrap narrow not-found-page">
+    <section class="box not-found-panel" aria-labelledby="not-found-title">
+      <p class="error-code">404</p>
+      <h1 id="not-found-title" class="page-title-sm">Page not found</h1>
+      <p>
+        We couldn’t find that page. The address may be incorrect, or the page may have moved.
+      </p>
+      <div class="not-found-actions">
+        <a class="btn btn-primary" href="/">Browse the catalog</a>
+        <a class="btn btn-quiet" href="/methodology">Read the methodology</a>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .not-found-page {
+    display: grid;
+    min-height: 58vh;
+    align-items: center;
+  }
+
+  .not-found-panel {
+    padding: clamp(28px, 6vw, 56px);
+  }
+
+  .error-code {
+    margin: 0 0 12px;
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .not-found-panel > p:not(.error-code) {
+    max-width: 590px;
+    margin: 16px 0 0;
+    color: var(--muted);
+  }
+
+  .not-found-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+</style>
