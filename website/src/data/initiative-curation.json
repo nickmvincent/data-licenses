@@ -71,6 +71,10 @@
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Member count is now recorded as a conservative announced total across official alliance announcements."
   },
+  "databazaar": {
+    "adoptionResearchStatus": "needs-research",
+    "adoptionResearchNotes": "Reviewed operator terms and public MCP documentation on October 10, 2026. No public user, transaction, or licensed-data volume figure was established by these sources."
+  },
   "dataseeds-ai": {
     "adoptionResearchStatus": "populated",
     "adoptionResearchNotes": "Company-issued releases support a conservative image-corpus metric for the rights-cleared marketplace."
